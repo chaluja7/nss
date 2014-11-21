@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="/WEB-INF/templates/default.xhtml">
+
+    <ui:define name="pageTitle">
+        <h3>Seznam stanic <h:outputLink value="station-new.xhtml">+</h:outputLink></h3>
+    </ui:define>
+    <ui:define name="content">
+
+        <h:dataTable value="#{stationBB.stations}" var="s">
+            <h:column>
+                <f:facet name="header">Popisek</f:facet>
+                #{s.title}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Celé jméno</f:facet>
+                #{s.name}
+            </h:column>
+        </h:dataTable>
+
+    </ui:define>
+</ui:composition>
