@@ -2,7 +2,11 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
-                template="/WEB-INF/templates/default.xhtml">
+                template="/WEB-INF/templates/admin.xhtml">
+
+    <ui:define name="errors">
+
+    </ui:define>
 
     <ui:define name="pageTitle">
         <h3>Přidání nové stanice</h3>
@@ -10,20 +14,27 @@
     <ui:define name="content">
 
         <h:form>
-            <label for="name">Popisek:</label>
-            <h:inputText value="#{stationBB.station.title}" id="title" /><br/>
+            <div class="inputRow">
+                <label for="title">Popisek:</label>
+                <h:inputText value="#{stationBB.station.title}" id="title" label="Popisek" /><br/>
+            </div>
 
-            <label for="name">Celé jméno:</label>
-            <h:inputText value="#{stationBB.station.name}" id="name" /><br/>
+            <div class="inputRow">
+                <label for="name">Jméno:</label>
+                <h:inputText value="#{stationBB.station.name}" id="name" label="Jméno" /><br/>
+            </div>
 
-            <label for="name">Lat:</label>
-            <h:inputText value="#{stationBB.station.latitude}" id="lat" /><br/>
+            <div class="inputRow">
+                <label for="lat">Lat:</label>
+                <h:inputText value="#{stationBB.station.latitude}" id="lat" label="Latitude" /><br/>
+            </div>
 
-            <label for="name">Lon:</label>
-            <h:inputText value="#{stationBB.station.longtitude}" id="lon" /><br/>
+            <div class="inputRow">
+                <label for="lon">Lon:</label>
+                <h:inputText value="#{stationBB.station.longtitude}" id="lon" label="Longtitude" /><br/>
+            </div>
 
             <h:commandButton value="Vytvořit" action="#{stationBB.saveStation}"/><br/>
-            <h:messages showDetail="true"/>
 
         </h:form>
 

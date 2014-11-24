@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="/WEB-INF/templates/default.xhtml">
+
+    <ui:define name="errors">
+        <h:panelGroup layout="block" class="error" rendered="#{param['error'] != null}">
+            Zadali jste špatné přihlašovací údaje. Zkuste to prosím znovu.
+        </h:panelGroup>
+    </ui:define>
+    <ui:define name="pageTitle">
+        <h1>Welcome to NSS! :)</h1>
+    </ui:define>
+    <ui:define name="content">
+        <h:panelGroup>Přihlášení do administrace</h:panelGroup>
+
+        <form action="j_spring_security_check" method="post">
+            <div class="inputRow">
+                <label for="userName">Login:</label>
+                <input type="text" name="j_username" id="userName"/>
+            </div>
+            <div class="inputRow">
+                <label for="password">Heslo:</label>
+                <input type="password" name="j_password" id="password" />
+            </div>
+
+            <input type="submit" name="submit" value="Přihlásit" />
+
+        </form>
+
+    </ui:define>
+</ui:composition>

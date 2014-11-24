@@ -6,19 +6,27 @@
 <h:head>
     <title>NSS</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link type="text/css" rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css" />
     <h:outputStylesheet name="css/styles.css" />
+
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+    <ui:insert name="scripts"></ui:insert>
 </h:head>
 
 <h:body>
     <div id="container">
         <div id="mainMenu">
             <ul>
-                <li><h:link value="Domů" outcome="/index.xhtml" /></li>
-                <li><h:link value="Administrace" outcome="/login.xhtml" /></li>
+                <li><h:link value="Domů" outcome="/admin/index.xhtml" /></li>
+                <li><h:link value="Seznam stanic" outcome="/admin/station-list.xhtml" /></li>
+                <li><a href="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">Odhlásit</a></li>
             </ul>
         </div>
         <div id="content">
+            <h:messages styleClass="errorJsf" />
             <ui:insert name="errors">
+
             </ui:insert>
             <ui:insert name="pageTitle">
                 [Page title will be inserted here]

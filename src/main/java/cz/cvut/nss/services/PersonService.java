@@ -43,4 +43,12 @@ public interface PersonService {
      */
     public List<Person> getAll();
 
+
+    /**
+     * find person by username
+     * @param username username of person
+     * @return person with given username
+     */
+    public Person getPersonByUsername(String username);
+
 }

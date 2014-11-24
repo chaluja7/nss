@@ -10,4 +10,11 @@ import cz.cvut.nss.entities.Person;
  */
 public interface PersonDao extends GenericDao<Person> {
 
+    /**
+     * find person by username
+     * @param username username of person
+     * @return person with given username
+     */
+    Person getPersonByUsername(String username);
+
 }

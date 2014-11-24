@@ -50,4 +50,11 @@ public class PersonServiceImpl implements PersonService {
     public List<Person> getAll() {
         return personDao.findAll();
     }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Person getPersonByUsername(String username) {
+        return personDao.getPersonByUsername(username);
+    }
+
 }

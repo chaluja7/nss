@@ -31,3 +31,50 @@ body {
 #mainMenu ul li {
     display: inline;
 }
+
+.error {
+    border: 1px solid darkred;
+    padding: 10px;
+    background-color: lightpink;
+    color: red;
+    margin-top: 10px;
+}
+
+ul.errorJsf {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul.errorJsf li {
+    display: block;
+    border: 1px solid darkred;
+    padding: 10px;
+    background-color: lightpink;
+    color: red;
+    margin-top: 10px;
+}
+
+.inputRow {
+    padding: 5px 0 5px 0;
+}
+
+.inputRow label {
+    width: 80px;
+    display: inline-block;
+}
+
+tfoot input {
+    width: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+}
+
+#tableData {
+    width: 100%;
+    border-width: 3px;
+    background: rgb(243, 244, 248);
+}
+
+#dataTableList {
+    width: 100%;
+}
