@@ -4,9 +4,10 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * Super class for all entities.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {

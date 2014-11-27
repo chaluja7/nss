@@ -5,9 +5,10 @@ import cz.cvut.nss.entities.RouteStop;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Common interface for all RouteStopService implementations.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface RouteStopService {
 

@@ -3,9 +3,10 @@ package cz.cvut.nss.security;
 import java.security.MessageDigest;
 
 /**
- * Created by jakubchalupa on 24.11.14.
- *
  * Helper class for hash comutation.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public class HashUtils {
 

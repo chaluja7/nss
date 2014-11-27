@@ -6,9 +6,10 @@ import cz.cvut.nss.entities.Route;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * JPA implementation of RouteDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Repository
 public class JpaRouteDao extends AbstractGenericJpaDao<Route> implements RouteDao {

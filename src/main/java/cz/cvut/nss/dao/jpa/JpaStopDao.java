@@ -6,9 +6,10 @@ import cz.cvut.nss.entities.Stop;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * JPA implementation of StopDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Repository
 public class JpaStopDao extends AbstractGenericJpaDao<Stop> implements StopDao {

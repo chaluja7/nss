@@ -6,9 +6,10 @@ import cz.cvut.nss.entities.Ride;
 import org.springframework.stereotype.Repository;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * JPA implementation of RideDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Repository
 public class JpaRideDao extends AbstractGenericJpaDao<Ride> implements RideDao {

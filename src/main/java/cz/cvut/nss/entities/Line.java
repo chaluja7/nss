@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * Common transport.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Entity
 @Table(name = "lines")

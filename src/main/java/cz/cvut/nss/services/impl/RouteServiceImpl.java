@@ -11,9 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Implementation of RouteService.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Service
 public class RouteServiceImpl implements RouteService {

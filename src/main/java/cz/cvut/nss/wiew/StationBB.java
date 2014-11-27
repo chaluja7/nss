@@ -2,33 +2,50 @@ package cz.cvut.nss.wiew;
 
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.services.StationService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
 
-import java.util.List;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
 
 /**
- * Created by jakubchalupa on 21.11.14.
- *
  * Backing bean for station.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
-@Controller
-@Scope(value = "request")
+@ManagedBean
+@ViewScoped
 public class StationBB {
+
+    private Long id;
 
     private Station station = new Station();
 
-    @Autowired
+    @ManagedProperty(value = "#{stationServiceImpl}")
     private StationService stationService;
+
+    public void loadStation() {
+        if(id != null) {
+            station = stationService.getStation(id);
+        }
+    }
 
     public String saveStation() {
         stationService.createStation(station);
-        return "station-list";
+        return "station-list?faces-redirect=true";
     }
 
-    public List<Station> getStations() {
-        return stationService.getAll();
+    public String updateStation() {
+        stationService.updateStation(station);
+        return "station-list?faces-redirect=true";
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Station getStation() {
@@ -37,6 +54,10 @@ public class StationBB {
 
     public void setStation(Station station) {
         this.station = station;
+    }
+
+    public void setStationService(StationService stationService) {
+        this.stationService = stationService;
     }
 
 }

@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 24.11.14.
- *
  * Authentication provider to enable spring security.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public class AuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 

@@ -5,9 +5,10 @@ import cz.cvut.nss.entities.AbstractEntity;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Common interface for all Dao implementation.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface GenericDao<T extends AbstractEntity> {
 

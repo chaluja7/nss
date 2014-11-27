@@ -4,9 +4,10 @@ import cz.cvut.nss.dao.generics.GenericDao;
 import cz.cvut.nss.entities.Route;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Interface for all implementations of RouteDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface RouteDao extends GenericDao<Route> {
 

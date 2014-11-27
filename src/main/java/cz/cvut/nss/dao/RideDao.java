@@ -4,9 +4,10 @@ import cz.cvut.nss.dao.generics.GenericDao;
 import cz.cvut.nss.entities.Ride;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Interface for all implementations of RideDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface RideDao extends GenericDao<Ride> {
 

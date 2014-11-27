@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 24.11.14.
- *
  * Controller for station resource.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @RestController
 public class StationController {

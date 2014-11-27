@@ -5,9 +5,10 @@ import org.hibernate.annotations.Index;
 import javax.persistence.*;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * One stop on Route.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Entity
 @Table(name = "route_stops")

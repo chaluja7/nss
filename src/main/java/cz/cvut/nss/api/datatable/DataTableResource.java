@@ -5,9 +5,10 @@ import cz.cvut.nss.entities.AbstractEntity;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 24.11.14.
+ *  Generic resource for data table purpose. It just wraps data to aa container.
  *
- * Generic resource for data table purpose. It just wraps data to aa container.
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public class DataTableResource<T extends AbstractEntity> {
 

@@ -7,9 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * System user (admin).
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Entity
 @Table(name = "persons")

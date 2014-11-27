@@ -8,9 +8,10 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * Station.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Entity
 @Table(name = "stations")

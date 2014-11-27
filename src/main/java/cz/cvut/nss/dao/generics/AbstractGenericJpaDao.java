@@ -9,9 +9,10 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Abstract JPA generic dao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public abstract class AbstractGenericJpaDao<T extends AbstractEntity> implements GenericDao<T> {
 

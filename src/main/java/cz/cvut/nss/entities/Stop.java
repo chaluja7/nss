@@ -7,9 +7,10 @@ import org.joda.time.LocalDateTime;
 import javax.persistence.*;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
  * One stop of a ride.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Entity
 @Table(name = "stops")

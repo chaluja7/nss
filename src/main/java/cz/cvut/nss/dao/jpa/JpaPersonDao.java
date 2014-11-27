@@ -8,9 +8,10 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.TypedQuery;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * JPA implementation of PersonDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 @Repository
 public class JpaPersonDao extends AbstractGenericJpaDao<Person> implements PersonDao {

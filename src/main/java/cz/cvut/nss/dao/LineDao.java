@@ -4,9 +4,10 @@ import cz.cvut.nss.dao.generics.GenericDao;
 import cz.cvut.nss.entities.Line;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Interface for all implementations of LineDao.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface LineDao extends GenericDao<Line> {
 

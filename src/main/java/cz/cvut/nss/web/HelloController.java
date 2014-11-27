@@ -5,6 +5,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * @author jakubchalupa
+ * @since 24.11.14.
+ */
 @Controller
 @RequestMapping("/")
 public class HelloController {

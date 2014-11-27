@@ -5,9 +5,10 @@ import cz.cvut.nss.entities.Stop;
 import java.util.List;
 
 /**
- * Created by jakubchalupa on 20.11.14.
- *
  * Common interface for all StopService implementations.
+ *
+ * @author jakubchalupa
+ * @since 24.11.14.
  */
 public interface StopService {
 
