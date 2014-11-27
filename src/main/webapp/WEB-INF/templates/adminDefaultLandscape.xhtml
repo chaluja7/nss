@@ -2,10 +2,14 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
-                template="/WEB-INF/templates/common.xhtml">
+                template="/WEB-INF/templates/adminCommon.xhtml">
+
+    <ui:define name="scripts">
+        <ui:insert name="scripts" />
+    </ui:define>
 
     <ui:define name="mainContent">
-        <div id="innerContent">
+        <div id="innerContentLandscape">
             <h:panelGroup layout="block" class="errorBox" rendered="#{param['error'] != null}">
                 Zadali jste špatné přihlašovací údaje. Zkuste to prosím znovu.
             </h:panelGroup>

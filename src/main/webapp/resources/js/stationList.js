@@ -7,14 +7,13 @@ $(document).ready(function() {
     } );
 
     var table = $("#dataTableList").DataTable( {
-        "bProcessing": false,
-        "bServerSide": false,
-        "sort": "title",
+        "bProcessing": true,
         "sAjaxSource": "../api/stationsDataTable",
-        "aaSorting": [[ 0, "asc" ]],
+        "aaSorting": [[0, "asc"]],
         "aoColumns": [
-            { "mData": "title" },
-            { "mData": "name" }
+            {"mData": "title"},
+            {"mData": "name"},
+            {"mData": "region"}
         ],
         "oLanguage": {
             "sLengthMenu": "Zobrazit _MENU_ záznamů",
@@ -30,6 +29,18 @@ $(document).ready(function() {
                 "sLast": "Poslední"
             }
 
+        },
+        "fnDrawCallback": function() {
+            $('#dataTableList tbody tr').click(function () {
+                var recordId = table.row(this).data().id;
+                document.location.href = "station.xhtml?id=" + recordId;
+            });
+
+            $('#dataTableList tbody tr').hover(function() {
+                $(this).css('cursor', 'pointer');
+            }, function() {
+                $(this).css('cursor', 'auto');
+            });
         }
 
     });

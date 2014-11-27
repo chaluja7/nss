@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
@@ -15,30 +16,27 @@
 </h:head>
 
 <h:body>
-    <div id="container">
-        <div id="mainMenu">
+    <f:loadBundle basename="messages" var="msg"/>
+    <div id="topBar">
+        <h1><h:link value="NSS" outcome="/admin/index.xhtml" /></h1>
+        <div id="topMenu">
             <ul>
-                <li><h:link value="Domů" outcome="/admin/index.xhtml" /></li>
                 <li><h:link value="Seznam stanic" outcome="/admin/station-list.xhtml" /></li>
                 <li><a href="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">Odhlásit</a></li>
             </ul>
         </div>
-        <div id="content">
-            <h:messages styleClass="errorJsf" />
-            <ui:insert name="errors">
+    </div>
 
-            </ui:insert>
-            <ui:insert name="pageTitle">
-                [Page title will be inserted here]
-            </ui:insert>
-            <ui:insert name="content">
-                [Template content will be inserted here]
-            </ui:insert>
-        </div>
+    <div id="content">
 
-        <div id="footer">
-            <p>NSS Bachelor project, Copyright Jakub Chalupa CTU in Prague, chaluja7@fel.cvut.cz</p>
-        </div>
+        <ui:insert name="mainContent">
+            [Template content will be inserted here]
+        </ui:insert>
+
+    </div>
+
+    <div id="footer">
+        <p>Jakub Chalupa | ČVUT v Praze 2014, chaluja7@fel.cvut.cz</p>
     </div>
 </h:body>
 </html>

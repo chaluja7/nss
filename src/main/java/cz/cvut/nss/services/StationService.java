@@ -20,6 +20,13 @@ public interface StationService {
     public Station getStation(long id);
 
     /**
+     * find station by id with pre-loaded lazy initialization
+     * @param id id of a station
+     * @return station by id or null
+     */
+    public Station getStationLazyInitialized(long id);
+
+    /**
      * update station
      * @param station station to update
      * @return updated station

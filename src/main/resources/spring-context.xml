@@ -12,6 +12,8 @@
 
     <context:property-placeholder location="classpath:nss.properties" />
 
+    <context:annotation-config />
+
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basename" value="messages" />
         <property name="cacheSeconds" value="0" />

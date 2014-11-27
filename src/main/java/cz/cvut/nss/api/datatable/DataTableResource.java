@@ -1,7 +1,5 @@
 package cz.cvut.nss.api.datatable;
 
-import cz.cvut.nss.entities.AbstractEntity;
-
 import java.util.List;
 
 /**
@@ -10,7 +8,7 @@ import java.util.List;
  * @author jakubchalupa
  * @since 24.11.14.
  */
-public class DataTableResource<T extends AbstractEntity> {
+public class DataTableResource<T> {
 
     private List<T> aaData;
 

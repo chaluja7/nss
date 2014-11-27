@@ -3,43 +3,31 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                template="/WEB-INF/templates/admin.xhtml">
+                xmlns:nss="http://cz.cvut.eos/facelets"
+                template="/WEB-INF/templates/adminDefault.xhtml">
 
     <f:metadata>
         <f:viewParam name="id" value="#{stationBB.id}"/>
         <f:event type="preRenderView" listener="#{stationBB.loadStation}"/>
     </f:metadata>
 
-    <ui:define name="errors">
+    <ui:define name="innerContent">
 
-    </ui:define>
-
-    <ui:define name="pageTitle">
-        <h3><h:outputText value="Přidání nové stanice" rendered="#{stationBB.id == null}" /></h3>
-        <h3><h:outputText value="Editace stanice" rendered="#{stationBB.id != null}" /></h3>
-    </ui:define>
-    <ui:define name="content">
+        <h:messages styleClass="errorJsf"/>
+        <h2><h:outputText value="Přidání nové stanice" rendered="#{stationBB.id == null}" /></h2>
+        <h2><h:outputText value="Editace stanice" rendered="#{stationBB.id != null}" /></h2>
 
         <h:form>
-            <div class="inputRow">
-                <label for="title">Popisek:</label>
-                <h:inputText value="#{stationBB.station.title}" id="title" label="Popisek" />
-            </div>
+            <nss:inputText value="#{stationBB.station.title}" title="title" label="#{msg['stations.title']}" />
 
-            <div class="inputRow">
-                <label for="name">Jméno:</label>
-                <h:inputText value="#{stationBB.station.name}" id="name" label="Jméno" />
-            </div>
+            <nss:inputText value="#{stationBB.station.name}" title="name" label="#{msg['stations.name']}" />
 
-            <div class="inputRow">
-                <label for="lat">Lat:</label>
-                <h:inputText value="#{stationBB.station.latitude}" id="lat" label="Latitude" />
-            </div>
+            <nss:inputText value="#{stationBB.station.latitude}" title="lat" label="#{msg['stations.latitude']}" />
 
-            <div class="inputRow">
-                <label for="lon">Lon:</label>
-                <h:inputText value="#{stationBB.station.longtitude}" id="lon" label="Longtitude" />
-            </div>
+            <nss:inputText value="#{stationBB.station.longtitude}" title="lon" label="#{msg['stations.longtitude']}" />
+
+            <nss:selectOne value="#{stationBB.station.region}" items="#{stationBB.allRegions}" title="region"
+                    label="#{msg['stations.region']}" converter="#{regionConverter}"/>
 
             <h:commandButton value="Vytvořit" action="#{stationBB.saveStation}" rendered="#{stationBB.id == null}"/>
             <h:commandButton value="Uložit" action="#{stationBB.updateStation}" rendered="#{stationBB.id != null}"/>

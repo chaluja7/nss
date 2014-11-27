@@ -1,13 +1,16 @@
 package cz.cvut.nss.api;
 
 import cz.cvut.nss.api.datatable.DataTableResource;
+import cz.cvut.nss.api.datatable.resource.StationResource;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.services.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,13 +26,35 @@ public class StationController {
     protected StationService stationService;
 
     @RequestMapping(value ="/stations", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public List<Station> getStations() {
-        return stationService.getAll();
+    @Transactional
+    public List<StationResource> getStations() {
+        return getAllTransformedStations();
     }
 
     @RequestMapping(value ="/stationsDataTable", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
-    public DataTableResource<Station> getStationsForDataTable() {
-        return new DataTableResource<>(stationService.getAll());
+    @Transactional
+    public DataTableResource<StationResource> getStationsForDataTable() {
+        return new DataTableResource<>(getAllTransformedStations());
+    }
+
+    /**
+     * ztransformuje station entity na station resourcy
+     *
+     * @return list station resourcu
+     */
+    private List<StationResource> getAllTransformedStations() {
+        List<StationResource> resourceList = new ArrayList<>();
+        for(Station station : stationService.getAll()) {
+            StationResource resource = new StationResource();
+            resource.setId(station.getId());
+            resource.setTitle(station.getTitle());
+            resource.setName(station.getName());
+            resource.setRegion(station.getRegion().getName());
+
+            resourceList.add(resource);
+        }
+
+        return resourceList;
     }
 
 }

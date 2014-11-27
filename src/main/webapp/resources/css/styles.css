@@ -1,17 +1,22 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #EAECEE;
     font-family: Verdana, sans-serif;
-    font-size: 0.9em;
+    background-color: #404040;
+    color: #ffffff;
 }
 
-#container {
-    margin: 0 auto;
-    padding: 10px 20px 10px 20px;
-    border: 1px solid #666666;
-    width: 1000px;
-    margin-top: 15px;
+body a {
+    color: #ffffff;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #ffffff;
+}
+
+#content {
+    margin-top: 65px;
+    position: relative;
 }
 
 #footer {
@@ -22,17 +27,75 @@ body {
     padding: 3em 0 0 0;
 }
 
-#mainMenu ul {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
+#topBar {
+    position: fixed;
+    top: 0px;
+    box-sizing: border-box;
+    height: 60px;
+    padding: 10px;
+    width: 100%;
+    background-color: #1abc6e;
+    box-shadow: black 0px 4px 15px;
+    -webkit-box-shadow: black 0px 4px 15px;
+    -moz-box-shadow: black 0px 4px 15px;
+    margin-bottom: 5px;
+    z-index: 99;
 }
 
-#mainMenu ul li {
+#topBar a {
+    display: inline-block;
+    text-decoration: none;
+}
+
+#topBar h1 {
+    padding: 0;
+    margin: 0;
+    font-weight: normal;
+    display: inline-block;
+}
+
+#topMenu {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+#topMenu ul {
+    display: inline-block;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#topMenu li {
     display: inline;
 }
 
-.error {
+#topMenu a {
+    padding-right: 10px;
+}
+
+#topMenu a:hover {
+    font-weight: bold;
+}
+
+#content {
+    margin-top: 65px;
+    position: relative;
+}
+
+#innerContent {
+    width: 1000px;
+    margin: 0px auto;
+    padding-top: 10px;
+}
+
+#innerContentLandscape {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.errorBox {
     border: 1px solid darkred;
     padding: 10px;
     background-color: lightpink;
@@ -70,11 +133,77 @@ tfoot input {
 }
 
 #tableData {
+    color: #000000;
+    padding: 10px;
     width: 100%;
     border-width: 3px;
     background: rgb(243, 244, 248);
+    box-shadow: black 0px 15px 15px;
+    -webkit-box-shadow: black 0px 15px 15px;
+    -moz-box-shadow: black 0px 15px 15px;
+}
+
+#tableData a {
+    color: #000000;
 }
 
 #dataTableList {
     width: 100%;
+}
+
+.inputRow {
+    padding: 10px 0 10px 0;
+}
+
+.inputRow * {
+    vertical-align: middle;
+}
+
+.inputRowHint {
+    font-size: 8px;
+}
+
+.inputRowHelp {
+    font-size: 10px;
+}
+
+.inputRow input[type="text"],.inputRow input[type="file"],.inputRow input[type="password"],.inputRow select,.inputRow textarea {
+    width: 400px;
+    padding: 0;
+}
+
+.inputRow input[type="text"], .inputRow input[type="password"] {
+    height: 25px;
+}
+
+.inputRow select {
+    height: 25px;
+    line-height: 25px;
+    background: #f4f4f4;
+    font-size: 14px;
+}
+
+.inputRow textarea {
+    height: 80px;
+}
+
+.inputRow label {
+    display: inline-block;
+    width: 150px;
+}
+
+input[type="submit"] {
+    background-color: #1abc6e;
+    border-radius: 5px;
+    width: 100%;
+    height: 50px;
+    font-size: 20px;
+    color: white;
+    border: 0;
+    width: 555px;
+    margin-top: 10px;
+}
+
+a.simpleLink {
+    text-decoration: none;
 }
