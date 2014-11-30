@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:nss="http://cz.cvut.eos/facelets"
+                template="/WEB-INF/templates/adminDefault.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{lineBB.id}"/>
+        <f:event type="preRenderView" listener="#{lineBB.loadLine}"/>
+    </f:metadata>
+
+    <ui:define name="innerContent">
+
+        <h:messages styleClass="errorJsf"/>
+        <h2><h:outputText value="Přidání nového spoje" rendered="#{lineBB.id == null}" /></h2>
+        <h2><h:outputText value="Editace spoje" rendered="#{lineBB.id != null}" /></h2>
+
+        <h:form>
+            <nss:inputText value="#{lineBB.line.name}" title="name" label="#{msg['lines.name']}" />
+
+            <nss:selectOne value="#{lineBB.line.route}" items="#{lineBB.allRoutes}" title="route"
+                    label="#{msg['lines.route']}" converter="#{routeConverter}"/>
+
+            <nss:selectOne value="#{lineBB.line.lineType}" items="#{lineBB.allLineTypes}" title="type"
+                           label="#{msg['lines.type']}" converter="#{lineTypeConverter}" />
+
+            <h:commandButton value="Vytvořit" action="#{lineBB.saveLine}" rendered="#{lineBB.id == null}" styleClass="submitButton"/>
+            <h:commandButton value="Uložit" action="#{lineBB.updateLine}"  rendered="#{lineBB.id != null}" styleClass="submitButton"/>
+
+            <h:panelGroup rendered="#{lineBB.id != null}" layout="block">
+                <h:panelGroup layout="block" styleClass="dangerZone" />
+                <h:panelGroup layout="block" styleClass="centerBox">
+                    <h:commandButton value="Smazat spoj" action="#{lineBB.deleteLine}" styleClass="deleteButton"
+                                     onclick="return confirm('Opravdu chcete tuto akci provést? ' +
+                                      'Smazáním spoje odstraníte i příslušné jízdy tohoto spoje.')"/>
+                </h:panelGroup>
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

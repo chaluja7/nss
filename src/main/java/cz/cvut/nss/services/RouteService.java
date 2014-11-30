@@ -20,6 +20,13 @@ public interface RouteService {
     public Route getRoute(long id);
 
     /**
+     * find route by id with pre-loaded lazy initialization
+     * @param id id of a route
+     * @return route by id or null
+     */
+    public Route getRouteLazyInitialized(long id);
+
+    /**
      * update route
      * @param route route to update
      * @return updated route

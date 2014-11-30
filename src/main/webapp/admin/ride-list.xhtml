@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="/WEB-INF/templates/adminDefaultLandscape.xhtml">
+
+    <ui:define name="scripts">
+        <h:outputScript library="js" name="rideList.js" />
+    </ui:define>
+
+    <ui:define name="innerContent">
+
+        <h3>Seznam jízd <h:outputLink styleClass="simpleLink" value="ride.xhtml">+</h:outputLink></h3>
+
+        <table id="tableData"><tr><td>
+            <table id="dataTableList" class="display">
+                <thead>
+                <tr>
+                    <th>Spoj</th>
+                    <th>Datum a čas výjezdu</th>
+                    <th>Datum a čas příjezdu</th>
+                    <th>Doba jízdy</th>
+                    <th>Výchozí stanice</th>
+                    <th>Cílová stanice</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>Spoj</th>
+                    <th>Datum a čas výjezdu</th>
+                    <th>Datum a čas příjezdu</th>
+                    <th>Doba jízdy</th>
+                    <th>Výchozí stanice</th>
+                    <th>Cílová stanice</th>
+                </tr>
+                </tfoot>
+            </table>
+        </td></tr></table>
+
+    </ui:define>
+
+</ui:composition>

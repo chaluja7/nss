@@ -21,6 +21,7 @@ public class Route extends AbstractEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "route")
+    @OrderBy("distance ASC")
     private List<RouteStop> routeStops;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "route")

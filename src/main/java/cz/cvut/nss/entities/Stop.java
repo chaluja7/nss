@@ -18,18 +18,20 @@ public class Stop extends AbstractEntity {
 
     @Column
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
+    @Index(name = "stop_arrival_index")
     private LocalDateTime arrival;
 
     @Column
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentLocalDateTime")
+    @Index(name = "stop_departure_index")
     private LocalDateTime departure;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "station_id")
     @Index(name = "stop_station_index")
     private Station station;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ride_id")
     @Index(name = "stop_ride_index")
     private Ride ride;

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                template="/WEB-INF/templates/adminDefaultLandscape.xhtml">
+
+    <ui:define name="scripts">
+        <h:outputScript library="js" name="lineList.js" />
+    </ui:define>
+
+    <ui:define name="innerContent">
+
+        <h3>Seznam spojů <h:outputLink styleClass="simpleLink" value="line.xhtml">+</h:outputLink></h3>
+
+        <table id="tableData"><tr><td>
+            <table id="dataTableList" class="display">
+                <thead>
+                <tr>
+                    <th>Název</th>
+                    <th>Trasa</th>
+                    <th>Typ spoje</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>Název</th>
+                    <th>Trasa</th>
+                    <th>Typ spoje</th>
+                </tr>
+                </tfoot>
+            </table>
+        </td></tr></table>
+
+    </ui:define>
+
+</ui:composition>

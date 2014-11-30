@@ -28,7 +28,7 @@ public class Line extends AbstractEntity {
     @NotNull
     private LineType lineType;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "route_id")
     @Index(name = "line_route_index")
     private Route route;

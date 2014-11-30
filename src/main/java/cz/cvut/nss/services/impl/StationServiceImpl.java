@@ -29,17 +29,6 @@ public class StationServiceImpl implements StationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Station getStationLazyInitialized(long id) {
-        Station station =  stationDao.find(id);
-        if(station != null) {
-            station.getRegion().getId();
-        }
-
-        return station;
-    }
-
-    @Override
     @Transactional
     public Station updateStation(Station station) {
         return stationDao.update(station);

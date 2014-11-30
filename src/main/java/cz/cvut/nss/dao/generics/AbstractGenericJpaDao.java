@@ -19,7 +19,7 @@ public abstract class AbstractGenericJpaDao<T extends AbstractEntity> implements
     @PersistenceContext
     protected EntityManager em;
 
-    private final Class<T> type;
+    protected final Class<T> type;
 
     @SuppressWarnings("unchecked")
     public AbstractGenericJpaDao() {

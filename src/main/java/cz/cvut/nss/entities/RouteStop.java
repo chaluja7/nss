@@ -17,12 +17,12 @@ public class RouteStop extends AbstractEntity {
     @Column
     private Integer distance;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "station_id")
     @Index(name = "route_stop_station_index")
     private Station station;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "route_id")
     @Index(name = "route_stop_route_index")
     private Route route;

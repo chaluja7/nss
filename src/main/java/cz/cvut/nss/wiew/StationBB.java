@@ -33,7 +33,7 @@ public class StationBB {
 
     public void loadStation() {
         if(id != null) {
-            station = stationService.getStationLazyInitialized(id);
+            station = stationService.getStation(id);
         }
     }
 
@@ -44,6 +44,11 @@ public class StationBB {
 
     public String updateStation() {
         stationService.updateStation(station);
+        return "station-list?faces-redirect=true";
+    }
+
+    public String deleteStation() {
+        stationService.deleteStation(station.getId());
         return "station-list?faces-redirect=true";
     }
 

@@ -29,6 +29,17 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Route getRouteLazyInitialized(long id) {
+        Route route = routeDao.find(id);
+        if(route != null) {
+            route.getRouteStops().size();
+        }
+
+        return route;
+    }
+
+    @Override
     @Transactional
     public Route updateRoute(Route route) {
         return routeDao.update(route);

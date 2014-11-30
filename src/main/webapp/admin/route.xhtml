@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:nss="http://cz.cvut.eos/facelets"
+                template="/WEB-INF/templates/adminDefault.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{routeBB.id}"/>
+        <f:event type="preRenderView" listener="#{routeBB.loadRoute}"/>
+    </f:metadata>
+
+    <ui:define name="innerContent">
+
+        <h:messages styleClass="errorJsf"/>
+        <h2><h:outputText value="Přidání nové trasy" rendered="#{routeBB.id == null}" /></h2>
+        <h2><h:outputText value="Editace trasy" rendered="#{routeBB.id != null}" /></h2>
+
+        <h:form>
+            <nss:inputText value="#{routeBB.route.name}" title="name" label="#{msg['routes.name']}" />
+
+            <h:commandButton value="Vytvořit" action="#{routeBB.saveRoute}" rendered="#{routeBB.id == null}" styleClass="submitButton"/>
+            <h:commandButton value="Uložit" action="#{routeBB.updateRoute}" rendered="#{routeBB.id != null}" styleClass="submitButton"/>
+
+            <h:panelGroup layout="block" rendered="#{routeBB.id != null}">
+                <h3>Zastávky trasy</h3>
+                <h:dataTable value="#{routeBB.route.routeStops}" var="stop">
+                    <h:column>
+                        <f:facet name="header">Stanice</f:facet>
+                        <h:outputText value="#{stop.station.title}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Vzdálenost (km)</f:facet>
+                        #{stop.distance}
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Akce</f:facet>
+                        <h:commandButton value="X" action="#{routeBB.deleteRouteStop(stop.id)}" styleClass="deleteOneButton"
+                                onclick="return confirm('Opravdu chcete tuto akci provést?')"/>
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+
+            <h4>Přidání nové zastávky</h4>
+            <nss:selectOne value="#{routeBB.newRouteStop}" items="#{routeBB.allAvailableStations}" title="newRouteStop"
+                           label="#{msg['routes.newStation']}" converter="#{stationConverter}"/>
+
+            <nss:inputText value="#{routeBB.newRouteStopDistance}" title="Vzdálenost" label="#{msg['routes.distance']}" />
+
+            <h:commandButton value="Přidat zastávku" action="#{routeBB.addRouteStop}" styleClass="submitButton"/>
+
+
+
+            <h:panelGroup rendered="#{routeBB.id != null}" layout="block">
+                <h:panelGroup layout="block" styleClass="dangerZone" />
+                <h:panelGroup layout="block" styleClass="centerBox">
+                    <h:commandButton value="Smazat trasu" action="#{routeBB.deleteRoute}" styleClass="deleteButton"
+                                     onclick="return confirm('Opravdu chcete tuto akci provést?')"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
