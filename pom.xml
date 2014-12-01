@@ -14,7 +14,7 @@
         <spring.version>4.1.2.RELEASE</spring.version>
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
         <hibernate.version>4.2.1.Final</hibernate.version>
-        <richfaces.version>4.3.7.Final</richfaces.version>
+        <richfaces.version>4.5.0.Alpha3</richfaces.version>
 
         <!-- Logging -->
         <logback.version>1.1.2</logback.version>
@@ -27,31 +27,14 @@
         <profile>
             <id>openshift</id>
             <build>
-                <finalName>nss</finalName>
+                <finalName>travel</finalName>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-war-plugin</artifactId>
-                        <version>2.3</version>
+                        <version>2.1.1</version>
                         <configuration>
-                            <failOnMissingWebXml>false</failOnMissingWebXml>
-                            <outputDirectory>deployments</outputDirectory>
+                            <outputDirectory>webapps</outputDirectory>
                             <warName>ROOT</warName>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>1.7</source>
-                            <target>1.7</target>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <includes>
-                                <include>**/*Test.java</include>
-                            </includes>
                         </configuration>
                     </plugin>
                 </plugins>
