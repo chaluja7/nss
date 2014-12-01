@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:nss="http://cz.cvut.eos/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/WEB-INF/templates/adminDefault.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{rideBB.id}"/>
+        <f:event type="preRenderView" listener="#{rideBB.loadRide}"/>
+    </f:metadata>
+
+    <ui:define name="innerContent">
+
+        <h:messages styleClass="errorJsf"/>
+        <h2><h:outputText value="Přidání nové jízdy" rendered="#{rideBB.id == null}" /></h2>
+        <h2><h:outputText value="Editace jízdy" rendered="#{rideBB.id != null}" /></h2>
+
+        <h:form>
+
+            <nss:selectOne value="#{rideBB.ride.line}" items="#{rideBB.allLines}" title="line"
+                    label="#{msg['rides.line']}" converter="#{lineConverter}"/>
+
+
+            <h:commandButton value="Vytvořit" action="#{rideBB.saveRide}" rendered="#{rideBB.id == null}" styleClass="submitButton"/>
+            <h:commandButton value="Uložit" action="#{rideBB.updateRide}"  rendered="#{rideBB.id != null}" styleClass="submitButton"/>
+
+            <h:panelGroup layout="block" rendered="#{rideBB.id != null}">
+                <h3>Zastavení jízdy</h3>
+                <h:dataTable value="#{rideBB.ride.stops}" var="stop">
+                    <h:column>
+                        <f:facet name="header">Stanice</f:facet>
+                        <h:outputText value="#{stop.station.title}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Příjezd</f:facet>
+                        <rich:calendar id="arrival" value="#{stop.arrival}" datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
+                                enableManualInput="true">
+                            <f:converter binding="#{localDateTimeConverter}" />
+                        </rich:calendar>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Výjezd</f:facet>
+                        <rich:calendar id="departure" value="#{stop.departure}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
+                                enableManualInput="true">
+                            <f:converter binding="#{localDateTimeConverter}" />
+                        </rich:calendar>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Akce</f:facet>
+                        <h:commandButton value="X" action="#{rideBB.deleteStop(stop.id)}" styleClass="deleteOneButton"
+                                         onclick="return confirm('Opravdu chcete tuto akci provést?')"/>
+                    </h:column>
+                </h:dataTable>
+            </h:panelGroup>
+
+            <h4>Přidání nového zastavení jízdy</h4>
+            <nss:selectOne value="#{rideBB.newRideStop}" items="#{rideBB.allAvailableStations}" title="newStop"
+                           label="#{msg['rides.newStop']}" converter="#{stationConverter}"/>
+
+            <h:panelGroup layout="block" styleClass="inputRow">
+                <label for="newArrival">Příjezd:</label>
+                <rich:calendar id="newArrival" value="#{rideBB.newStopArrival}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
+                       enableManualInput="true">
+                    <f:converter binding="#{localDateTimeConverter}" />
+                </rich:calendar>
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" styleClass="inputRow">
+                <label for="newDeparture">Výjezd:</label>
+                <rich:calendar id="newDeparture" value="#{rideBB.newStopDeparture}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
+                        enableManualInput="true">
+                    <f:converter binding="#{localDateTimeConverter}" />
+                </rich:calendar>
+            </h:panelGroup>
+
+            <h:commandButton value="Přidat zastavení" action="#{rideBB.addStop}" styleClass="submitButton"/>
+
+            <h:panelGroup rendered="#{rideBB.id != null}" layout="block">
+                <h:panelGroup layout="block" styleClass="dangerZone" />
+                <h:panelGroup layout="block" styleClass="centerBox">
+                    <h:commandButton value="Smazat spoj" action="#{rideBB.deleteRide}" styleClass="deleteButton"
+                                     onclick="return confirm('Opravdu chcete tuto akci provést?')"/>
+                </h:panelGroup>
+            </h:panelGroup>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>

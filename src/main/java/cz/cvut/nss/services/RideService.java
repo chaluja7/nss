@@ -20,6 +20,13 @@ public interface RideService {
     public Ride getRide(long id);
 
     /**
+     * find ride by id with pre-loaded lazy initialization
+     * @param id id of a ride
+     * @return ride by id or null
+     */
+    public Ride getRideLazyInitialized(long id);
+
+    /**
      * update ride
      * @param ride ride to update
      * @return updated ride

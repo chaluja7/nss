@@ -1016,3 +1016,5 @@ INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (84, 10, '2014
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (84, 9, '2014-12-12 06:19:00', '2014-12-12 06:21:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (84, 2, '2014-12-12 06:35:00', '2014-12-12 06:37:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (84, 1, '2014-12-12 08:56:00', null);
+
+ALTER SEQUENCE rides_id_seq RESTART WITH 85;

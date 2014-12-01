@@ -29,6 +29,17 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Ride getRideLazyInitialized(long id) {
+        Ride ride = rideDao.find(id);
+        if(ride != null) {
+            ride.getStops().size();
+        }
+
+        return ride;
+    }
+
+    @Override
     @Transactional
     public Ride updateRide(Ride ride) {
         return rideDao.update(ride);

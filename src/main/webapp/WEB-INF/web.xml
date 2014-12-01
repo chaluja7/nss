@@ -59,6 +59,11 @@
         <param-value>/WEB-INF/nss.taglib.xml</param-value>
     </context-param>
 
+    <context-param>
+        <param-name>org.richfaces.enableControlSkinning</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
     <listener>
         <description>Nahodi Spring context po startu serveru</description>
         <listener-class>
@@ -71,7 +76,6 @@
             org.springframework.web.context.request.RequestContextListener
         </listener-class>
     </listener>
-
 
     <session-config>
         <session-timeout>
