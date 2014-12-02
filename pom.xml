@@ -269,7 +269,7 @@
     </dependencies>
 
     <build>
-        <finalName>NSS</finalName>
+        <finalName>NSSP</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
