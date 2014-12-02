@@ -15,7 +15,7 @@ import javax.faces.convert.Converter;
  * @author jakubchalupa
  * @since 27.11.14
  */
-@Component
+@Component("lineConverter")
 public class LineConverter implements Converter {
 
     @Autowired
