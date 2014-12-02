@@ -12,7 +12,7 @@
 
     <context:annotation-config />
 
-    <context:property-placeholder location="classpath:nssLocal.properties" />
+    <context:property-placeholder location="classpath:nss.properties" />
 
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
         <property name="basename" value="messages" />
