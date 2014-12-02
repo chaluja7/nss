@@ -22,7 +22,6 @@
         <com.sun.faces.version>2.2.8</com.sun.faces.version>
 
     </properties>
-
     <profiles>
         <profile>
             <id>openshift</id>
