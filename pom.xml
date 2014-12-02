@@ -19,7 +19,7 @@
         <!-- Logging -->
         <logback.version>1.1.2</logback.version>
         <slf4j.version>1.7.7</slf4j.version>
-        <com.sun.faces.version>2.2.6</com.sun.faces.version>
+        <com.sun.faces.version>2.2.8</com.sun.faces.version>
 
     </properties>
 
@@ -244,16 +244,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.richfaces.ui</groupId>
-            <artifactId>richfaces-components-ui</artifactId>
-            <version>${richfaces.version}</version>
+            <groupId>org.richfaces</groupId>
+            <artifactId>richfaces-core</artifactId>
+            <version>4.5.0.Final</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.richfaces.core</groupId>
-            <artifactId>richfaces-core-impl</artifactId>
-            <version>${richfaces.version}</version>
-        </dependency>
 
         <!-- XML JSON parser -->
         <dependency>
