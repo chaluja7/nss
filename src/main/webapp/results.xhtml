@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                template="/WEB-INF/templates/default.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="from" value="#{searchResultBB.stationFromTitle}"/>
+        <f:viewParam name="to" value="#{searchResultBB.stationToTitle}"/>
+        <f:viewParam name="date" value="#{searchResultBB.departureDate}"/>
+        <f:viewParam name="time" value="#{searchResultBB.departureTime}"/>
+
+        <f:event type="preRenderView" listener="#{searchResultBB.performSearch}"/>
+    </f:metadata>
+
+    <ui:define name="innerContent">
+
+        <h:panelGroup layout="block" styleClass="errorBox" rendered="#{searchResultBB.errorInputs}">
+            Zadali jste neplatné údaje pro vyhledání spojů. Vraťte se prosím zpět a zkuste to znovu.
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{!searchResultBB.errorInputs}">
+
+            <h3><h:outputText value="#{searchResultBB.stationFromTitle} --> #{searchResultBB.stationToTitle}" /></h3>
+            <h4><h:outputText value="#{searchResultBB.departureDate} #{searchResultBB.departureTime}"/></h4>
+            <h:link value="Nové zadání" outcome="/index.xhtml" />
+
+            <h:panelGroup layout="block" styleClass="errorBox" rendered="#{fn:length(searchResultBB.foundResults) == 0}">
+                Pro zadané hledání bohužel nebyly nalezeny žádné spoje.
+            </h:panelGroup>
+
+            <ui:repeat value="#{searchResultBB.foundResults}" var="rideWrapper">
+                <h:panelGroup styleClass="searchResultTableWrapper" layout="block">
+                    <h:dataTable value="#{rideWrapper.stops}" var="stop">
+                        <h:column>
+                            <f:facet name="header">Datum</f:facet>
+                            <h:outputText value="#{stop.arrival != null ? stop.arrival.toString('dd.MM.yyyy') : stop.departure.toString('dd.MM.yyyy')}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Stanice</f:facet>
+                            <h:outputText value="#{stop.station.title}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Příjezd</f:facet>
+                            <h:outputText value="#{stop.arrival.toString('HH:mm')}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Výjezd</f:facet>
+                            <h:outputText value="#{stop.departure.toString('HH:mm')}" />
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Spoj</f:facet>
+                            <h:outputText value="#{stop.ride.line.name}" />
+                        </h:column>
+                    </h:dataTable>
+
+                    <h:panelGroup layout="block" styleClass="searchResultTime">
+                        <h:outputText value="Doba jízdy: "/>
+                        <strong><h:outputText value="#{rideWrapper.travelTime}" /></strong>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </ui:repeat>
+
+        </h:panelGroup>
+
+    </ui:define>
+</ui:composition>

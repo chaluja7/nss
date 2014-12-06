@@ -45,6 +45,9 @@ public class Station extends AbstractEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "station")
     private List<RouteStop> routeStops;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "station")
+    private List<Stop> stops;
+
     public String getTitle() {
         return title;
     }
@@ -95,5 +98,17 @@ public class Station extends AbstractEntity {
 
     public void setRouteStops(List<RouteStop> routeStops) {
         this.routeStops = routeStops;
+    }
+
+    public List<Stop> getStops() {
+        if(stops == null) {
+            stops = new ArrayList<>();
+        }
+
+        return stops;
+    }
+
+    public void setStops(List<Stop> stops) {
+        this.stops = stops;
     }
 }

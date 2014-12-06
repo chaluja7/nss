@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,6 +51,22 @@ public class StationServiceImpl implements StationService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Station> getAll() {
         return stationDao.findAll();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Station> getAllByNamePattern(String pattern) {
+        if(pattern == null || pattern.equals("")) {
+            return new ArrayList<>();
+        }
+
+        return stationDao.getStationsByNamePattern(pattern);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Station getStationByTitle(String title) {
+        return stationDao.getStationByTitle(title);
     }
 
 }

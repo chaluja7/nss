@@ -44,4 +44,18 @@ public interface StationService {
      */
     public List<Station> getAll();
 
+    /**
+     * find all stations with pattern in name
+     * @param pattern pattern of station name
+     * @return all stations with pattern
+     */
+    public List<Station> getAllByNamePattern(String pattern);
+
+    /**
+     * find station by its title
+     * @param title title of station
+     * @return station with given title or null
+     */
+    public Station getStationByTitle(String title);
+
 }

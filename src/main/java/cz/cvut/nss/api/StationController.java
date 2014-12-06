@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -35,6 +36,18 @@ public class StationController {
     @Transactional
     public DataTableResource<StationResource> getStationsForDataTable() {
         return new DataTableResource<>(getAllTransformedStations());
+    }
+
+    @RequestMapping(value ="/stationsTitleByPattern", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public List<String> getStationsTitleByPattern(@RequestParam("pattern") String pattern) {
+        List<Station> stationList = stationService.getAllByNamePattern(pattern);
+
+        List<String> stationTitleList = new ArrayList<>();
+        for(Station station : stationList) {
+            stationTitleList.add(station.getTitle());
+        }
+
+        return stationTitleList;
     }
 
     /**

@@ -1,12 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://java.sun.com/jsf/html"
                 template="/WEB-INF/templates/default.xhtml">
 
 
     <ui:define name="innerContent">
-        <h1>Vítejte! :)</h1>
-        <p>NSS je aplikace pro vyhledevání spojů veřejné dopravy.</p>
+
+        <h1>Najdi svůj spoj</h1>
+
+
+        <form method="get" action="results.xhtml" id="searchRideForm">
+            <div class="searchStationFields">
+                <input type="text" id="from" name="from" placeholder="Odkud" class="stationSelect" />
+
+                <h:graphicImage value="resources/images/flip-512a.png" styleClass="stationSwap"/>
+
+                <input type="text" id="to" name="to" placeholder="Kam" class="stationSelect" />
+            </div>
+
+            <div class="inputRowBasic">
+                <label for="date">Datum:</label>
+                <input type="text" id="date" name="date" />
+            </div>
+
+            <div class="inputRowBasic">
+                <label for="time">Čas:</label>
+                <input type="text" id="time" name="time" />
+            </div>
+
+
+            <input type="submit" value="Vyhledat spoj" class="submitButton" />
+        </form>
+
     </ui:define>
 
 </ui:composition>

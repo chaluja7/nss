@@ -53,4 +53,9 @@
         <property name="transactionManager" ref="transactionManager" />
     </bean>
 
+    <!-- JDBC BEANS -->
+    <bean id="searchDao" class="cz.cvut.nss.dao.jdbc.JdbcSearchDao">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
 </beans>

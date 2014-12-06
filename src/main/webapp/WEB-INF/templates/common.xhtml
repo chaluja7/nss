@@ -7,7 +7,15 @@
 <h:head>
     <title>NSS - najdi svůj spoj</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
     <h:outputStylesheet name="css/styles.css" />
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/css/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/css/jquery.timepicker.css" rel="stylesheet" type="text/css" />
+
+    <h:outputScript library="js" name="jquery/jquery-2.1.1.min.js" />
+    <h:outputScript library="js" name="jquery/jquery-ui.js" />
+    <h:outputScript library="js" name="jquery/jquery.timepicker.js" />
+    <h:outputScript library="js" name="custom.js" />
 </h:head>
 
 <h:body>

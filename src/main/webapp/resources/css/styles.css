@@ -117,13 +117,24 @@ ul.errorJsf li {
     margin-top: 10px;
 }
 
-.inputRow {
-    padding: 5px 0 5px 0;
+.inputRowBasic {
+    padding: 10px 0 10px 0;
 }
 
-.inputRow label {
-    width: 80px;
+.inputRowBasic label {
+    width: 85px;
     display: inline-block;
+}
+
+.inputRowBasic * {
+    vertical-align: middle;
+}
+
+.inputRowBasic input[type="text"] {
+    width: 120px;
+    padding: 0;
+    height: 25px;
+    font-size: 18px;
 }
 
 tfoot input {
@@ -174,6 +185,7 @@ tfoot input {
 
 .inputRow input[type="text"], .inputRow input[type="password"] {
     height: 25px;
+    font-size: 16px;
 }
 
  select {
@@ -249,4 +261,52 @@ th, td {
 
 .rf-cal {
     color: #000000;
+}
+
+#searchRideForm {
+    margin-top: 60px;
+}
+
+.stationSelect {
+    width: 246px;
+    height: 25px;
+    font-size: 18px;
+}
+
+.stationSwap {
+    cursor: pointer;
+    margin-left: 10px;
+    margin-right: 5px;
+}
+
+.searchStationFields {
+    margin-bottom: 25px;
+}
+
+.searchStationFields * {
+    vertical-align: middle;
+}
+
+.ui-datepicker-trigger {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.searchResultTableWrapper {
+    margin-top: 30px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid white;
+}
+
+.searchResultTableWrapper table {
+    width: 100%;
+}
+
+.searchResultTableWrapper table th {
+    text-align: left;
+}
+
+.searchResultTime {
+    margin-top: 30px;
+    font-size: 12px;
 }
