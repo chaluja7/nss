@@ -14,7 +14,7 @@
         <spring.version>4.1.2.RELEASE</spring.version>
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
         <hibernate.version>4.2.1.Final</hibernate.version>
-        <richfaces.version>4.3.5.Final</richfaces.version>
+        <richfaces.version>4.3.7.Final</richfaces.version>
 
         <!-- Logging -->
         <logback.version>1.1.2</logback.version>
@@ -244,10 +244,17 @@
         </dependency>
 
         <dependency>
-            <groupId>org.richfaces</groupId>
-            <artifactId>richfaces-core</artifactId>
-            <version>4.5.0.Final</version>
+            <groupId>org.richfaces.ui</groupId>
+            <artifactId>richfaces-components-ui</artifactId>
+            <version>${richfaces.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.richfaces.core</groupId>
+            <artifactId>richfaces-core-impl</artifactId>
+            <version>${richfaces.version}</version>
+        </dependency>
+
 
 
         <!-- XML JSON parser -->
@@ -269,6 +276,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -276,6 +284,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.11</version>
                 <configuration>
                     <includes>
                         <include>**/*Test.java</include>
