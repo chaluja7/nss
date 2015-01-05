@@ -14,7 +14,7 @@ import java.util.List;
 public interface SearchService {
 
     /**
-     * Najde spojeni
+     * will find paths
      * @param stationFromId
      * @param stationToId
      * @param departure

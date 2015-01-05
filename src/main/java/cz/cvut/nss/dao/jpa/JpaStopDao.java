@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaStopDao extends AbstractGenericJpaDao<Stop> implements StopDao {
 
+    public JpaStopDao() {
+        super(Stop.class);
+    }
+
 }

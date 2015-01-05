@@ -1,7 +1,7 @@
 package cz.cvut.nss.api.datatable.resource;
 
 /**
- * Resource stations.
+ * Station resource.
  *
  * @author jakubchalupa
  * @since 27.11.14

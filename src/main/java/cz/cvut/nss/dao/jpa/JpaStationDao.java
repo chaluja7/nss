@@ -17,6 +17,10 @@ import java.util.List;
 @Repository
 public class JpaStationDao extends AbstractGenericJpaDao<Station> implements StationDao {
 
+    public JpaStationDao() {
+        super(Station.class);
+    }
+
     @Override
     @SuppressWarnings("JpaQlInspection")
     public List<Station> getStationsByNamePattern(String pattern) {

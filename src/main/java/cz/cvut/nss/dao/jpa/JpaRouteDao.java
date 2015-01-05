@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaRouteDao extends AbstractGenericJpaDao<Route> implements RouteDao {
 
+    public JpaRouteDao() {
+        super(Route.class);
+    }
+
 }

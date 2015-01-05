@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.RideDao;
 import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.services.RideService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,18 +42,21 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Ride updateRide(Ride ride) {
         return rideDao.update(ride);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createRide(Ride ride) {
         rideDao.create(ride);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteRide(long id) {
         rideDao.delete(id);
     }

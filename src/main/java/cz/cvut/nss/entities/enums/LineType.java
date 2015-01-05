@@ -1,4 +1,4 @@
-package cz.cvut.nss.entities;
+package cz.cvut.nss.entities.enums;
 
 /**
  * Available type of lines.

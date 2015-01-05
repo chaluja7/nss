@@ -11,7 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * Converter pro line (hlavne pro jsf select one)
+ * Converter for line (prior pro jsf select one)
  *
  * @author jakubchalupa
  * @since 27.11.14

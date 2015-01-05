@@ -4,8 +4,6 @@ import cz.cvut.nss.entities.AbstractEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -21,11 +19,8 @@ public abstract class AbstractGenericJpaDao<T extends AbstractEntity> implements
 
     protected final Class<T> type;
 
-    @SuppressWarnings("unchecked")
-    public AbstractGenericJpaDao() {
-        Type type = getClass().getGenericSuperclass();
-        ParameterizedType pt = (ParameterizedType) type;
-        this.type = (Class) pt.getActualTypeArguments()[0];
+    public AbstractGenericJpaDao(Class<T> type) {
+        this.type = type;
     }
 
     @Override

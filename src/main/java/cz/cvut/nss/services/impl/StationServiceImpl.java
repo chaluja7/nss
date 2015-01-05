@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.StationDao;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.services.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,18 +32,21 @@ public class StationServiceImpl implements StationService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Station updateStation(Station station) {
         return stationDao.update(station);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createStation(Station station) {
         stationDao.create(station);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteStation(long id) {
         stationDao.delete(id);
     }

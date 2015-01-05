@@ -3,7 +3,7 @@ package cz.cvut.nss.SearchWrappers;
 import java.util.List;
 
 /**
- * Wrapper pro zobrazeni vysledku vyhledavani cesty.
+ * Wrapper to wrap search results.
  *
  * @author jakubchalupa
  * @since 06.12.14

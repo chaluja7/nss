@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaRideDao extends AbstractGenericJpaDao<Ride> implements RideDao {
 
+    public JpaRideDao() {
+        super(Ride.class);
+    }
+
 }

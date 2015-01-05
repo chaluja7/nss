@@ -1,5 +1,6 @@
 package cz.cvut.nss.entities;
 
+import cz.cvut.nss.entities.enums.LineType;
 import org.hibernate.annotations.Index;
 import org.hibernate.validator.constraints.NotBlank;
 

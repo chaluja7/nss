@@ -16,6 +16,10 @@ import javax.persistence.TypedQuery;
 @Repository
 public class JpaPersonDao extends AbstractGenericJpaDao<Person> implements PersonDao {
 
+    public JpaPersonDao() {
+        super(Person.class);
+    }
+
     @Override
     @SuppressWarnings("JpaQlInspection")
     public Person getPersonByUsername(String username) {

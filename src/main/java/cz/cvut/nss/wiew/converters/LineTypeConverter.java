@@ -1,6 +1,6 @@
 package cz.cvut.nss.wiew.converters;
 
-import cz.cvut.nss.entities.LineType;
+import cz.cvut.nss.entities.enums.LineType;
 import org.springframework.stereotype.Component;
 
 import javax.faces.component.UIComponent;
@@ -8,7 +8,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * Converter pro region (hlavne pro jsf select one)
+ * Converter for region (prior pro jsf select one)
  *
  * @author jakubchalupa
  * @since 27.11.14

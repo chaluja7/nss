@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.StopDao;
 import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.services.StopService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +31,21 @@ public class StopServiceImpl implements StopService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Stop updateStop(Stop stop) {
         return stopDao.update(stop);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createStop(Stop stop) {
         stopDao.create(stop);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteStop(long id) {
         stopDao.delete(id);
     }

@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaRegionDao extends AbstractGenericJpaDao<Region> implements RegionDao {
 
+    public JpaRegionDao() {
+        super(Region.class);
+    }
+
 }

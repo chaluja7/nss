@@ -3,6 +3,8 @@ package cz.cvut.nss.SearchWrappers;
 import java.util.Date;
 
 /**
+ * Wrapper to wrap founded stops.
+ *
  * @author jakubchalupa
  * @since 06.12.14
  */

@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.RegionDao;
 import cz.cvut.nss.entities.Region;
 import cz.cvut.nss.services.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +31,21 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Region updateRegion(Region region) {
         return regionDao.update(region);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createRegion(Region region) {
         regionDao.create(region);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteRegion(long id) {
         regionDao.delete(id);
     }

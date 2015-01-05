@@ -140,6 +140,9 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         return finalList;
     }
 
+    /**
+     * slouzi pro serazeni vysledku vyhledavani spojeni
+     */
     public class SearchResultComparator implements Comparator<SearchResultWrapper> {
         @Override
         public int compare(SearchResultWrapper o1, SearchResultWrapper o2) {

@@ -1,6 +1,8 @@
 package cz.cvut.nss.api.datatable.resource;
 
 /**
+ * Ride resource.
+ *
  * @author jakubchalupa
  * @since 29.11.14
  */

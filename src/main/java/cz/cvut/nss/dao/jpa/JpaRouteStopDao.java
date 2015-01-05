@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaRouteStopDao extends AbstractGenericJpaDao<RouteStop> implements RouteStopDao {
 
+    public JpaRouteStopDao() {
+        super(RouteStop.class);
+    }
+
 }

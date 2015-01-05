@@ -5,6 +5,8 @@ import cz.cvut.nss.entities.Stop;
 import java.util.List;
 
 /**
+ * Wrapper to wrap founded paths.
+ *
  * @author jakubchalupa
  * @since 06.12.14
  */

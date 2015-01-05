@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.RouteDao;
 import cz.cvut.nss.entities.Route;
 import cz.cvut.nss.services.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,18 +42,21 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Route updateRoute(Route route) {
         return routeDao.update(route);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createRoute(Route route) {
         routeDao.create(route);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteRoute(long id) {
         routeDao.delete(id);
     }

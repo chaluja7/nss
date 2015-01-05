@@ -1,8 +1,8 @@
 package cz.cvut.nss.wiew;
 
 import cz.cvut.nss.entities.Line;
-import cz.cvut.nss.entities.LineType;
 import cz.cvut.nss.entities.Route;
+import cz.cvut.nss.entities.enums.LineType;
 import cz.cvut.nss.services.LineService;
 import cz.cvut.nss.services.RouteService;
 

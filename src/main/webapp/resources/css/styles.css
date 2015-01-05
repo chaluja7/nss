@@ -310,3 +310,7 @@ th, td {
     margin-top: 30px;
     font-size: 12px;
 }
+
+#dataTableList tbody tr:hover {
+    cursor: pointer;
+}

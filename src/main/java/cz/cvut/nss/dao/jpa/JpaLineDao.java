@@ -14,4 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JpaLineDao extends AbstractGenericJpaDao<Line> implements LineDao {
 
+    public JpaLineDao() {
+        super(Line.class);
+    }
+
 }

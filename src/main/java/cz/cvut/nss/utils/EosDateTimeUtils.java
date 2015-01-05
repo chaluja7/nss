@@ -1,6 +1,8 @@
 package cz.cvut.nss.utils;
 
 /**
+ * DateTime utils.
+ *
  * @author jakubchalupa
  * @since 29.11.14
  */

@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Search service implementace.
+ * Implementation of SearchService.
  *
  * @author jakubchalupa
  * @since 06.12.14

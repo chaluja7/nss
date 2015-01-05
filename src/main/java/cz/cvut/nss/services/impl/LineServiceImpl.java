@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.LineDao;
 import cz.cvut.nss.entities.Line;
 import cz.cvut.nss.services.LineService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,18 +31,21 @@ public class LineServiceImpl implements LineService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Line updateLine(Line line) {
         return lineDao.update(line);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createLine(Line line) {
         lineDao.create(line);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteLine(long id) {
         lineDao.delete(id);
     }

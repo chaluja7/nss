@@ -1,34 +1,70 @@
 package cz.cvut.nss.services;
 
-import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
-import cz.cvut.nss.dao.SearchDao;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.entities.Station;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
-
 /**
+ * Station service test.
+ *
  * Created by jakubchalupa on 20.11.14.
  */
 public class StationServiceTest extends AbstractServiceTest {
 
     @Autowired
-    SearchDao searchDao;
+    private StationService stationService;
 
     @Test
     public void testCreateAndGet() {
-        //TODO this :)
-        assertTrue(true);
+        Station station = prepareStation();
+
+        Station retrieved = stationService.getStation(station.getId());
+        Assert.assertNotNull(retrieved);
+        Assert.assertEquals(station.getName(), retrieved.getName());
+        Assert.assertEquals(station.getTitle(), retrieved.getTitle());
     }
 
     @Test
+    public void testUpdate() {
+        Station station = prepareStation();
+
+        Station retrieved = stationService.getStation(station.getId());
+        Assert.assertNotNull(retrieved);
+
+        retrieved.setName("newName");
+        retrieved.setTitle("newTitle");
+        stationService.updateStation(retrieved);
+
+        Station updated = stationService.getStation(retrieved.getId());
+        Assert.assertNotNull(updated);
+        Assert.assertEquals(retrieved.getName(), updated.getName());
+        Assert.assertEquals(retrieved.getTitle(), updated.getTitle());
+    }
+
+    @Test
+    public void testDelete() {
+        Station station = prepareStation();
+
+        Station retrieved = stationService.getStation(station.getId());
+        Assert.assertNotNull(retrieved);
+
+        stationService.deleteStation(retrieved.getId());
+        Assert.assertNull(stationService.getStation(station.getId()));
+    }
+
+    private Station prepareStation() {
+        Station station = new Station();
+        station.setName("testStation");
+        station.setTitle("testStationTitle");
+        station.setLongtitude(20.0);
+        station.setLatitude(30.0);
+
+        stationService.createStation(station);
+        return station;
+    }
+
+    /*@Test
     public void superTest() {
 
         Date date = new Date();
@@ -43,9 +79,6 @@ public class StationServiceTest extends AbstractServiceTest {
 
         List<SearchResultWrapper> foundedStops = searchDao.findRides(1, 5, date, 2);
 
-        int i = 1;
-
-
-    }
+    }*/
 
 }

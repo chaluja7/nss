@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Authentication provider to enable spring security.
+ * Authentication provider (using spring security)
  *
  * @author jakubchalupa
  * @since 24.11.14.
@@ -56,10 +56,9 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
                         throw new BadCredentialsException("Bad user credentials");
                     }
 
-                    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
-                    auths.add(new SimpleGrantedAuthority("ROLE_USER"));
-                    userDetails = new User(username, password, auths);
-
+                    List<GrantedAuthority> authorities = new ArrayList<>();
+                    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                    userDetails = new User(username, password, authorities);
                     return userDetails;
 
                 } catch(AuthenticationException e){
