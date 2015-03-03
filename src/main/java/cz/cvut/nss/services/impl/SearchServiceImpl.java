@@ -29,4 +29,9 @@ public class SearchServiceImpl implements SearchService {
         return searchDao.findRides(stationFromId, stationToId, departure, maxDays);
     }
 
+    @Override
+    public List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays) {
+        return searchDao.findRidesNew(stationFromId, stationToId, departure, maxDays);
+    }
+
 }

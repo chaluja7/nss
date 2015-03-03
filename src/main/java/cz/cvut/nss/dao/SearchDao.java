@@ -21,6 +21,8 @@ public interface SearchDao {
      * @param maxDays how many days in the future
      * @return wrapper with search results - founded paths
      */
-    List<SearchResultWrapper>findRides(long stationFromId, long stationToId, Date departure, int maxDays);
+    List<SearchResultWrapper> findRides(long stationFromId, long stationToId, Date departure, int maxDays);
+
+    List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, int maxDays);
 
 }

@@ -64,21 +64,4 @@ public class StationServiceTest extends AbstractServiceTest {
         return station;
     }
 
-    /*@Test
-    public void superTest() {
-
-        Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
-
-        try {
-            date = dateFormat.parse("12.12.2014 05:00");
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        List<SearchResultWrapper> foundedStops = searchDao.findRides(1, 5, date, 2);
-
-    }*/
-
 }
