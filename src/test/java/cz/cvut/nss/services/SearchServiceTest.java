@@ -1,7 +1,6 @@
 package cz.cvut.nss.services;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
-import cz.cvut.nss.dao.SearchDao;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import java.util.List;
 public class SearchServiceTest extends AbstractServiceTest {
 
     @Autowired
-    private SearchDao searchDao;
+    private SearchService searchService;
 
     @Test
     public void superTest() {
@@ -28,14 +27,14 @@ public class SearchServiceTest extends AbstractServiceTest {
         DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
 
         try {
-            date = dateFormat.parse("12.12.2014 05:00");
+            date = dateFormat.parse("08.12.2014 05:00");
         } catch (ParseException e) {
             e.printStackTrace();
             return;
         }
 
         long l = System.currentTimeMillis();
-        List<SearchResultWrapper> foundedStops = searchDao.findRidesNew(1, 5, date, 2);
+        List<SearchResultWrapper> foundedStops = searchService.findPathNew(1, 5, date, 1, 2);
         long executionTime = System.currentTimeMillis() - l;
 
         int i = 0;

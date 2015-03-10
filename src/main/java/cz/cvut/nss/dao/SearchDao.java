@@ -23,6 +23,6 @@ public interface SearchDao {
      */
     List<SearchResultWrapper> findRides(long stationFromId, long stationToId, Date departure, int maxDays);
 
-    List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, int maxDays);
+    List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers);
 
 }

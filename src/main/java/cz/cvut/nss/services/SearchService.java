@@ -23,5 +23,5 @@ public interface SearchService {
      */
     List<SearchResultWrapper> findPath(long stationFromId, long stationToId, Date departure, int maxDays);
 
-    List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays);
+    List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays, int maxTransfers);
 }

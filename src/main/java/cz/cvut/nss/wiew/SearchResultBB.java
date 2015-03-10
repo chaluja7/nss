@@ -59,10 +59,11 @@ public class SearchResultBB {
     private List<FoundedPathsWrapper> foundResults;
 
     public void performSearch() {
+        long l = System.currentTimeMillis();
         prepareAndValidateInputs();
 
         if(!errorInputs) {
-            List<SearchResultWrapper> path = searchService.findPath(stationFrom.getId(), stationTo.getId(), departure, 2);
+            List<SearchResultWrapper> path = searchService.findPathNew(stationFrom.getId(), stationTo.getId(), departure, 1, 2);
 
             foundResults = new ArrayList<>();
             for(SearchResultWrapper resultWrapper : path) {
@@ -92,6 +93,8 @@ public class SearchResultBB {
 
         }
 
+        long executionTime = System.currentTimeMillis() - l;
+        int i = 0;
     }
 
     private void prepareAndValidateInputs() {

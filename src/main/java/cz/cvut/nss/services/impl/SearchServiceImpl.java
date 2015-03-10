@@ -3,6 +3,7 @@ package cz.cvut.nss.services.impl;
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.dao.SearchDao;
 import cz.cvut.nss.services.SearchService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -30,8 +31,12 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays) {
-        return searchDao.findRidesNew(stationFromId, stationToId, departure, maxDays);
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays, int maxTransfers) {
+        DateTime departureDateTime = new DateTime(departure);
+        DateTime maxDateDeparture = departureDateTime.plusDays(maxDays);
+
+        return searchDao.findRidesNew(stationFromId, stationToId, departure, maxDateDeparture.toDate(), maxTransfers);
     }
 
 }

@@ -32,11 +32,9 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
     }
 
-    private void findRidesTry(long stationFromId, long stationToId, Date departure, Date maxDateDeparture, int stepNumber, Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides) {
-
-        if(stepNumber > 2) {
-            return;
-        }
+    private void findRidesTry(long stationFromId, long stationToId, Date departure, Date maxDateDeparture, int stepNumber,
+                              Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
+                              int maxTransfers) {
 
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         namedParameters.addValue("stationId", stationFromId);
@@ -78,7 +76,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                 if (stopOnRide.getStationId() == stationToId) {
                     StringBuilder stringBuilder = new StringBuilder();
                     for(Long l : newVisitedRides) {
-                        if(stringBuilder.length() == 0) {
+                        if(stringBuilder.length() != 0) {
                             stringBuilder.append("-");
                         }
                         stringBuilder.append(l);
@@ -98,13 +96,52 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                         break;
                     }
 
-                } else {
-                    findRidesTry(stopOnRide.getStationId(), stationToId, stopOnRide.getArrival(), maxDateDeparture, stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides);
+                } else if(stepNumber < maxTransfers) {
+                    findRidesTry(stopOnRide.getStationId(), stationToId, stopOnRide.getArrival(), maxDateDeparture,
+                            stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides, maxTransfers);
                 }
             }
 
         }
 
+    }
+
+    @Override
+    public List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers) {
+        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
+        findRidesTry(stationFromId, stationToId, departure, maxDeparture, 0, ridesMap, new ArrayList<Long>(), new ArrayList<Long>(), maxTransfers);
+
+        List<SearchResultWrapper> resultList = new ArrayList<>();
+        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
+            resultList.add(entry.getValue());
+        }
+
+        Collections.sort(resultList, new SearchResultComparator());
+
+        List<SearchResultWrapper> finalList = new ArrayList<>();
+
+        Set<Long> alreadyUsed = new HashSet<>();
+        for(SearchResultWrapper wrapper : resultList) {
+            boolean skip = false;
+            for(Long stopId : wrapper.getStops()) {
+                if(alreadyUsed.contains(stopId)) {
+                    skip = true;
+                    break;
+                }
+            }
+
+            if(skip) {
+                continue;
+            }
+
+            finalList.add(wrapper);
+            for(Long stopId : wrapper.getStops()) {
+                alreadyUsed.add(stopId);
+            }
+
+        }
+
+        return finalList;
     }
 
     @Override
@@ -230,47 +267,6 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         return finalList;
     }
 
-    @Override
-    public List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, int maxDays) {
-        DateTime departureDateTime = new DateTime(departure);
-        DateTime maxDateDeparture = departureDateTime.plusDays(maxDays);
-
-        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
-        findRidesTry(stationFromId, stationToId, departure, maxDateDeparture.toDate(), 0, ridesMap, new ArrayList<Long>(), new ArrayList<Long>());
-
-        List<SearchResultWrapper> resultList = new ArrayList<>();
-        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
-            resultList.add(entry.getValue());
-        }
-
-        Collections.sort(resultList, new SearchResultComparator());
-
-        List<SearchResultWrapper> finalList = new ArrayList<>();
-
-        Set<Long> alreadyUsed = new HashSet<>();
-        for(SearchResultWrapper wrapper : resultList) {
-            boolean skip = false;
-            for(Long stopId : wrapper.getStops()) {
-                if(alreadyUsed.contains(stopId)) {
-                    skip = true;
-                    break;
-                }
-            }
-
-            if(skip) {
-                continue;
-            }
-
-            finalList.add(wrapper);
-            for(Long stopId : wrapper.getStops()) {
-                alreadyUsed.add(stopId);
-            }
-
-        }
-
-        return finalList;
-    }
-
     /**
      * slouzi pro serazeni vysledku vyhledavani spojeni
      */
@@ -285,8 +281,15 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                 return 1;
             }
 
-            return o1.getTravelTime() < o2.getTravelTime() ? -1 : 1;
+            if(o1.getTravelTime() < o2.getTravelTime()) {
+                return -1;
+            }
 
+            if(o1.getTravelTime() > o2.getTravelTime()) {
+                return 1;
+            }
+
+            return 0;
         }
     }
 
