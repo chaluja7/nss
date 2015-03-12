@@ -10,9 +10,10 @@
     <f:metadata>
         <f:viewParam name="from" value="#{searchResultBB.stationFromTitle}"/>
         <f:viewParam name="to" value="#{searchResultBB.stationToTitle}"/>
-        <f:viewParam name="date" value="#{searchResultBB.departureDate}"/>
-        <f:viewParam name="time" value="#{searchResultBB.departureTime}"/>
+        <f:viewParam name="date" value="#{searchResultBB.departureOrArrivalDate}"/>
+        <f:viewParam name="time" value="#{searchResultBB.departureOrArrivalTime}"/>
         <f:viewParam name="noTransfer" value="#{searchResultBB.withoutTransfers}" />
+        <f:viewParam name="timeType" value="#{searchResultBB.timeType}" />
 
         <f:event type="preRenderView" listener="#{searchResultBB.performSearch}"/>
     </f:metadata>
@@ -26,7 +27,7 @@
         <h:panelGroup rendered="#{!searchResultBB.errorInputs}">
 
             <h3><h:outputText value="#{searchResultBB.stationFromTitle} --> #{searchResultBB.stationToTitle}" /></h3>
-            <h4><h:outputText value="#{searchResultBB.departureDate} #{searchResultBB.departureTime}"/></h4>
+            <h4><h:outputText value="#{searchResultBB.timeType == 'departure' ? 'Výjezd: ' : 'Příjezd: '}"/><h:outputText value="#{searchResultBB.departureOrArrivalDate} #{searchResultBB.departureOrArrivalTime}"/></h4>
             <h:link value="Nové zadání" outcome="/index.xhtml" />
 
             <h:panelGroup layout="block" styleClass="errorBox" rendered="#{fn:length(searchResultBB.foundResults) == 0}">

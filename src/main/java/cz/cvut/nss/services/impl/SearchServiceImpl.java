@@ -26,9 +26,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public List<SearchResultWrapper> findPathByDepartureDate(long stationFromId, long stationToId, Date departure, int maxDays, int maxTransfers) {
+    public List<SearchResultWrapper> findPathByDepartureDate(long stationFromId, long stationToId, Date departure, int maxHoursAfterDeparture, int maxTransfers, int maxResults) {
         DateTime departureDateTime = new DateTime(departure);
-        DateTime maxDateDeparture = departureDateTime.plusDays(maxDays);
+        DateTime maxDateDeparture = departureDateTime.plusHours(maxHoursAfterDeparture);
 
         //vytahnu vsechny moznosti, jak docestovat z from do to
         //zde jsou ovsem cesty, ktere nechci uzivatele zobrazit. Napr. muzu jet po stopech 1 - 3 - 5, nebo 1 - 3 - 4 - 5. V tomto pripade chci pouze tu cestu, ktera je tam drive a (nebo) rychleji.
@@ -39,7 +39,44 @@ public class SearchServiceImpl implements SearchService {
         Collections.sort(resultList, new SearchResultByDepartureDateComparator());
 
         //vratim jen ty nejrelevantnejsi vyfiltrovane vysledky
-        return this.getFilteredResults(resultList);
+        List<SearchResultWrapper> filteredList = this.getFilteredResults(resultList);
+
+        if(filteredList.size() <= maxResults || maxResults < 0) {
+            return filteredList;
+        }
+
+        List<SearchResultWrapper> retList = new ArrayList<>(maxResults);
+        for(int i = 0; i < maxResults; i++) {
+            retList.add(i, filteredList.get(i));
+        }
+
+        return retList;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<SearchResultWrapper> findPathByArrivalDate(long stationFromId, long stationToId, Date arrival, int maxHoursBeforeArrival, int maxTransfers, int maxResults) {
+        DateTime arrivalDateTime = new DateTime(arrival);
+        DateTime minDateArrival = arrivalDateTime.minusHours(maxHoursBeforeArrival);
+
+        List<SearchResultWrapper> resultList = searchDao.findRidesByArrivalDate(stationFromId, stationToId, arrival, minDateArrival.toDate(), maxTransfers);
+
+        //seradim vysledky vlastnim algoritmem
+        Collections.sort(resultList, new SearchResultByDepartureDateComparator());
+
+        //vratim jen ty nejrelevantnejsi vyfiltrovane vysledky
+        List<SearchResultWrapper> filteredList = this.getFilteredResults(resultList);
+
+        if(filteredList.size() <= maxResults || maxResults < 0) {
+            return filteredList;
+        }
+
+        List<SearchResultWrapper> retList = new ArrayList<>();
+        for(int i = 0; i < maxResults; i++) {
+            retList.add(filteredList.get(filteredList.size() - (maxResults - i)));
+        }
+
+        return retList;
     }
 
     /**

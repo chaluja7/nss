@@ -46,6 +46,19 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         return resultList;
     }
 
+    @Override
+    public List<SearchResultWrapper> findRidesByArrivalDate(long stationFromId, long stationToId, Date arrival, Date minArrival, int maxTransfers) {
+        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
+        findRidesByArrivalDateAlgorithm(stationFromId, stationToId, arrival, minArrival, 0, ridesMap, new ArrayList<Long>(), new ArrayList<Long>(), maxTransfers);
+
+        List<SearchResultWrapper> resultList = new ArrayList<>();
+        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
+            resultList.add(entry.getValue());
+        }
+
+        return resultList;
+    }
+
     /**
      * Naplni list ridesMap vysledky hledani cesty.
      * @param stationFromId stanice z
@@ -76,7 +89,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         }
 
         String initialStopsSql = "select id, ride_id, station_id, departure, arrival from stops " +
-                "where station_id = :stationId and departure > :departure and departure < :maxDeparture and ride_id not in(:visitedRides) " +
+                "where station_id = :stationId and departure >= :departure and departure <= :maxDeparture and ride_id not in(:visitedRides) " +
                 "order by departure asc";
 
         List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql, namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
@@ -88,7 +101,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
             List<Long> newVisitedRides = new ArrayList<>(visitedRides);
             newVisitedRides.add(stop.getRideId());
 
-            String rideSql = "select id, ride_id, station_id, departure, arrival from stops where ride_id = ? and (departure is null or departure > ?) order by departure asc ";
+            String rideSql = "select id, ride_id, station_id, departure, arrival from stops where ride_id = ? and (departure is null or departure > ?) order by departure asc";
 
             List<StopSearchWrapper> stopsOnRide =
                     getJdbcTemplate().
@@ -128,6 +141,82 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                     //pokud toto neni cilova stanice a jeste jsem neprestoupil MAX krat, zavolam rekurzivne algoritmus
                     //vychozi stanice bude aktualni stanice z cyklu a hledam vyjezd od data, kdy je prijezd do tohoto stopu
                     findRidesByDepartureDateAlgorithm(stopOnRide.getStationId(), stationToId, stopOnRide.getArrival(), maxDateDeparture,
+                            stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides, maxTransfers);
+                }
+            }
+        }
+    }
+
+    private void findRidesByArrivalDateAlgorithm(long stationFromId, long stationToId, Date arrival, Date minDateArrival, int stepNumber,
+                                                   Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
+                                                   int maxTransfers) {
+
+        //Nejdrive najdu vsechny stopy, ktere jsou na stanici, do ktere jedu serazene dle data prijezdu sestupne
+        MapSqlParameterSource namedParameters = new MapSqlParameterSource();
+        namedParameters.addValue("stationId", stationToId);
+        namedParameters.addValue("arrival", arrival);
+        namedParameters.addValue("minArrival", minDateArrival);
+        if(visitedRides.size() == 0) {
+            List<Long> tempList = new ArrayList<>();
+            tempList.add(0l);
+            namedParameters.addValue("visitedRides", tempList);
+        } else {
+            namedParameters.addValue("visitedRides", visitedRides);
+        }
+
+        String initialStopsSql = "select id, ride_id, station_id, departure, arrival from stops " +
+                "where station_id = :stationId and arrival <= :arrival and arrival >= :minArrival and ride_id not in(:visitedRides) " +
+                "order by arrival desc";
+
+        List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql, namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+
+        //pro tyto stopy iteruji
+        for(StopSearchWrapper stop : stops) {
+
+            //nyni vyberu vsechny stopy nachazejici se na Ride, ktera predchazi stopu v iteraci
+            List<Long> newVisitedRides = new ArrayList<>(visitedRides);
+            newVisitedRides.add(0, stop.getRideId());
+
+            String rideSql = "select id, ride_id, station_id, departure, arrival from stops where ride_id = ? and (arrival is null or arrival < ?) order by arrival desc nulls last";
+
+            List<StopSearchWrapper> stopsOnRide =
+                    getJdbcTemplate().
+                            query(rideSql, new Object[]{stop.getRideId(), stop.getArrival()}, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+
+            //pro vsechny nalezen stopy iteruji
+            for(StopSearchWrapper stopOnRide : stopsOnRide) {
+
+                List<Long> newVisitedStops = new ArrayList<>(visitedStops);
+                newVisitedStops.add(0, stop.getId());
+                newVisitedStops.add(0, stopOnRide.getId());
+
+                if (stopOnRide.getStationId() == stationFromId) {
+                    //pokud jsem narazil na cilovou stanici tak ulozim cestu do ridesMapy pokud tam jiz neni na stejnych ridach s lepsim casem
+                    StringBuilder stringBuilder = new StringBuilder();
+                    for(Long l : newVisitedRides) {
+                        if(stringBuilder.length() != 0) {
+                            stringBuilder.append("-");
+                        }
+                        stringBuilder.append(l);
+                    }
+
+                    String pathIdentifier = stringBuilder.toString();
+
+                    Stop arrivalStop = stopDao.find(newVisitedStops.get(newVisitedStops.size() - 1));
+                    long travelTime = arrivalStop.getArrival().toDate().getTime() - stopOnRide.getDeparture().getTime();
+                    if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
+                        SearchResultWrapper wrapper = new SearchResultWrapper();
+                        wrapper.setArrival(arrivalStop.getArrival().toDate().getTime());
+                        wrapper.setTravelTime(travelTime);
+                        wrapper.setStops(newVisitedStops);
+                        ridesMap.put(pathIdentifier, wrapper);
+                    }
+
+                    break;
+                } else if(stepNumber < maxTransfers) {
+                    //pokud toto neni cilova stanice a jeste jsem neprestoupil MAX krat, zavolam rekurzivne algoritmus
+                    //vychozi stanice bude aktualni stanice z cyklu a hledam vyjezd od data, kdy je prijezd do tohoto stopu
+                    findRidesByArrivalDateAlgorithm(stationFromId, stopOnRide.getStationId(), stopOnRide.getDeparture(), minDateArrival,
                             stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides, maxTransfers);
                 }
             }

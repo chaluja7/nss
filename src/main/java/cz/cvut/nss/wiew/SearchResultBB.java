@@ -44,17 +44,19 @@ public class SearchResultBB {
 
     private String stationToTitle;
 
-    private String departureDate;
+    private String departureOrArrivalDate;
 
-    private String departureTime;
+    private String departureOrArrivalTime;
 
     private Station stationFrom;
 
     private Station stationTo;
 
-    private Date departure;
+    private Date departureOrArrival;
 
     private boolean withoutTransfers;
+
+    private String timeType;
 
     private boolean errorInputs = false;
 
@@ -65,7 +67,13 @@ public class SearchResultBB {
         prepareAndValidateInputs();
 
         if(!errorInputs) {
-            List<SearchResultWrapper> path = searchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departure, 1, withoutTransfers ? 0 : 2);
+            List<SearchResultWrapper> path;
+
+            if(timeType.equals("departure")) {
+                path = searchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 2, -1);
+            } else {
+                path = searchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 2, 3);
+            }
 
             foundResults = new ArrayList<>();
             for(SearchResultWrapper resultWrapper : path) {
@@ -101,13 +109,20 @@ public class SearchResultBB {
 
         if(stationFrom == null || stationTo == null) {
             errorInputs = true;
+            return;
         }
 
         DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
         try {
-            departure = dateFormat.parse(departureDate + " " + departureTime);
+            departureOrArrival = dateFormat.parse(departureOrArrivalDate + " " + departureOrArrivalTime);
         } catch (ParseException e) {
             errorInputs = true;
+            return;
+        }
+
+        if(timeType == null || (!timeType.equals("departure") && !timeType.equals("arrival"))) {
+            errorInputs = true;
+            return;
         }
 
     }
@@ -128,20 +143,20 @@ public class SearchResultBB {
         this.stationToTitle = stationToTitle;
     }
 
-    public String getDepartureDate() {
-        return departureDate;
+    public String getDepartureOrArrivalDate() {
+        return departureOrArrivalDate;
     }
 
-    public void setDepartureDate(String departureDate) {
-        this.departureDate = departureDate;
+    public void setDepartureOrArrivalDate(String departureOrArrivalDate) {
+        this.departureOrArrivalDate = departureOrArrivalDate;
     }
 
-    public String getDepartureTime() {
-        return departureTime;
+    public String getDepartureOrArrivalTime() {
+        return departureOrArrivalTime;
     }
 
-    public void setDepartureTime(String departureTime) {
-        this.departureTime = departureTime;
+    public void setDepartureOrArrivalTime(String departureOrArrivalTime) {
+        this.departureOrArrivalTime = departureOrArrivalTime;
     }
 
     public boolean isWithoutTransfers() {
@@ -150,6 +165,14 @@ public class SearchResultBB {
 
     public void setWithoutTransfers(boolean withoutTransfers) {
         this.withoutTransfers = withoutTransfers;
+    }
+
+    public String getTimeType() {
+        return timeType;
+    }
+
+    public void setTimeType(String timeType) {
+        this.timeType = timeType;
     }
 
     public boolean isErrorInputs() {
