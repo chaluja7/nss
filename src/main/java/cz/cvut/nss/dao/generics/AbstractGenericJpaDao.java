@@ -46,6 +46,6 @@ public abstract class AbstractGenericJpaDao<T extends AbstractEntity> implements
     @Override
     @SuppressWarnings("unchecked")
     public List<T> findAll() {
-        return em.createQuery( "from " + type.getName()).getResultList();
+        return em.createQuery("from " + type.getName()).getResultList();
     }
 }

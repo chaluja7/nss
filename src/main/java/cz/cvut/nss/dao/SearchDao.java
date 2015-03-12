@@ -13,16 +13,6 @@ import java.util.List;
  */
 public interface SearchDao {
 
-    /**
-     * will find paths.
-     * @param stationFromId station from
-     * @param stationToId station to
-     * @param departure time departure
-     * @param maxDays how many days in the future
-     * @return wrapper with search results - founded paths
-     */
-    List<SearchResultWrapper> findRides(long stationFromId, long stationToId, Date departure, int maxDays);
-
-    List<SearchResultWrapper> findRidesNew(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers);
+    List<SearchResultWrapper> findRidesByDepartureDate(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers);
 
 }

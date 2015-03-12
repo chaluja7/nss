@@ -12,16 +12,26 @@ import java.util.List;
  */
 public class FoundedPathsWrapper {
 
-    private String travelTime;
+    private int travelTimeHours;
+
+    private int travelTimeMinutes;
 
     private List<Stop> stops;
 
-    public String getTravelTime() {
-        return travelTime;
+    public int getTravelTimeHours() {
+        return travelTimeHours;
     }
 
-    public void setTravelTime(String travelTime) {
-        this.travelTime = travelTime;
+    public void setTravelTimeHours(int travelTimeHours) {
+        this.travelTimeHours = travelTimeHours;
+    }
+
+    public int getTravelTimeMinutes() {
+        return travelTimeMinutes;
+    }
+
+    public void setTravelTimeMinutes(int travelTimeMinutes) {
+        this.travelTimeMinutes = travelTimeMinutes;
     }
 
     public List<Stop> getStops() {

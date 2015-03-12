@@ -34,7 +34,7 @@ public class SearchServiceTest extends AbstractServiceTest {
         }
 
         long l = System.currentTimeMillis();
-        List<SearchResultWrapper> foundedStops = searchService.findPathNew(1, 5, date, 1, 2);
+        List<SearchResultWrapper> foundedStops = searchService.findPathByDepartureDate(1, 5, date, 1, 2);
         long executionTime = System.currentTimeMillis() - l;
 
         int i = 0;

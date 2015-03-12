@@ -14,14 +14,13 @@ import java.util.List;
 public interface SearchService {
 
     /**
-     * will find paths
-     * @param stationFromId
-     * @param stationToId
-     * @param departure
-     * @param maxDays
-     * @return
+     * Najde spojeni dle data odjezdu
+     * @param stationFromId stanice z
+     * @param stationToId stanice do
+     * @param departure datum odjezdu
+     * @param maxDays max pocet dni od min odjezdu
+     * @param maxTransfers max pocet prestupu
+     * @return list vysledku
      */
-    List<SearchResultWrapper> findPath(long stationFromId, long stationToId, Date departure, int maxDays);
-
-    List<SearchResultWrapper> findPathNew(long stationFromId, long stationToId, Date departure, int maxDays, int maxTransfers);
+    List<SearchResultWrapper> findPathByDepartureDate(long stationFromId, long stationToId, Date departure, int maxDays, int maxTransfers);
 }

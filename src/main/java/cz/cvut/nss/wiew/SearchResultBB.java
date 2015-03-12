@@ -54,6 +54,8 @@ public class SearchResultBB {
 
     private Date departure;
 
+    private boolean withoutTransfers;
+
     private boolean errorInputs = false;
 
     private List<FoundedPathsWrapper> foundResults;
@@ -63,7 +65,7 @@ public class SearchResultBB {
         prepareAndValidateInputs();
 
         if(!errorInputs) {
-            List<SearchResultWrapper> path = searchService.findPathNew(stationFrom.getId(), stationTo.getId(), departure, 1, 2);
+            List<SearchResultWrapper> path = searchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departure, 1, withoutTransfers ? 0 : 2);
 
             foundResults = new ArrayList<>();
             for(SearchResultWrapper resultWrapper : path) {
@@ -79,14 +81,10 @@ public class SearchResultBB {
                 Stop to = wrapper.getStops().get(wrapper.getStops().size() - 1);
 
                 Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
-
                 Minutes minutes = Minutes.minutesBetween(from.getDeparture(), to.getArrival());
-                String minutesString = String.valueOf(minutes.getMinutes() % 60);
-                if ((minutes.getMinutes() % 60) < 10) {
-                    minutesString = "0" + minutesString;
-                }
 
-                wrapper.setTravelTime(hours.getHours() + " hod " + minutesString + " min");
+                wrapper.setTravelTimeHours(hours.getHours());
+                wrapper.setTravelTimeMinutes(minutes.getMinutes() % 60);
 
                 foundResults.add(wrapper);
             }
@@ -144,6 +142,14 @@ public class SearchResultBB {
 
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
+    }
+
+    public boolean isWithoutTransfers() {
+        return withoutTransfers;
+    }
+
+    public void setWithoutTransfers(boolean withoutTransfers) {
+        this.withoutTransfers = withoutTransfers;
     }
 
     public boolean isErrorInputs() {
