@@ -4,9 +4,11 @@ import cz.cvut.nss.SearchWrappers.FoundedPathsWrapper;
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.entities.Stop;
+import cz.cvut.nss.entities.neo4j.StationNode;
 import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
+import cz.cvut.nss.services.neo4j.StationNeo4jService;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
@@ -40,6 +42,9 @@ public class SearchResultBB {
     @ManagedProperty(value = "#{stopServiceImpl}")
     private StopService stopService;
 
+    @ManagedProperty(value = "#{stationNeo4jServiceImpl}")
+    private StationNeo4jService stationNeo4jService;
+
     private String stationFromTitle;
 
     private String stationToTitle;
@@ -62,9 +67,33 @@ public class SearchResultBB {
 
     private List<FoundedPathsWrapper> foundResults;
 
+    public void testNeo4j() {
+
+        //stationNeo4jService.deleteAll();
+
+        StationNode stationNode = new StationNode();
+        stationNode.setTitle("zkouštičkaaaa");
+        stationNode.setName("zkouštičkaaaaa jméno");
+        StationNode stationNode1 = stationNeo4jService.create(stationNode);
+
+        StationNode stationNode2 = new StationNode();
+        stationNode2.setTitle("zk2aaaa");
+        stationNode2.setName("name2aaaa");
+        StationNode stationNode3 = stationNeo4jService.create(stationNode2);
+
+        StationNode retrieved = stationNeo4jService.findById(10);
+        StationNode retrieved2 = stationNeo4jService.findById(stationNode1.getId());
+
+        Iterable<StationNode> all = stationNeo4jService.findAll();
+
+
+        int i = 0;
+    }
+
     public void performSearch() {
         long l = System.currentTimeMillis();
         prepareAndValidateInputs();
+        testNeo4j();
 
         if(!errorInputs) {
             List<SearchResultWrapper> path;
@@ -193,5 +222,9 @@ public class SearchResultBB {
 
     public void setStopService(StopService stopService) {
         this.stopService = stopService;
+    }
+
+    public void setStationNeo4jService(StationNeo4jService stationNeo4jService) {
+        this.stationNeo4jService = stationNeo4jService;
     }
 }
