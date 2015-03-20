@@ -1,9 +1,11 @@
 package cz.cvut.nss.services.neo4j;
 
+import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.entities.neo4j.StationNode;
 import cz.cvut.nss.entities.neo4j.StopNode;
+import cz.cvut.nss.services.RideService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
 import org.junit.Test;
@@ -24,7 +26,6 @@ import java.util.List;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring-context.xml"})
-//@TransactionConfiguration(transactionManager = "neo4jTransactionManager")
 @TransactionConfiguration(defaultRollback = false)
 @Transactional
 public class StationNeo4jServiceTest {
@@ -41,8 +42,16 @@ public class StationNeo4jServiceTest {
     @Autowired
     private StopService stopService;
 
+    @Autowired
+    private RideService rideService;
+
     @Test
     public void testIt() {
+        //stop 1 departure: 1418011560000
+        //stop 232 departure: 1418060160000
+
+//        match (n:StopNode {stationId: 1})-[nextStop*]->(m:StopNode {stationId: 7}) where n.departureInMillis >= 1418011560000 and n.departureInMillis <= 1418060160000 return nextStop
+
         stationNeo4jService.deleteAll();
         stopNeo4jService.deleteAll();
     }
@@ -59,20 +68,31 @@ public class StationNeo4jServiceTest {
             stationNeo4jService.create(stationNode);
         }
 
-        List<Stop> stopList = stopService.getAll();
-        for(Stop stop : stopList) {
-            StopNode stopNode = new StopNode();
-            stopNode.setStopId(stop.getId());
-            stopNode.setStationId(stop.getStation().getId());
-            stopNode.setRideId(stop.getRide().getId());
-            if(stop.getArrival() != null) {
-                stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
+        List<Ride> rideList = rideService.getAll();
+        for(Ride ride : rideList) {
+            List<Stop> stopList = ride.getStops();
+            StopNode prevStopNode = null;
+            for(Stop stop : stopList) {
+                StopNode stopNode = new StopNode();
+                stopNode.setStopId(stop.getId());
+                stopNode.setStationId(stop.getStation().getId());
+                stopNode.setRideId(stop.getRide().getId());
+                if(stop.getArrival() != null) {
+                    stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
+                }
+                if(stop.getDeparture() != null) {
+                    stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
+                }
+                stopNode.setStationNode(stationNeo4jService.findOneByLongProperty("stationId", stop.getStation().getId()));
+
+                if(prevStopNode != null) {
+                    stopNode.addPrevStop(prevStopNode);
+                }
+
+                prevStopNode = stopNeo4jService.create(stopNode);
             }
-            if(stop.getDeparture() != null) {
-                stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
-            }
-            stopNode.setStationNode(stationNeo4jService.findOneByLongProperty("stationId", stop.getStation().getId()));
-            stopNeo4jService.create(stopNode);
+
+
         }
 
         Iterable<StationNode> stationNodeIterable = stationNeo4jService.findAll();
@@ -88,6 +108,8 @@ public class StationNeo4jServiceTest {
         while(stopNodeIterator.hasNext()) {
             stopNodeList.add(stopNodeIterator.next());
         }
+
+        stopNeo4jService.testFindPath();
 
 
         int i = 0;

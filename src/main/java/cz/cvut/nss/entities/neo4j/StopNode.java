@@ -3,6 +3,9 @@ package cz.cvut.nss.entities.neo4j;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author jakubchalupa
  * @since 17.03.15
@@ -26,11 +29,15 @@ public class StopNode {
     @GraphProperty
     private Long arrivalInMillis;
 
+    @Indexed
     @GraphProperty
     private Long departureInMillis;
 
     @RelatedTo(type = "hasStop", direction = Direction.INCOMING)
     private StationNode stationNode;
+
+    @RelatedTo(type = "nextStop", direction = Direction.INCOMING)
+    private Set<StopNode> prevStops;
 
     public Long getId() {
         return id;
@@ -86,5 +93,23 @@ public class StopNode {
 
     public void setStationNode(StationNode stationNode) {
         this.stationNode = stationNode;
+    }
+
+    public Set<StopNode> getPrevStops() {
+        if(prevStops == null) {
+            prevStops = new HashSet<>();
+        }
+
+        return prevStops;
+    }
+
+    public void setPrevStops(Set<StopNode> prevStops) {
+        this.prevStops = prevStops;
+    }
+
+    public void addPrevStop(StopNode stopNode) {
+        if(!getPrevStops().contains(stopNode)) {
+            getPrevStops().add(stopNode);
+        }
     }
 }

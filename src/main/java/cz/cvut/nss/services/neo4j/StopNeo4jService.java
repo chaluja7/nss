@@ -16,4 +16,6 @@ public interface StopNeo4jService {
 
     void deleteAll();
 
+    void testFindPath();
+
 }
