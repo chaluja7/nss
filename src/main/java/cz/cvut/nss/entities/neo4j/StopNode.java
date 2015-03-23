@@ -1,5 +1,6 @@
 package cz.cvut.nss.entities.neo4j;
 
+import cz.cvut.nss.entities.neo4j.relationship.NextStopRelationship;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
 
@@ -33,11 +34,11 @@ public class StopNode {
     @GraphProperty
     private Long departureInMillis;
 
-    @RelatedTo(type = "hasStop", direction = Direction.INCOMING)
+    @RelatedTo(type = "HAS_STOP", direction = Direction.INCOMING)
     private StationNode stationNode;
 
-    @RelatedTo(type = "nextStop", direction = Direction.INCOMING)
-    private Set<StopNode> prevStops;
+    @RelatedToVia(type = "NEXT_STOP")
+    private Set<NextStopRelationship> prevStopNodesRelationShips;
 
     public Long getId() {
         return id;
@@ -95,21 +96,26 @@ public class StopNode {
         this.stationNode = stationNode;
     }
 
-    public Set<StopNode> getPrevStops() {
-        if(prevStops == null) {
-            prevStops = new HashSet<>();
+    public void setPrevStopNodesRelationShips(Set<NextStopRelationship> prevStopNodesRelationShips) {
+        this.prevStopNodesRelationShips = prevStopNodesRelationShips;
+    }
+
+    public Set<NextStopRelationship> getPrevStopNodesRelationShips() {
+        if(prevStopNodesRelationShips == null) {
+            prevStopNodesRelationShips = new HashSet<>();
         }
 
-        return prevStops;
+        return prevStopNodesRelationShips;
     }
 
-    public void setPrevStops(Set<StopNode> prevStops) {
-        this.prevStops = prevStops;
-    }
-
-    public void addPrevStop(StopNode stopNode) {
-        if(!getPrevStops().contains(stopNode)) {
-            getPrevStops().add(stopNode);
+    public void addPrevStopNodeRelationShip(NextStopRelationship prevStopNodeRelationShips) {
+        if(!getPrevStopNodesRelationShips().contains(prevStopNodeRelationShips)) {
+            getPrevStopNodesRelationShips().add(prevStopNodeRelationShips);
         }
     }
+
+    public void hasPrevStopNodeRelationShip(StopNode prevStop, Long travelTime) {
+        addPrevStopNodeRelationShip(new NextStopRelationship(prevStop, this, travelTime));
+    }
+
 }

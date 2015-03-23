@@ -919,7 +919,7 @@ INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (77, 1, '2014-
 INSERT INTO rides(id, line_id) VALUES (78, 17);
 INSERT INTO rides(id, line_id) VALUES (79, 17);
 
-INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 7, null, '2014-12-13 10:56:00');
+INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 7, null, '2014-12-13 08:56:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 6, '2014-12-13 09:05:00', '2014-12-13 09:06:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 5, '2014-12-13 09:11:00', '2014-12-13 09:17:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 3, '2014-12-13 09:23:00', '2014-12-13 09:25:00');
@@ -930,7 +930,7 @@ INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 9, '2014-
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 2, '2014-12-13 12:35:00', '2014-12-13 12:37:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (78, 1, '2014-12-13 14:56:00', null);
 
-INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (79, 7, null, '2014-12-14 10:56:00');
+INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (79, 7, null, '2014-12-14 08:56:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (79, 6, '2014-12-14 09:05:00', '2014-12-14 09:06:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (79, 5, '2014-12-14 09:11:00', '2014-12-14 09:17:00');
 INSERT INTO stops(ride_id, station_id, arrival, departure) VALUES (79, 3, '2014-12-14 09:23:00', '2014-12-14 09:25:00');

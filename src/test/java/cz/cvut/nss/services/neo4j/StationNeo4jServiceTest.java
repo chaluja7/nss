@@ -86,7 +86,7 @@ public class StationNeo4jServiceTest {
                 stopNode.setStationNode(stationNeo4jService.findOneByLongProperty("stationId", stop.getStation().getId()));
 
                 if(prevStopNode != null) {
-                    stopNode.addPrevStop(prevStopNode);
+                    stopNode.hasPrevStopNodeRelationShip(prevStopNode, stopNode.getArrivalInMillis() - prevStopNode.getDepartureInMillis());
                 }
 
                 prevStopNode = stopNeo4jService.create(stopNode);

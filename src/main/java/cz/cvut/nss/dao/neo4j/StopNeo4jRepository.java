@@ -12,7 +12,7 @@ import org.springframework.data.neo4j.repository.RelationshipOperationsRepositor
  */
 public interface StopNeo4jRepository extends GraphRepository<StopNode>, RelationshipOperationsRepository<StopNode> {
 
-    @Query("match path = ((n:StopNode {stationId: {0}})-[nextStop*]->(m:StopNode {stationId: {1}})) where n.departureInMillis >= {2} and n.departureInMillis <= {3} return path")
+    @Query("match path = ((n:StopNode {stationId: {0}})-[NEXT_STOP*]->(m:StopNode {stationId: {1}})) where n.departureInMillis >= {2} and n.departureInMillis <= {3} return path")
     Iterable<EntityPath<StopNode, StopNode>> getShortestNetworkPathBetween(Long stationFrom, Long stationTo, Long departureInMillisMin, Long departureInMillisMax);
 
 }
