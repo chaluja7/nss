@@ -1,8 +1,10 @@
-package cz.cvut.nss.services.neo4j;
+package cz.cvut.nss.services.neo4j.impl;
 
 import cz.cvut.nss.entities.neo4j.StationNode;
 
 /**
+ * Station Neo4j service.
+ *
  * @author jakubchalupa
  * @since 15.03.15
  */

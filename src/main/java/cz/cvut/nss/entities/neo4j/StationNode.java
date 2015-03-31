@@ -6,6 +6,8 @@ import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 /**
+ * Node stanice v grafu.
+ *
  * @author jakubchalupa
  * @since 15.03.15
  */

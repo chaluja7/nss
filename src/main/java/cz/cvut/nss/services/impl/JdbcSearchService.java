@@ -4,24 +4,30 @@ import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.dao.SearchDao;
 import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.utils.comparator.SearchResultByDepartureDateComparator;
+import cz.cvut.nss.utils.filter.SearchResultFilter;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
- * Implementation of SearchService.
+ * JDBC Implementation of SearchService.
  *
  * @author jakubchalupa
  * @since 06.12.14
  */
 @Service
-public class SearchServiceImpl implements SearchService {
+public class JdbcSearchService implements SearchService {
 
     @Autowired
+    @Qualifier("jdbcSearchDao")
     protected SearchDao searchDao;
 
     @Override
@@ -39,7 +45,7 @@ public class SearchServiceImpl implements SearchService {
         Collections.sort(resultList, new SearchResultByDepartureDateComparator());
 
         //vratim jen ty nejrelevantnejsi vyfiltrovane vysledky
-        List<SearchResultWrapper> filteredList = this.getFilteredResults(resultList);
+        List<SearchResultWrapper> filteredList = SearchResultFilter.getFilteredResults(resultList);
 
         if(filteredList.size() <= maxResults || maxResults < 0) {
             return filteredList;
@@ -65,7 +71,7 @@ public class SearchServiceImpl implements SearchService {
         Collections.sort(resultList, new SearchResultByDepartureDateComparator());
 
         //vratim jen ty nejrelevantnejsi vyfiltrovane vysledky
-        List<SearchResultWrapper> filteredList = this.getFilteredResults(resultList);
+        List<SearchResultWrapper> filteredList = SearchResultFilter.getFilteredResults(resultList);
 
         if(filteredList.size() <= maxResults || maxResults < 0) {
             return filteredList;
@@ -79,36 +85,6 @@ public class SearchServiceImpl implements SearchService {
         return retList;
     }
 
-    /**
-     * vyfiltruje jen relevantni search resulty
-     * @param resultList vsechny vysledky vyhledavani - SERAZENE!
-     * @return list vyfiltrovanych nejlepsich vysledku
-     */
-    private List<SearchResultWrapper> getFilteredResults(List<SearchResultWrapper> resultList) {
-        List<SearchResultWrapper> finalList = new ArrayList<>();
-        Set<Long> alreadyUsed = new HashSet<>();
-        //kazdy STOP uzivateli zobrazim pouze na te nejlepsi trase.
-        for(SearchResultWrapper wrapper : resultList) {
-            boolean skip = false;
-            for(Long stopId : wrapper.getStops()) {
-                if(alreadyUsed.contains(stopId)) {
-                    skip = true;
-                    break;
-                }
-            }
 
-            if(skip) {
-                continue;
-            }
-
-            finalList.add(wrapper);
-            for(Long stopId : wrapper.getStops()) {
-                alreadyUsed.add(stopId);
-            }
-
-        }
-
-        return finalList;
-    }
 
 }

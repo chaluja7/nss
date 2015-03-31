@@ -4,13 +4,13 @@ import cz.cvut.nss.entities.neo4j.StopNode;
 import org.springframework.data.neo4j.annotation.*;
 
 /**
- * Relace, slouzi pro urceni dalsich stopu na jedne ride.
+ * Relace, slouzi pro urceni dalsich moznych spoju pro prestup.
  *
  * @author jakubchalupa
  * @since 23.03.15
  */
-@RelationshipEntity(type = "NEXT_STOP")
-public class NextStopRelationship {
+@RelationshipEntity(type = "NEXT_AWAITING_STOP")
+public class NextAwaitingStopRelationship {
 
     @GraphId
     private Long id;
@@ -22,16 +22,16 @@ public class NextStopRelationship {
     private StopNode stopTo;
 
     @GraphProperty
-    private Long travelTime;
+    private Long waitingTime;
 
-    public NextStopRelationship() {
+    public NextAwaitingStopRelationship() {
 
     }
 
-    public NextStopRelationship(StopNode stopFrom, StopNode stopTo, Long travelTime) {
+    public NextAwaitingStopRelationship(StopNode stopFrom, StopNode stopTo, Long waitingTime) {
         this.stopFrom = stopFrom;
         this.stopTo = stopTo;
-        this.travelTime = travelTime;
+        this.waitingTime = waitingTime;
     }
 
     public Long getId() {
@@ -58,11 +58,11 @@ public class NextStopRelationship {
         this.stopTo = stopTo;
     }
 
-    public Long getTravelTime() {
-        return travelTime;
+    public Long getWaitingTime() {
+        return waitingTime;
     }
 
-    public void setTravelTime(Long travelTime) {
-        this.travelTime = travelTime;
+    public void setWaitingTime(Long waitingTime) {
+        this.waitingTime = waitingTime;
     }
 }

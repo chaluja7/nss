@@ -14,6 +14,7 @@
         <f:viewParam name="time" value="#{searchResultBB.departureOrArrivalTime}"/>
         <f:viewParam name="noTransfer" value="#{searchResultBB.withoutTransfers}" />
         <f:viewParam name="timeType" value="#{searchResultBB.timeType}" />
+        <f:viewParam name="neo4j" value="#{searchResultBB.withNeo4j}" />
 
         <f:event type="preRenderView" listener="#{searchResultBB.performSearch}"/>
     </f:metadata>

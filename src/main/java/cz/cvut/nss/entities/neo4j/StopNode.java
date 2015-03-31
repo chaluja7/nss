@@ -1,5 +1,6 @@
 package cz.cvut.nss.entities.neo4j;
 
+import cz.cvut.nss.entities.neo4j.relationship.NextAwaitingStopRelationship;
 import cz.cvut.nss.entities.neo4j.relationship.NextStopRelationship;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
@@ -8,11 +9,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Node stop v grafu.
+ *
  * @author jakubchalupa
  * @since 17.03.15
  */
 @NodeEntity
 public class StopNode {
+
+    public static final String STOP_PROPERTY = "stopId";
+
+    public static final String STATION_PROPERTY = "stationId";
+
+    public static final String RIDE_PROPERTY = "rideId";
+
+    public static final String ARRIVAL_PROPERTY = "arrivalInMillis";
+
+    public static final String DEPARTURE_PROPERTY = "departureInMillis";
 
     @GraphId
     private Long id;
@@ -39,6 +52,9 @@ public class StopNode {
 
     @RelatedToVia(type = "NEXT_STOP")
     private Set<NextStopRelationship> prevStopNodesRelationShips;
+
+    @RelatedToVia(type = "NEXT_AWAITING_STOP")
+    private Set<NextAwaitingStopRelationship> nextAwaitingStopRelationships;
 
     public Long getId() {
         return id;
@@ -114,8 +130,30 @@ public class StopNode {
         }
     }
 
+    public void setNextAwaitingStopRelationships(Set<NextAwaitingStopRelationship> nextAwaitingStopRelationships) {
+        this.nextAwaitingStopRelationships = nextAwaitingStopRelationships;
+    }
+
+    public Set<NextAwaitingStopRelationship> getNextAwaitingStopRelationships() {
+        if(nextAwaitingStopRelationships == null) {
+            nextAwaitingStopRelationships = new HashSet<>();
+        }
+
+        return nextAwaitingStopRelationships;
+    }
+
+    public void addNextAwaitingStopRelationship(NextAwaitingStopRelationship nextAwaitingStopRelationship) {
+        if(!getNextAwaitingStopRelationships().contains(nextAwaitingStopRelationship)) {
+            getNextAwaitingStopRelationships().add(nextAwaitingStopRelationship);
+        }
+    }
+
     public void hasPrevStopNodeRelationShip(StopNode prevStop, Long travelTime) {
         addPrevStopNodeRelationShip(new NextStopRelationship(prevStop, this, travelTime));
+    }
+
+    public void hasNextAwaitingStopNodeRelationShip(StopNode nextAwaitingStop, Long waitingTime) {
+        addNextAwaitingStopRelationship(new NextAwaitingStopRelationship(this, nextAwaitingStop, waitingTime));
     }
 
 }

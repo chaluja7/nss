@@ -4,6 +4,7 @@ import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class SearchServiceTest extends AbstractServiceTest {
 
     @Autowired
+    @Qualifier("jdbcSearchService")
     private SearchService searchService;
 
     @Test

@@ -1,24 +1,29 @@
 package cz.cvut.nss.services.neo4j;
 
+import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.entities.neo4j.StationNode;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.services.RideService;
+import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
-import cz.cvut.nss.services.StopService;
+import cz.cvut.nss.services.neo4j.impl.StationNeo4jService;
+import cz.cvut.nss.services.neo4j.impl.StopNeo4jService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author jakubchalupa
@@ -40,10 +45,11 @@ public class StationNeo4jServiceTest {
     private StationService stationService;
 
     @Autowired
-    private StopService stopService;
+    private RideService rideService;
 
     @Autowired
-    private RideService rideService;
+    @Qualifier("neo4jSearchService")
+    private SearchService searchService;
 
     @Test
     public void testIt() {
@@ -89,31 +95,44 @@ public class StationNeo4jServiceTest {
                     stopNode.hasPrevStopNodeRelationShip(prevStopNode, stopNode.getArrivalInMillis() - prevStopNode.getDepartureInMillis());
                 }
 
-                prevStopNode = stopNeo4jService.create(stopNode);
+                prevStopNode = stopNeo4jService.save(stopNode);
             }
-
-
         }
 
-        Iterable<StationNode> stationNodeIterable = stationNeo4jService.findAll();
-        List<StationNode> stationNodeList = new ArrayList<>();
-        Iterator<StationNode> stationNodeIterator = stationNodeIterable.iterator();
-        while(stationNodeIterator.hasNext()) {
-            stationNodeList.add(stationNodeIterator.next());
+
+        Iterable<StationNode> allStationNodesIterable = stationNeo4jService.findAll();
+        Iterator<StationNode> allStationNodesIterator = allStationNodesIterable.iterator();
+        while(allStationNodesIterator.hasNext()) {
+            StationNode stationNode = allStationNodesIterator.next();
+
+            Set<StopNode> notStartingStopNodesByStationOrderByArrival = stopNeo4jService.findNotStartingStopNodesByStationOrderByArrival(stationNode.getStationId());
+            for (StopNode stopNodeFrom : notStartingStopNodesByStationOrderByArrival) {
+
+                long maxDepartureInMillis = stopNodeFrom.getArrivalInMillis() + 86400000;
+                Set<StopNode> possibleAwaitingTransferStopNodes = stopNeo4jService.findByStationAndDepartureRange(stopNodeFrom.getStationId(), stopNodeFrom.getArrivalInMillis(), maxDepartureInMillis);
+
+                for (StopNode stopNodeTo : possibleAwaitingTransferStopNodes) {
+                    stopNodeFrom.hasNextAwaitingStopNodeRelationShip(stopNodeTo, stopNodeTo.getDepartureInMillis() - stopNodeFrom.getArrivalInMillis());
+                }
+
+                stopNeo4jService.save(stopNodeFrom);
+            }
         }
 
-        Iterable<StopNode> stopNodeIterable = stopNeo4jService.findAll();
-        List<StopNode> stopNodeList = new ArrayList<>();
-        Iterator<StopNode> stopNodeIterator = stopNodeIterable.iterator();
-        while(stopNodeIterator.hasNext()) {
-            stopNodeList.add(stopNodeIterator.next());
-        }
-
-        stopNeo4jService.testFindPath();
-
-
-        int i = 0;
     }
 
+    @Test
+    public void testSearch() {
+
+
+        List<SearchResultWrapper> pathsWithTransfers = searchService.findPathByDepartureDate(4, 7, new Date(1418061600000l), 5, 3, 5);
+
+        int i = 0;
+
+    }
 
 }
+
+
+
+

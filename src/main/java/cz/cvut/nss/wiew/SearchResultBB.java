@@ -4,11 +4,10 @@ import cz.cvut.nss.SearchWrappers.FoundedPathsWrapper;
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.entities.Stop;
-import cz.cvut.nss.entities.neo4j.StationNode;
 import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
-import cz.cvut.nss.services.neo4j.StationNeo4jService;
+import cz.cvut.nss.services.neo4j.impl.StationNeo4jService;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
@@ -36,14 +35,17 @@ public class SearchResultBB {
     @ManagedProperty(value = "#{stationServiceImpl}")
     private StationService stationService;
 
-    @ManagedProperty(value = "#{searchServiceImpl}")
-    private SearchService searchService;
-
     @ManagedProperty(value = "#{stopServiceImpl}")
     private StopService stopService;
 
     @ManagedProperty(value = "#{stationNeo4jServiceImpl}")
     private StationNeo4jService stationNeo4jService;
+
+    @ManagedProperty(value= "#{neo4jSearchService}")
+    private SearchService neo4jSearchService;
+
+    @ManagedProperty(value = "#{jdbcSearchService}")
+    private SearchService jdbcSearchService;
 
     private String stationFromTitle;
 
@@ -61,47 +63,29 @@ public class SearchResultBB {
 
     private boolean withoutTransfers;
 
+    private boolean withNeo4j;
+
     private String timeType;
 
     private boolean errorInputs = false;
 
     private List<FoundedPathsWrapper> foundResults;
 
-    public void testNeo4j() {
-
-        //stationNeo4jService.deleteAll();
-
-        StationNode stationNode = new StationNode();
-        stationNode.setTitle("zkouštičkaaaa");
-        stationNode.setName("zkouštičkaaaaa jméno");
-        StationNode stationNode1 = stationNeo4jService.create(stationNode);
-
-        StationNode stationNode2 = new StationNode();
-        stationNode2.setTitle("zk2aaaa");
-        stationNode2.setName("name2aaaa");
-        StationNode stationNode3 = stationNeo4jService.create(stationNode2);
-
-        StationNode retrieved = stationNeo4jService.findById(10);
-        StationNode retrieved2 = stationNeo4jService.findById(stationNode1.getId());
-
-        Iterable<StationNode> all = stationNeo4jService.findAll();
-
-
-        int i = 0;
-    }
-
     public void performSearch() {
         long l = System.currentTimeMillis();
         prepareAndValidateInputs();
-        testNeo4j();
 
         if(!errorInputs) {
             List<SearchResultWrapper> path;
 
             if(timeType.equals("departure")) {
-                path = searchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 2, -1);
+                if(isWithNeo4j()) {
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, -1);
+                } else {
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, -1);
+                }
             } else {
-                path = searchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 2, 3);
+                path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
             }
 
             foundResults = new ArrayList<>();
@@ -196,6 +180,14 @@ public class SearchResultBB {
         this.withoutTransfers = withoutTransfers;
     }
 
+    public boolean isWithNeo4j() {
+        return withNeo4j;
+    }
+
+    public void setWithNeo4j(boolean withNeo4j) {
+        this.withNeo4j = withNeo4j;
+    }
+
     public String getTimeType() {
         return timeType;
     }
@@ -216,15 +208,19 @@ public class SearchResultBB {
         this.stationService = stationService;
     }
 
-    public void setSearchService(SearchService searchService) {
-        this.searchService = searchService;
-    }
-
     public void setStopService(StopService stopService) {
         this.stopService = stopService;
     }
 
     public void setStationNeo4jService(StationNeo4jService stationNeo4jService) {
         this.stationNeo4jService = stationNeo4jService;
+    }
+
+    public void setNeo4jSearchService(SearchService neo4jSearchService) {
+        this.neo4jSearchService = neo4jSearchService;
+    }
+
+    public void setJdbcSearchService(SearchService jdbcSearchService) {
+        this.jdbcSearchService = jdbcSearchService;
     }
 }
