@@ -72,16 +72,15 @@
     </bean>
 
 
-
-     <!-- NEO 4J -->
+     <!-- NEO4J -->
     <bean id="graphDatabaseService" class="org.springframework.data.neo4j.support.GraphDatabaseServiceFactoryBean"
           destroy-method="shutdown" scope="singleton">
-        <constructor-arg index="0" value="/Users/jakubchalupa/Documents/AS/neo4j-community-2.1.7/data/graph.db"/>
-        <constructor-arg index="1">
+        <property name="path" value="${neo4j.path}" />
+        <property name="config">
             <map>
-                <entry key="enable_remote_shell" value="true"/>
+                <entry key="enable_remote_shell" value="true" />
             </map>
-        </constructor-arg>
+        </property>
     </bean>
 
     <bean id="neo4jTransactionManagerService" class="org.neo4j.kernel.impl.transaction.SpringTransactionManager">
@@ -102,4 +101,5 @@
     <neo4j:repositories base-package="cz.cvut.nss.dao.neo4j" />
 
     <neo4j:config graphDatabaseService="graphDatabaseService" base-package="cz.cvut.nss.entities.neo4j"/>
+
 </beans>

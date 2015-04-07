@@ -2,7 +2,6 @@ package cz.cvut.nss.entities.neo4j;
 
 import cz.cvut.nss.entities.neo4j.relationship.NextAwaitingStopRelationship;
 import cz.cvut.nss.entities.neo4j.relationship.NextStopRelationship;
-import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
 
 import java.util.HashSet;
@@ -46,9 +45,6 @@ public class StopNode {
     @Indexed
     @GraphProperty
     private Long departureInMillis;
-
-    @RelatedTo(type = "HAS_STOP", direction = Direction.INCOMING)
-    private StationNode stationNode;
 
     @RelatedToVia(type = "NEXT_STOP")
     private Set<NextStopRelationship> prevStopNodesRelationShips;
@@ -102,14 +98,6 @@ public class StopNode {
 
     public void setDepartureInMillis(Long departureInMillis) {
         this.departureInMillis = departureInMillis;
-    }
-
-    public StationNode getStationNode() {
-        return stationNode;
-    }
-
-    public void setStationNode(StationNode stationNode) {
-        this.stationNode = stationNode;
     }
 
     public void setPrevStopNodesRelationShips(Set<NextStopRelationship> prevStopNodesRelationShips) {

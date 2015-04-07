@@ -51,4 +51,10 @@ public interface RideService {
      */
     public List<Ride> getAll();
 
+    /**
+     * import the whole ride into neo4j graph db
+     * @param id ride id
+     */
+    public void importRideToNeo4j(long id);
+
 }

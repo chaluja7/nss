@@ -1,11 +1,21 @@
 $(document).ready(function() {
 
     var table = $("#dataTableList").DataTable( {
-        "sAjaxSource": "../api/stationsDataTable",
-        "aoColumns": [
-            {"mData": "title"},
-            {"mData": "name"},
-            {"mData": "region"}
+        "serverSide": true,
+        "processing": true,
+        "ajax": {
+            "url": "../api/stationsDataTable",
+            "type": "POST",
+            "dataType": "json",
+            "contentType": "application/json",
+            "data": function(d) {
+                return JSON.stringify(d);
+            }
+        },
+        "columns": [
+            {"data": "title"},
+            {"data": "name"},
+            {"data": "region"}
         ],
         "fnDrawCallback": function() {
             $('#dataTableList tbody tr').click(function () {

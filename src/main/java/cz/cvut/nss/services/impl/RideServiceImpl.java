@@ -2,7 +2,10 @@ package cz.cvut.nss.services.impl;
 
 import cz.cvut.nss.dao.RideDao;
 import cz.cvut.nss.entities.Ride;
+import cz.cvut.nss.entities.Stop;
+import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.services.RideService;
+import cz.cvut.nss.services.neo4j.StopNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class RideServiceImpl implements RideService {
 
     @Autowired
     protected RideDao rideDao;
+
+    @Autowired
+    protected StopNeo4jService stopNeo4jService;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -65,6 +71,35 @@ public class RideServiceImpl implements RideService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Ride> getAll() {
         return rideDao.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void importRideToNeo4j(long id) {
+        Ride ride = getRide(id);
+
+        if(ride != null) {
+            List<Stop> stopList = ride.getStops();
+            StopNode prevStopNode = null;
+            for (Stop stop : stopList) {
+                StopNode stopNode = new StopNode();
+                stopNode.setStopId(stop.getId());
+                stopNode.setStationId(stop.getStation().getId());
+                stopNode.setRideId(stop.getRide().getId());
+                if (stop.getArrival() != null) {
+                    stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
+                }
+                if (stop.getDeparture() != null) {
+                    stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
+                }
+
+                if (prevStopNode != null) {
+                    stopNode.hasPrevStopNodeRelationShip(prevStopNode, stopNode.getArrivalInMillis() - prevStopNode.getDepartureInMillis());
+                }
+
+                prevStopNode = stopNeo4jService.save(stopNode);
+            }
+        }
     }
 
 }

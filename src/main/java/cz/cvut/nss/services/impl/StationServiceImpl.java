@@ -1,8 +1,11 @@
 package cz.cvut.nss.services.impl;
 
+import cz.cvut.nss.api.datatable.CommonRequest;
 import cz.cvut.nss.dao.StationDao;
 import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.services.StationService;
+import cz.cvut.nss.utils.dto.EntitiesAndCountResult;
+import cz.cvut.nss.utils.dto.IdsAndCountResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -72,5 +75,24 @@ public class StationServiceImpl implements StationService {
     public Station getStationByTitle(String title) {
         return stationDao.getStationByTitle(title);
     }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public EntitiesAndCountResult<Station> getAllForDatatables(CommonRequest filter) {
+        IdsAndCountResult idsAndCountResult = stationDao.getStationIdsByFilter(filter);
+        EntitiesAndCountResult<Station> entitiesAndCountResult = new EntitiesAndCountResult<>();
+
+        entitiesAndCountResult.setEntities(stationDao.getByIds(idsAndCountResult.getList(), true));
+        entitiesAndCountResult.setCount(idsAndCountResult.getCount());
+
+        return entitiesAndCountResult;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public int getCountAll() {
+        return stationDao.getCountAll();
+    }
+
 
 }

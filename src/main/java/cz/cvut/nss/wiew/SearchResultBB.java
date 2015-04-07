@@ -7,7 +7,6 @@ import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
-import cz.cvut.nss.services.neo4j.impl.StationNeo4jService;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
@@ -37,9 +36,6 @@ public class SearchResultBB {
 
     @ManagedProperty(value = "#{stopServiceImpl}")
     private StopService stopService;
-
-    @ManagedProperty(value = "#{stationNeo4jServiceImpl}")
-    private StationNeo4jService stationNeo4jService;
 
     @ManagedProperty(value= "#{neo4jSearchService}")
     private SearchService neo4jSearchService;
@@ -210,10 +206,6 @@ public class SearchResultBB {
 
     public void setStopService(StopService stopService) {
         this.stopService = stopService;
-    }
-
-    public void setStationNeo4jService(StationNeo4jService stationNeo4jService) {
-        this.stationNeo4jService = stationNeo4jService;
     }
 
     public void setNeo4jSearchService(SearchService neo4jSearchService) {

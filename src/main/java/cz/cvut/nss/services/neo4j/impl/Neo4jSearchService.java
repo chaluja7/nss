@@ -1,4 +1,4 @@
-package cz.cvut.nss.services.neo4j;
+package cz.cvut.nss.services.neo4j.impl;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.dao.SearchDao;

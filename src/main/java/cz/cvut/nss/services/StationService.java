@@ -1,6 +1,8 @@
 package cz.cvut.nss.services;
 
+import cz.cvut.nss.api.datatable.CommonRequest;
 import cz.cvut.nss.entities.Station;
+import cz.cvut.nss.utils.dto.EntitiesAndCountResult;
 
 import java.util.List;
 
@@ -57,5 +59,18 @@ public interface StationService {
      * @return station with given title or null
      */
     public Station getStationByTitle(String title);
+
+    /**
+     * find all filtered stations for datatables and count
+     * @param filter filter
+     * @return list stations and count
+     */
+    public EntitiesAndCountResult<Station> getAllForDatatables(CommonRequest filter);
+
+    /**
+     * get count of all stations
+     * @return count of all stations
+     */
+    public int getCountAll();
 
 }

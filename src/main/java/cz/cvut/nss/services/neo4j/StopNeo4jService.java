@@ -1,4 +1,4 @@
-package cz.cvut.nss.services.neo4j.impl;
+package cz.cvut.nss.services.neo4j;
 
 import cz.cvut.nss.entities.neo4j.StopNode;
 
@@ -35,5 +35,11 @@ public interface StopNeo4jService {
      * @return nalezene stopy
      */
     Set<StopNode> findByStationAndDepartureRange(Long stationId, Long departureInMillisMin, Long departureInMillisMax);
+
+    /**
+     * propoji stopy v neo4j prestupnymi hranami (tedy v ramci jedne stanice)
+     * @param stationId id stanice
+     */
+    void connectStopNodesOnStationWithWaitingStopRelationship(long stationId);
 
 }

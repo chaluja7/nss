@@ -12,12 +12,27 @@ public class DataTableResource<T> {
 
     private List<T> aaData;
 
+    private int recordsFiltered;
+
+    private int recordsTotal;
+
     public DataTableResource() {
 
     }
 
     public DataTableResource(List<T> data) {
         setAaData(data);
+    }
+
+    public DataTableResource(List<T> data, int recordsFiltered) {
+        setAaData(data);
+        setRecordsFiltered(recordsFiltered);
+    }
+
+    public DataTableResource(List<T> data, int recordsFiltered, int recordsTotal) {
+        setAaData(data);
+        setRecordsFiltered(recordsFiltered);
+        setRecordsTotal(recordsTotal);
     }
 
     public List<T> getAaData() {
@@ -28,4 +43,19 @@ public class DataTableResource<T> {
         this.aaData = aaData;
     }
 
+    public int getRecordsFiltered() {
+        return recordsFiltered;
+    }
+
+    public void setRecordsFiltered(int recordsFiltered) {
+        this.recordsFiltered = recordsFiltered;
+    }
+
+    public int getRecordsTotal() {
+        return recordsTotal;
+    }
+
+    public void setRecordsTotal(int recordsTotal) {
+        this.recordsTotal = recordsTotal;
+    }
 }
