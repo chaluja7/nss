@@ -1,6 +1,8 @@
 package cz.cvut.nss.services;
 
+import cz.cvut.nss.api.datatable.CommonRequest;
 import cz.cvut.nss.entities.Line;
+import cz.cvut.nss.utils.dto.EntitiesAndCountResult;
 
 import java.util.List;
 
@@ -43,5 +45,18 @@ public interface LineService {
      * @return all lines
      */
     public List<Line> getAll();
+
+    /**
+     * find all filtered lines for datatables and count
+     * @param filter filter
+     * @return list lines and count
+     */
+    public EntitiesAndCountResult<Line> getAllForDatatables(CommonRequest filter);
+
+    /**
+     * get count of all lines
+     * @return count of all lines
+     */
+    public int getCountAll();
 
 }

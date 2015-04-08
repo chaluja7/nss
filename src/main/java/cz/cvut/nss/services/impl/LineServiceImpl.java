@@ -1,8 +1,11 @@
 package cz.cvut.nss.services.impl;
 
+import cz.cvut.nss.api.datatable.CommonRequest;
 import cz.cvut.nss.dao.LineDao;
 import cz.cvut.nss.entities.Line;
 import cz.cvut.nss.services.LineService;
+import cz.cvut.nss.utils.dto.EntitiesAndCountResult;
+import cz.cvut.nss.utils.dto.IdsAndCountResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -54,6 +57,24 @@ public class LineServiceImpl implements LineService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Line> getAll() {
         return lineDao.findAll();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public EntitiesAndCountResult<Line> getAllForDatatables(CommonRequest filter) {
+        IdsAndCountResult idsAndCountResult = lineDao.getLineIdsByFilter(filter);
+        EntitiesAndCountResult<Line> entitiesAndCountResult = new EntitiesAndCountResult<>();
+
+        entitiesAndCountResult.setEntities(lineDao.getByIds(idsAndCountResult.getList(), true));
+        entitiesAndCountResult.setCount(idsAndCountResult.getCount());
+
+        return entitiesAndCountResult;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public int getCountAll() {
+        return lineDao.getCountAll();
     }
 
 }

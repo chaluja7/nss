@@ -29,13 +29,13 @@ public class RouteContoller {
     @RequestMapping(value ="/routes", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     @Transactional
     public List<RouteResource> getRoutes() {
-        return getAllTransformedRoutes();
+        return getTransformedRoutes(routeService.getAll());
     }
 
     @RequestMapping(value ="/routesDataTable", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     @Transactional
     public DataTableResource<RouteResource> getRoutesForDataTable() {
-        return new DataTableResource<>(getAllTransformedRoutes());
+        return new DataTableResource<>(getTransformedRoutes(routeService.getAll()));
     }
 
     /**
@@ -43,9 +43,9 @@ public class RouteContoller {
      *
      * @return list route resourcu
      */
-    private List<RouteResource> getAllTransformedRoutes() {
+    private List<RouteResource> getTransformedRoutes(List<Route> routeList) {
         List<RouteResource> resourceList = new ArrayList<>();
-        for(Route route : routeService.getAll()) {
+        for(Route route : routeList) {
             RouteResource resource = new RouteResource();
             resource.setId(route.getId());
             resource.setName(route.getName());
