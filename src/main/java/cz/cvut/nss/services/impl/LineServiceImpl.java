@@ -3,7 +3,9 @@ package cz.cvut.nss.services.impl;
 import cz.cvut.nss.api.datatable.CommonRequest;
 import cz.cvut.nss.dao.LineDao;
 import cz.cvut.nss.entities.Line;
+import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.services.LineService;
+import cz.cvut.nss.services.neo4j.StopNeo4jService;
 import cz.cvut.nss.utils.dto.EntitiesAndCountResult;
 import cz.cvut.nss.utils.dto.IdsAndCountResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class LineServiceImpl implements LineService {
 
     @Autowired
     protected LineDao lineDao;
+
+    @Autowired
+    protected StopNeo4jService stopNeo4jService;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -50,7 +55,13 @@ public class LineServiceImpl implements LineService {
     @Transactional
     @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteLine(long id) {
-        lineDao.delete(id);
+        Line line = lineDao.find(id);
+        if(line != null) {
+            for(Ride ride : line.getRides()) {
+                stopNeo4jService.deleteAllByRideId(ride.getId());
+            }
+            lineDao.delete(id);
+        }
     }
 
     @Override

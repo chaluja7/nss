@@ -32,15 +32,6 @@
             <h:commandButton value="Vytvořit" action="#{stationBB.saveStation}" rendered="#{stationBB.id == null}" styleClass="submitButton"/>
             <h:commandButton value="Uložit" action="#{stationBB.updateStation}"  rendered="#{stationBB.id != null}" styleClass="submitButton"/>
 
-            <h:panelGroup rendered="#{stationBB.id != null}" layout="block">
-                <h:panelGroup layout="block" styleClass="dangerZone" />
-                <h:panelGroup layout="block" styleClass="centerBox">
-                    <h:commandButton value="Smazat stanici" action="#{stationBB.deleteStation}" styleClass="deleteButton"
-                                     onclick="return confirm('Opravdu chcete tuto akci provést? ' +
-                                      'Smazáním stanice odstraníte i příslušné zastávky na trase a zastavení vlaku.')"/>
-                </h:panelGroup>
-            </h:panelGroup>
-
         </h:form>
 
     </ui:define>

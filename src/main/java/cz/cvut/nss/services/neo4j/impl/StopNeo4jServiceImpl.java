@@ -71,4 +71,19 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
         }
     }
 
+    @Override
+    public void deleteByStopId(long stopId) {
+        StopNode stopNode = stopNeo4jRepository.findByStopId(stopId);
+        if(stopNode != null) {
+            stopNeo4jRepository.delete(stopNode);
+        }
+    }
+
+    @Override
+    public void deleteAllByRideId(long rideId) {
+        for(StopNode stopNode : stopNeo4jRepository.findByRideId(rideId)) {
+            stopNeo4jRepository.delete(stopNode);
+        }
+    }
+
 }

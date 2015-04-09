@@ -65,4 +65,10 @@ public interface StopNeo4jRepository extends GraphRepository<StopNode> {
     @Query("match (n:StopNode {stationId: {0}}) where n.arrivalInMillis >= {1} and n.arrivalInMillis <= {2} return n")
     Iterable<Node> findByStationAndArrivalRangeReturnIterable(Long stationId, Long arrivalInMillisMin, Long arrivalInMillisMax);
 
+    @Query("match (n:StopNode {stopId: {0}}) return n")
+    StopNode findByStopId(Long stopId);
+
+    @Query("match (n:StopNode {rideId: {0}}) return n")
+    Set<StopNode> findByRideId(Long rideId);
+
 }

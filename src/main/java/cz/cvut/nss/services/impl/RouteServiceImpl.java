@@ -1,8 +1,11 @@
 package cz.cvut.nss.services.impl;
 
 import cz.cvut.nss.dao.RouteDao;
+import cz.cvut.nss.entities.Line;
+import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Route;
 import cz.cvut.nss.services.RouteService;
+import cz.cvut.nss.services.neo4j.StopNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class RouteServiceImpl implements RouteService {
 
     @Autowired
     protected RouteDao routeDao;
+
+    @Autowired
+    protected StopNeo4jService stopNeo4jService;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -58,7 +64,16 @@ public class RouteServiceImpl implements RouteService {
     @Transactional
     @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteRoute(long id) {
-        routeDao.delete(id);
+        Route route = routeDao.find(id);
+        if(route != null) {
+            for(Line line : route.getLines()) {
+                for(Ride ride : line.getRides()) {
+                    stopNeo4jService.deleteAllByRideId(ride.getId());
+                }
+            }
+
+            routeDao.delete(id);
+        }
     }
 
     @Override

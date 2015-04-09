@@ -42,4 +42,8 @@ public interface StopNeo4jService {
      */
     void connectStopNodesOnStationWithWaitingStopRelationship(long stationId);
 
+    void deleteByStopId(long stopId);
+
+    void deleteAllByRideId(long rideId);
+
 }

@@ -47,11 +47,6 @@ public class StationBB {
         return "station-list?faces-redirect=true";
     }
 
-    public String deleteStation() {
-        stationService.deleteStation(station.getId());
-        return "station-list?faces-redirect=true";
-    }
-
     public Map<String, Object> getAllRegions() {
         Map<String, Object> map = new HashMap<>();
         for(Region region : regionService.getAll()) {
