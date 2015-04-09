@@ -103,12 +103,7 @@ public class Neo4jSearchDao implements SearchDao {
         }
 
         //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
-        List<SearchResultWrapper> resultList = new ArrayList<>();
-        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
-            resultList.add(entry.getValue());
-        }
-
-        return resultList;
+        return transformSearchResultWrapperMapToList(ridesMap);
     }
 
     @Override
@@ -178,6 +173,15 @@ public class Neo4jSearchDao implements SearchDao {
         }
 
         //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
+        return transformSearchResultWrapperMapToList(ridesMap);
+    }
+
+    /**
+     * vrati list value hodnot z mapy
+     * @param ridesMap mapa search result wrapperu
+     * @return list search result wrapperu
+     */
+    protected List<SearchResultWrapper> transformSearchResultWrapperMapToList(Map<String, SearchResultWrapper> ridesMap) {
         List<SearchResultWrapper> resultList = new ArrayList<>();
         for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
             resultList.add(entry.getValue());

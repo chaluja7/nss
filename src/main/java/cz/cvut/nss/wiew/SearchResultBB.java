@@ -8,6 +8,7 @@ import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
 import cz.cvut.nss.utils.EosDateTimeUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
 
@@ -59,6 +60,8 @@ public class SearchResultBB {
 
     private boolean withoutTransfers;
 
+    private int maxTransfers;
+
     private boolean withNeo4j;
 
     private String timeType;
@@ -73,18 +76,19 @@ public class SearchResultBB {
 
         if(!errorInputs) {
             List<SearchResultWrapper> path;
+            int maxNumberOfTransfers = withoutTransfers ? 0 : maxTransfers;
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, -1);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
                 }
             }
 
@@ -116,6 +120,44 @@ public class SearchResultBB {
         int i = 0;
     }
 
+    public void findNextRides() {
+        DateTime newDateTime;
+        if(foundResults != null && !foundResults.isEmpty()) {
+            //jako bernou minci beru posledni nalazeny spoj a cas odjezdu z vychozi stanice
+            FoundedPathsWrapper lastFoundedPathWrapper = foundResults.get(foundResults.size() - 1);
+            Stop firstStop = lastFoundedPathWrapper.getStops().get(0);
+            DateTime dateTime = firstStop.getDeparture().toDateTime();
+            newDateTime = dateTime.plusMillis(1);
+            timeType = "departure";
+        } else {
+            DateTime dateTime = new DateTime(departureOrArrival);
+            newDateTime = dateTime.plusHours(9);
+        }
+
+        departureOrArrival = newDateTime.toDate();
+        departureOrArrivalDate = newDateTime.toString(EosDateTimeUtils.datePattern);
+        departureOrArrivalTime = newDateTime.toString(EosDateTimeUtils.timePattern);
+    }
+
+    public void findPrevRides() {
+        DateTime newDateTime;
+        if(foundResults != null && !foundResults.isEmpty()) {
+            //jako bernou minci beru prvni nalazeny spoj a cas prijezdu do cilove stanice
+            FoundedPathsWrapper firstFoundedPathWrapper = foundResults.get(0);
+            Stop lastStop = firstFoundedPathWrapper.getStops().get(firstFoundedPathWrapper.getStops().size() - 1);
+            DateTime dateTime = lastStop.getArrival().toDateTime();
+            newDateTime = dateTime.minusMillis(1);
+            timeType = "arrival";
+        } else {
+            DateTime dateTime = new DateTime(departureOrArrival);
+            newDateTime = dateTime.minusHours(9);
+        }
+
+        departureOrArrival = newDateTime.toDate();
+        departureOrArrivalDate = newDateTime.toString(EosDateTimeUtils.datePattern);
+        departureOrArrivalTime = newDateTime.toString(EosDateTimeUtils.timePattern);
+    }
+
     private void prepareAndValidateInputs() {
         stationFrom = stationService.getStationByTitle(stationFromTitle);
         stationTo = stationService.getStationByTitle(stationToTitle);
@@ -125,12 +167,14 @@ public class SearchResultBB {
             return;
         }
 
-        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
-        try {
-            departureOrArrival = dateFormat.parse(departureOrArrivalDate + " " + departureOrArrivalTime);
-        } catch (ParseException e) {
-            errorInputs = true;
-            return;
+        if(departureOrArrival == null) {
+            DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+            try {
+                departureOrArrival = dateFormat.parse(departureOrArrivalDate + " " + departureOrArrivalTime);
+            } catch (ParseException e) {
+                errorInputs = true;
+                return;
+            }
         }
 
         if(timeType == null || (!timeType.equals("departure") && !timeType.equals("arrival"))) {
@@ -178,6 +222,14 @@ public class SearchResultBB {
 
     public void setWithoutTransfers(boolean withoutTransfers) {
         this.withoutTransfers = withoutTransfers;
+    }
+
+    public int getMaxTransfers() {
+        return maxTransfers;
+    }
+
+    public void setMaxTransfers(int maxTransfers) {
+        this.maxTransfers = maxTransfers;
     }
 
     public boolean isWithNeo4j() {

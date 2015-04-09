@@ -137,6 +137,13 @@ ul.errorJsf li {
     font-size: 18px;
 }
 
+.inputRowBasic select {
+    width: 120px;
+    padding: 0;
+    height: 25px;
+    font-size: 18px;
+}
+
 tfoot input {
     width: 100%;
     padding: 3px;
@@ -239,6 +246,22 @@ input[type="submit"].deleteOneButton {
     color: red;
 }
 
+.nextOrPrevRidesButton {
+    background-color: #999999;
+    border-radius: 5px;
+    font-size: 12px;
+    color: white;
+    border: 0;
+    width: 200px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    float: right;
+}
+
+.nextOrPrevRidesButton:hover {
+    color: #000000;
+}
+
 .dangerZone {
     height: 2px;
     background-color: red;
@@ -317,4 +340,8 @@ th, td {
 
 .noDisplay {
     display: none;
+}
+
+.clearer {
+    clear: both;
 }

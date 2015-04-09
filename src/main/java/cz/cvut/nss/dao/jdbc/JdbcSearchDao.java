@@ -38,12 +38,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         findRidesByDepartureDateAlgorithm(stationFromId, stationToId, departure, maxDeparture, 0, ridesMap, new ArrayList<Long>(), new ArrayList<Long>(), maxTransfers);
 
         //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
-        List<SearchResultWrapper> resultList = new ArrayList<>();
-        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
-            resultList.add(entry.getValue());
-        }
-
-        return resultList;
+        return transformSearchResultWrapperMapToList(ridesMap);
     }
 
     @Override
@@ -51,12 +46,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
         findRidesByArrivalDateAlgorithm(stationFromId, stationToId, arrival, minArrival, 0, ridesMap, new ArrayList<Long>(), new ArrayList<Long>(), maxTransfers);
 
-        List<SearchResultWrapper> resultList = new ArrayList<>();
-        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
-            resultList.add(entry.getValue());
-        }
-
-        return resultList;
+        return transformSearchResultWrapperMapToList(ridesMap);
     }
 
     /**
@@ -71,7 +61,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
      * @param visitedRides jiz navstivene ridy v ramci rekurze (abych do nich nelezl znovu) a abych znal nalezenou cestu
      * @param maxTransfers max pocet prestupu (max zanoreni rekurze)
      */
-    private void findRidesByDepartureDateAlgorithm(long stationFromId, long stationToId, Date departure, Date maxDateDeparture, int stepNumber,
+    protected void findRidesByDepartureDateAlgorithm(long stationFromId, long stationToId, Date departure, Date maxDateDeparture, int stepNumber,
                               Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
                               int maxTransfers) {
 
@@ -147,7 +137,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         }
     }
 
-    private void findRidesByArrivalDateAlgorithm(long stationFromId, long stationToId, Date arrival, Date minDateArrival, int stepNumber,
+    protected void findRidesByArrivalDateAlgorithm(long stationFromId, long stationToId, Date arrival, Date minDateArrival, int stepNumber,
                                                    Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
                                                    int maxTransfers) {
 
@@ -223,8 +213,18 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
         }
     }
 
+    /**
+     * vrati list value hodnot z mapy
+     * @param ridesMap mapa search result wrapperu
+     * @return list search result wrapperu
+     */
+    protected List<SearchResultWrapper> transformSearchResultWrapperMapToList(Map<String, SearchResultWrapper> ridesMap) {
+        List<SearchResultWrapper> resultList = new ArrayList<>();
+        for(Map.Entry<String, SearchResultWrapper> entry : ridesMap.entrySet()) {
+            resultList.add(entry.getValue());
+        }
 
-
-
+        return resultList;
+    }
 
 }

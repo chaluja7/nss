@@ -73,6 +73,10 @@ public class StationServiceImpl implements StationService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public Station getStationByTitle(String title) {
+        if(title == null) {
+            return null;
+        }
+
         return stationDao.getStationByTitle(title);
     }
 

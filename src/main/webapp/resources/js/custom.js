@@ -57,5 +57,12 @@ $(document).ready(function() {
         step: 15
     });
 
+    $("#noTransfer").change(function() {
+        if(this.checked) {
+            $("#maxTransfersDiv").hide();
+        } else {
+            $("#maxTransfersDiv").show();
+        }
+    });
 
 });
