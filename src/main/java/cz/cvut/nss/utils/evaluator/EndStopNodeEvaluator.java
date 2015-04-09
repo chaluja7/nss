@@ -21,14 +21,17 @@ public final class EndStopNodeEvaluator implements Evaluator {
 
     private final Long endStationId;
 
-    private final Long maxDepartureInMillis;
+    private final Long maxDepartureOrMinArrivalInMillis;
 
     private final int maxTransfers;
 
-    public EndStopNodeEvaluator(Long endStationId, Long maxDepartureInMillis, int maxTransfers) {
+    private final EndStopNodeEvaluatorType searchingType;
+
+    public EndStopNodeEvaluator(Long endStationId, Long maxDepartureOrMinArrivalInMillis, int maxTransfers, EndStopNodeEvaluatorType searchingType) {
         this.endStationId = endStationId;
-        this.maxDepartureInMillis = maxDepartureInMillis;
+        this.maxDepartureOrMinArrivalInMillis = maxDepartureOrMinArrivalInMillis;
         this.maxTransfers = maxTransfers;
+        this.searchingType = searchingType;
     }
 
     @Override
@@ -90,9 +93,24 @@ public final class EndStopNodeEvaluator implements Evaluator {
         }
 
         //mimo casovy rozsah
-        if(prevRelationShipType != null && prevRelationShipType.equals(RelTypes.NEXT_AWAITING_STOP)
-                && currentNode.hasProperty(StopNode.DEPARTURE_PROPERTY) && ((Long) currentNode.getProperty(StopNode.DEPARTURE_PROPERTY) > maxDepartureInMillis)) {
-            return Evaluation.EXCLUDE_AND_PRUNE;
+        if(prevRelationShipType != null && prevRelationShipType.equals(RelTypes.NEXT_AWAITING_STOP)) {
+            if(searchingType.equals(EndStopNodeEvaluatorType.DEPARTURE)) {
+                //pokud hledam dle data odjezdu
+                if(currentNode.hasProperty(StopNode.DEPARTURE_PROPERTY) &&
+                        ((Long) currentNode.getProperty(StopNode.DEPARTURE_PROPERTY) > maxDepartureOrMinArrivalInMillis)) {
+
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            } else if(searchingType.equals(EndStopNodeEvaluatorType.ARRIVAL)) {
+                //pokud hledam dle data prijezdu
+                if(currentNode.hasProperty(StopNode.ARRIVAL_PROPERTY) &&
+                        ((Long) currentNode.getProperty(StopNode.ARRIVAL_PROPERTY) < maxDepartureOrMinArrivalInMillis)) {
+
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            } else {
+                throw new RuntimeException("this path finding method is not yet implemented");
+            }
         }
 
         return Evaluation.EXCLUDE_AND_CONTINUE;

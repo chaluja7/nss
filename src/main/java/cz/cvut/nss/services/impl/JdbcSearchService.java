@@ -77,7 +77,7 @@ public class JdbcSearchService implements SearchService {
             return filteredList;
         }
 
-        List<SearchResultWrapper> retList = new ArrayList<>();
+        List<SearchResultWrapper> retList = new ArrayList<>(maxResults);
         for(int i = 0; i < maxResults; i++) {
             retList.add(filteredList.get(filteredList.size() - (maxResults - i)));
         }

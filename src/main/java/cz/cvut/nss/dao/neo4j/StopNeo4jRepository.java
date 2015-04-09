@@ -42,7 +42,7 @@ public interface StopNeo4jRepository extends GraphRepository<StopNode> {
      * @param departureInMillisMax max datum odjezdu
      * @return nalezene stopy
      */
-    @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis > {1} and n.departureInMillis < {2} return n")
+    @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis >= {1} and n.departureInMillis <= {2} return n")
     Set<StopNode> findByStationAndDepartureRange(Long stationId, Long departureInMillisMin, Long departureInMillisMax);
 
     /**
@@ -52,7 +52,17 @@ public interface StopNeo4jRepository extends GraphRepository<StopNode> {
      * @param departureInMillisMax max datum odjezdu
      * @return nalezene stopy
      */
-    @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis > {1} and n.departureInMillis < {2} return n")
+    @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis >= {1} and n.departureInMillis <= {2} return n")
     Iterable<Node> findByStationAndDepartureRangeReturnIterable(Long stationId, Long departureInMillisMin, Long departureInMillisMax);
+
+    /**
+     * najde vsechny stopy dle stationId a rozsahu arrivalInMillis
+     * @param stationId id stanice
+     * @param arrivalInMillisMin min datum prijezdu
+     * @param arrivalInMillisMax max datum prijezdu
+     * @return nalezene stopy
+     */
+    @Query("match (n:StopNode {stationId: {0}}) where n.arrivalInMillis >= {1} and n.arrivalInMillis <= {2} return n")
+    Iterable<Node> findByStationAndArrivalRangeReturnIterable(Long stationId, Long arrivalInMillisMin, Long arrivalInMillisMax);
 
 }

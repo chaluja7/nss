@@ -81,7 +81,11 @@ public class SearchResultBB {
                     path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, -1);
                 }
             } else {
-                path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
+                if(isWithNeo4j()) {
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
+                } else {
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 12, withoutTransfers ? 0 : 3, 3);
+                }
             }
 
             foundResults = new ArrayList<>();
