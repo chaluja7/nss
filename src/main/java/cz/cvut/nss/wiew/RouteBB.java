@@ -6,6 +6,7 @@ import cz.cvut.nss.entities.Station;
 import cz.cvut.nss.services.RouteService;
 import cz.cvut.nss.services.RouteStopService;
 import cz.cvut.nss.services.StationService;
+import cz.cvut.nss.services.SynchronizationService;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -34,6 +35,9 @@ public class RouteBB {
     @ManagedProperty(value = "#{routeStopServiceImpl}")
     private RouteStopService routeStopService;
 
+    @ManagedProperty(value = "#{synchronizationServiceImpl}")
+    private SynchronizationService synchronizationService;
+
     private Long id;
 
     private Route route = new Route();
@@ -59,7 +63,7 @@ public class RouteBB {
     }
 
     public String deleteRoute() {
-        routeService.deleteRoute(route.getId());
+        synchronizationService.deleteRouteById(route.getId());
         return "route-list?faces-redirect=true";
     }
 
@@ -152,4 +156,7 @@ public class RouteBB {
         this.routeStopService = routeStopService;
     }
 
+    public void setSynchronizationService(SynchronizationService synchronizationService) {
+        this.synchronizationService = synchronizationService;
+    }
 }

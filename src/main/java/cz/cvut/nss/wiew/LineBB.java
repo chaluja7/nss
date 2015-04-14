@@ -5,6 +5,7 @@ import cz.cvut.nss.entities.Route;
 import cz.cvut.nss.entities.enums.LineType;
 import cz.cvut.nss.services.LineService;
 import cz.cvut.nss.services.RouteService;
+import cz.cvut.nss.services.SynchronizationService;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -28,6 +29,9 @@ public class LineBB {
     @ManagedProperty(value = "#{routeServiceImpl}")
     private RouteService routeService;
 
+    @ManagedProperty(value = "#{synchronizationServiceImpl}")
+    private SynchronizationService synchronizationService;
+
     private Long id;
 
     private Line line = new Line();
@@ -49,7 +53,7 @@ public class LineBB {
     }
 
     public String deleteLine() {
-        lineService.deleteLine(line.getId());
+        synchronizationService.deleteLineById(line.getId());
         return "line-list?faces-redirect=true";
     }
 
@@ -95,4 +99,7 @@ public class LineBB {
         this.routeService = routeService;
     }
 
+    public void setSynchronizationService(SynchronizationService synchronizationService) {
+        this.synchronizationService = synchronizationService;
+    }
 }
