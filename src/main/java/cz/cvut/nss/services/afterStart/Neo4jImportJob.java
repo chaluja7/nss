@@ -33,8 +33,8 @@ public class Neo4jImportJob implements ApplicationListener<ContextRefreshedEvent
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         if(numberOfInvocation++ == 0) {
-            deleteAllStopNodes();
-            importAllStopNodes();
+//            deleteAllStopNodes();
+//            importAllStopNodes();
         }
     }
 

@@ -82,6 +82,16 @@ public class StationServiceImpl implements StationService {
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public Station getStationByName(String title) {
+        if(title == null) {
+            return null;
+        }
+
+        return stationDao.getStationByName(title);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public EntitiesAndCountResult<Station> getAllForDatatables(CommonRequest filter) {
         IdsAndCountResult idsAndCountResult = stationDao.getStationIdsByFilter(filter);
         EntitiesAndCountResult<Station> entitiesAndCountResult = new EntitiesAndCountResult<>();

@@ -30,6 +30,13 @@ public interface StationDao extends GenericDao<Station> {
     Station getStationByTitle(String title);
 
     /**
+     * find station with given name
+     * @param name name of station
+     * @return station with given name or null
+     */
+    Station getStationByName(String name);
+
+    /**
      * find station ids and total number of filtered stations
      * @param filter filter
      * @return list ids ant total count of filtered

@@ -60,6 +60,8 @@ public interface StationService {
      */
     public Station getStationByTitle(String title);
 
+    public Station getStationByName(String name);
+
     /**
      * find all filtered stations for datatables and count
      * @param filter filter

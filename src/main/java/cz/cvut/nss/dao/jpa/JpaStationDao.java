@@ -52,51 +52,67 @@ public class JpaStationDao extends AbstractGenericJpaDao<Station> implements Sta
     }
 
     @Override
+    @SuppressWarnings("JpaQlInspection")
+    public Station getStationByName(String name) {
+        TypedQuery<Station> query = em.createQuery("select s from Station s where name = :name", Station.class);
+        query.setParameter("name", name);
+
+        if(query.getResultList().size() == 1) {
+            return query.getResultList().get(0);
+        }
+
+        return null;
+    }
+
+    @Override
     public IdsAndCountResult getStationIdsByFilter(CommonRequest filter) {
-        String where = " where 1 = 1";
+        StringBuilder where = new StringBuilder();
+        where.append(" where 1 = 1");
         for(CommonRequestColumn column : filter.getColumns()) {
             if(column.getSearch() != null && !StringUtils.isEmpty(column.getSearch().getValue())) {
                 switch(column.getColumnName()) {
                     case "title":
-                        where += " and lower(s.title) like lower(:title)";
+                        where.append(" and lower(s.title) like lower(:title)");
                         break;
                     case "name":
-                        where += " and lower(s.name) like lower(:name)";
+                        where.append(" and lower(s.name) like lower(:name)");
                         break;
                     case "region":
-                        where += " and lower(r.name) like lower(:regionName)";
+                        where.append(" and lower(r.name) like lower(:regionName)");
                         break;
                 }
             }
         }
 
         if(filter.getSearch() != null && !StringUtils.isEmpty(filter.getSearch().getValue())) {
-            where += " and (lower(s.title) like lower(:searchPattern) or lower(s.name) like lower(:searchPattern) or lower(r.name) like lower(:searchPattern))";
+            where.append(" and (lower(s.title) like lower(:searchPattern) or lower(s.name) like lower(:searchPattern) or lower(r.name) like lower(:searchPattern))");
         }
 
-        String from = " from stations s inner join regions r on s.region_id = r.id";
-        String sqlQuery = "select s.id, (select count(s.id)" + from + where + ")" + from + where;
+        StringBuilder from = new StringBuilder();
+        from.append(" from stations s inner join regions r on s.region_id = r.id");
+        StringBuilder sqlQuery = new StringBuilder();
+        sqlQuery.append("select s.id, (select count(s.id)").append(from).append(where).append(")").append(from).append(where);
 
         if(filter.getOrder() != null && filter.getOrder().size() == 1) {
             CommonRequestOrder order = filter.getOrder().get(0);
-            sqlQuery += " order by";
+            sqlQuery.append(" order by");
 
             switch (order.getColumnIndex()) {
                 case 0:
-                    sqlQuery += " s.title";
+                    sqlQuery.append(" s.title");
                     break;
                 case 1:
-                    sqlQuery += " s.name";
+                    sqlQuery.append(" s.name");
                     break;
                 case 2:
-                    sqlQuery += " r.name";
+                    sqlQuery.append(" r.name");
                     break;
             }
 
-            sqlQuery += " " + order.getDirection();
+            sqlQuery.append(" ").append(order.getDirection());
         }
 
-        Query query = em.createNativeQuery(sqlQuery);
+        Query query = em.createNativeQuery(sqlQuery.toString());
         for(CommonRequestColumn column : filter.getColumns()) {
             if(column.getSearch() != null && !StringUtils.isEmpty(column.getSearch().getValue())) {
                 switch(column.getColumnName()) {
