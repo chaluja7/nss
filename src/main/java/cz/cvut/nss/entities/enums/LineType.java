@@ -7,5 +7,5 @@ package cz.cvut.nss.entities.enums;
  * @since 24.11.14.
  */
 public enum LineType {
-    TRAIN, BUS
+    TRAIN, BUS, METRO, TRAM, BOAT
 }

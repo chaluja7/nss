@@ -1,5 +1,6 @@
 package cz.cvut.nss.entities;
 
+import org.hibernate.annotations.Index;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.*;
@@ -38,6 +39,7 @@ public class GoogleStation extends AbstractEntity {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_station")
+    @Index(name = "google_station_parent_index")
     private GoogleStation parentStation;
 
     @OneToMany(mappedBy = "parentStation")

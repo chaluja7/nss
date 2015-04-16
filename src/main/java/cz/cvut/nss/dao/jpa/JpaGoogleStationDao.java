@@ -21,7 +21,7 @@ public class JpaGoogleStationDao extends AbstractGenericJpaDao<GoogleStation> im
 
     @Override
     public void deleteAll() {
-        em.createNativeQuery("truncate table google_stations").executeUpdate();
+        em.createNativeQuery("delete from  google_stations").executeUpdate();
     }
 
     @Override
