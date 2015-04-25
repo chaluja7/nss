@@ -1,6 +1,6 @@
 package cz.cvut.nss.SearchWrappers;
 
-import java.util.Date;
+import java.sql.Time;
 
 /**
  * Wrapper to wrap founded stops.
@@ -16,9 +16,11 @@ public class StopSearchWrapper {
 
     private Long rideId;
 
-    private Date departure;
+    private Long stopOrder;
 
-    private Date arrival;
+    private Time departure;
+
+    private Time arrival;
 
     public Long getId() {
         return id;
@@ -44,19 +46,27 @@ public class StopSearchWrapper {
         this.rideId = rideId;
     }
 
-    public Date getDeparture() {
+    public Long getStopOrder() {
+        return stopOrder;
+    }
+
+    public void setStopOrder(Long stopOrder) {
+        this.stopOrder = stopOrder;
+    }
+
+    public Time getDeparture() {
         return departure;
     }
 
-    public void setDeparture(Date departure) {
+    public void setDeparture(Time departure) {
         this.departure = departure;
     }
 
-    public Date getArrival() {
+    public Time getArrival() {
         return arrival;
     }
 
-    public void setArrival(Date arrival) {
+    public void setArrival(Time arrival) {
         this.arrival = arrival;
     }
 }

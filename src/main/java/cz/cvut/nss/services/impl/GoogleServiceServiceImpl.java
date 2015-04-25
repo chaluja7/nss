@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author jakubchalupa
  * @since 15.04.15
@@ -67,5 +69,11 @@ public class GoogleServiceServiceImpl implements GoogleServiceService {
         googleService.setEndDate(endDate);
 
         createGoogleService(googleService);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<GoogleService> getAll() {
+        return googleServiceDao.findAll();
     }
 }

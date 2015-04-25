@@ -46,7 +46,7 @@ public class Neo4jImportJob implements ApplicationListener<ContextRefreshedEvent
         //do neo4j vrazim jednotlive RIDES
         List<Ride> rideList = rideService.getAll();
         for(Ride ride : rideList) {
-            rideService.importRideToNeo4j(ride.getId());
+            rideService.importRideToNeo4j(ride);
         }
 
         //Nyni proiteruji vsechny stanice a propojim prislusne stopy na dane stanici cekacimi hranamy

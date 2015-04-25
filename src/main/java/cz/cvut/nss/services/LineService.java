@@ -59,4 +59,6 @@ public interface LineService {
      */
     public int getCountAll();
 
+    public Line getByName(String name);
+
 }

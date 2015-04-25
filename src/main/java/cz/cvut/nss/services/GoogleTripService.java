@@ -2,6 +2,8 @@ package cz.cvut.nss.services;
 
 import cz.cvut.nss.entities.GoogleTrip;
 
+import java.util.List;
+
 /**
  * @author jakubchalupa
  * @since 14.04.15
@@ -21,5 +23,7 @@ public interface GoogleTripService {
     void createGoogleTrip(Integer tripId, String routeId, Integer serviceId);
 
     GoogleTrip getOneByRouteId(String routeId);
+
+    List<GoogleTrip> getAllForImport();
 
 }

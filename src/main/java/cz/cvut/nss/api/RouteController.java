@@ -21,7 +21,7 @@ import java.util.List;
  * @since 24.11.14.
  */
 @RestController
-public class RouteContoller {
+public class RouteController {
 
     @Autowired
     protected RouteService routeService;

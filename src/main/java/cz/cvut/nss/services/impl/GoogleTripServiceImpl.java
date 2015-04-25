@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author jakubchalupa
  * @since 15.04.15
@@ -63,6 +65,12 @@ public class GoogleTripServiceImpl implements GoogleTripService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public GoogleTrip getOneByRouteId(String routeId) {
         return googleTripDao.findOneByRouteId(routeId);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<GoogleTrip> getAllForImport() {
+        return googleTripDao.findAllForImport();
     }
 
 }

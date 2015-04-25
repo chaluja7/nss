@@ -2,7 +2,8 @@ package cz.cvut.nss.services;
 
 import cz.cvut.nss.entities.*;
 import cz.cvut.nss.entities.enums.LineType;
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class StopServiceTest extends AbstractServiceTest {
     @Autowired
     private StationService stationService;
 
+    @Autowired
+    private OperationIntervalService operationIntervalService;
+
     @Test
     public void testCreateAndGet() {
         Stop stop = prepareStop();
@@ -38,7 +42,7 @@ public class StopServiceTest extends AbstractServiceTest {
         Assert.assertNotNull(retrieved);
         Assert.assertNotNull(retrieved.getRide());
         Assert.assertNotNull(retrieved.getStation());
-        Assert.assertEquals(stop.getArrival().getDayOfYear(), retrieved.getArrival().getDayOfYear());
+        Assert.assertEquals(stop.getArrival().getHourOfDay(), retrieved.getArrival().getHourOfDay());
     }
 
     @Test
@@ -48,12 +52,12 @@ public class StopServiceTest extends AbstractServiceTest {
         Stop retrieved = stopService.getStop(stop.getId());
         Assert.assertNotNull(retrieved);
 
-        retrieved.setArrival(new LocalDateTime().plusDays(1));
+        retrieved.setArrival(new LocalTime().plusHours(1));
         stopService.updateStop(retrieved);
 
         Stop updated = stopService.getStop(stop.getId());
         Assert.assertNotNull(updated);
-        Assert.assertEquals(retrieved.getArrival().getDayOfYear(), updated.getArrival().getDayOfYear());
+        Assert.assertEquals(retrieved.getArrival().getHourOfDay(), updated.getArrival().getHourOfDay());
     }
 
     @Test
@@ -78,8 +82,21 @@ public class StopServiceTest extends AbstractServiceTest {
         line.setRoute(route);
         lineService.createLine(line);
 
+        OperationInterval operationInterval = new OperationInterval();
+        operationInterval.setStartDate(new LocalDate());
+        operationInterval.setEndDate(new LocalDate());
+        operationInterval.setMonday(true);
+        operationInterval.setTuesday(true);
+        operationInterval.setWednesday(true);
+        operationInterval.setThursday(true);
+        operationInterval.setFriday(true);
+        operationInterval.setSaturday(false);
+        operationInterval.setSunday(false);
+        operationIntervalService.createOperationInterval(operationInterval);
+
         Ride ride = new Ride();
         ride.setLine(line);
+        ride.setOperationInterval(operationInterval);
         rideService.createRide(ride);
 
         Station station = new Station();
@@ -88,7 +105,8 @@ public class StopServiceTest extends AbstractServiceTest {
         stationService.createStation(station);
 
         Stop stop = new Stop();
-        stop.setArrival(new LocalDateTime());
+        stop.setArrival(new LocalTime());
+        stop.setDeparture(new LocalTime());
         stop.setRide(ride);
         stop.setStation(station);
 

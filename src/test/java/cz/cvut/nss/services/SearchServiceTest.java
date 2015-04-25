@@ -29,14 +29,14 @@ public class SearchServiceTest extends AbstractServiceTest {
         DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
 
         try {
-            date = dateFormat.parse("08.12.2014 05:00");
+            date = dateFormat.parse("26.06.2015 19:13");
         } catch (ParseException e) {
             e.printStackTrace();
             return;
         }
 
         long l = System.currentTimeMillis();
-        List<SearchResultWrapper> foundedStops = searchService.findPathByDepartureDate(1, 5, date, 12, 2, 100);
+        List<SearchResultWrapper> foundedStops = searchService.findPathByDepartureDate(2449, 2450, date, 19, 1, -1);
         long executionTime = System.currentTimeMillis() - l;
 
         int i = 0;
@@ -50,14 +50,14 @@ public class SearchServiceTest extends AbstractServiceTest {
         DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
 
         try {
-            date = dateFormat.parse("08.12.2014 10:40");
+            date = dateFormat.parse("08.12.2014 19:14");
         } catch (ParseException e) {
             e.printStackTrace();
             return;
         }
 
         long l = System.currentTimeMillis();
-        List<SearchResultWrapper> foundedStops = searchService.findPathByArrivalDate(1, 5, date, 12, 2, 100);
+        List<SearchResultWrapper> foundedStops = searchService.findPathByArrivalDate(1, 5, date, 12, 10, 100);
         long executionTime = System.currentTimeMillis() - l;
 
         int i = 0;

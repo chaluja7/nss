@@ -36,10 +36,13 @@ public class Neo4jSearchService implements SearchService {
         DateTime departureDateTime = new DateTime(departure);
         DateTime maxDateDeparture = departureDateTime.plusHours(maxHoursAfterDeparture);
 
+        long l = System.currentTimeMillis();
         //vytahnu vsechny moznosti, jak docestovat z from do to
         //zde jsou ovsem cesty, ktere nechci uzivatele zobrazit. Napr. muzu jet po stopech 1 - 3 - 5, nebo 1 - 3 - 4 - 5. V tomto pripade chci pouze tu cestu, ktera je tam drive a (nebo) rychleji.
         //nema cenu uzivateli zobrazovat uplne vsechny moznosti
         List<SearchResultWrapper> resultList = searchDao.findRidesByDepartureDate(stationFromId, stationToId, departure, maxDateDeparture.toDate(), maxTransfers);
+
+        l = System.currentTimeMillis() - l;
 
         //seradim vysledky vlastnim algoritmem
         Collections.sort(resultList, new SearchResultByDepartureDateComparator());

@@ -31,4 +31,6 @@ public interface LineDao extends GenericDao<Line> {
      */
     int getCountAll();
 
+    Line findByName(String name);
+
 }

@@ -1,10 +1,15 @@
 package cz.cvut.nss.services.impl;
 
 import cz.cvut.nss.dao.RideDao;
+import cz.cvut.nss.entities.OperationInterval;
 import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Stop;
+import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
+import cz.cvut.nss.entities.neo4j.RideNode;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.services.RideService;
+import cz.cvut.nss.services.neo4j.OperationIntervalNeo4jService;
+import cz.cvut.nss.services.neo4j.RideNeo4jService;
 import cz.cvut.nss.services.neo4j.StopNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +33,12 @@ public class RideServiceImpl implements RideService {
 
     @Autowired
     protected StopNeo4jService stopNeo4jService;
+
+    @Autowired
+    protected RideNeo4jService rideNeo4jService;
+
+    @Autowired
+    protected OperationIntervalNeo4jService operationIntervalNeo4jService;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -75,10 +86,20 @@ public class RideServiceImpl implements RideService {
 
     @Override
     @Transactional
-    public void importRideToNeo4j(long id) {
-        Ride ride = getRide(id);
+    public void importRideToNeo4j(Ride ride) {
 
         if(ride != null) {
+            OperationInterval operationInterval = ride.getOperationInterval();
+            if(operationInterval == null) {
+                throw new RuntimeException();
+            }
+
+            OperationIntervalNode operationIntervalNode = operationIntervalNeo4jService.findByOperationIntervalId(operationInterval.getId());
+            RideNode rideNode = new RideNode();
+            rideNode.setRideId(ride.getId());
+            rideNode.setOperationIntervalNode(operationIntervalNode);
+            rideNeo4jService.save(rideNode);
+
             List<Stop> stopList = ride.getStops();
             StopNode prevStopNode = null;
             for (Stop stop : stopList) {
@@ -86,11 +107,16 @@ public class RideServiceImpl implements RideService {
                 stopNode.setStopId(stop.getId());
                 stopNode.setStationId(stop.getStation().getId());
                 stopNode.setRideId(stop.getRide().getId());
+                stopNode.setRideNode(rideNode);
                 if (stop.getArrival() != null) {
-                    stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
+                    //TODO?
+                    stopNode.setArrivalInMillis((long) stop.getArrival().getMillisOfDay());
+                   //stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
                 }
                 if (stop.getDeparture() != null) {
-                    stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
+                    //TODO?
+                    stopNode.setDepartureInMillis((long) stop.getDeparture().getMillisOfDay());
+                    //stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
                 }
 
                 if (prevStopNode != null) {

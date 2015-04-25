@@ -22,4 +22,6 @@ public interface GoogleStationService {
 
     GoogleStation getByName(String name);
 
+    void handleMetroStations();
+
 }

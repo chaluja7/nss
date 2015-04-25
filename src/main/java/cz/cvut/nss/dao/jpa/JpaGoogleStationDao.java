@@ -52,4 +52,14 @@ public class JpaGoogleStationDao extends AbstractGenericJpaDao<GoogleStation> im
         return null;
     }
 
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<GoogleStation> findByNamePattern(String name) {
+        TypedQuery<GoogleStation> query = em.createQuery("select g from GoogleStation g where name like :name", GoogleStation.class);
+        query.setParameter("name", name + "%");
+
+        return query.getResultList();
+    }
+
+
 }

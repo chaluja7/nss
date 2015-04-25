@@ -2,6 +2,7 @@ package cz.cvut.nss.services.neo4j;
 
 import cz.cvut.nss.entities.neo4j.StopNode;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -45,5 +46,7 @@ public interface StopNeo4jService {
     void deleteByStopId(long stopId);
 
     void deleteAllByRideId(long rideId);
+
+    List<StopNode> findStopNodesByStationIdOrderByActionTime(Long stationId);
 
 }

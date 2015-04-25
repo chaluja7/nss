@@ -62,11 +62,13 @@ public class RideController {
                 Stop to = stopList.get(stopList.size() - 1);
 
                 if(from.getDeparture() != null && to.getArrival() != null) {
-                    resource.setDeparture(from.getDeparture().toString(EosDateTimeUtils.dateTimePattern));
-                    resource.setArrival(to.getArrival().toString(EosDateTimeUtils.dateTimePattern));
+                    resource.setDeparture(from.getDeparture().toString(EosDateTimeUtils.timePattern));
+                    resource.setArrival(to.getArrival().toString(EosDateTimeUtils.timePattern));
 
+                    //todo?
                     Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
 
+                    //todo?
                     Minutes minutes = Minutes.minutesBetween(from.getDeparture(), to.getArrival());
                     String minutesString = String.valueOf(minutes.getMinutes() % 60);
                     if ((minutes.getMinutes() % 60) < 10) {

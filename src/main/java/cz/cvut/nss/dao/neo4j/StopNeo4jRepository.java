@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.core.EntityPath;
 import org.springframework.data.neo4j.repository.GraphRepository;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -70,5 +71,12 @@ public interface StopNeo4jRepository extends GraphRepository<StopNode> {
 
     @Query("match (n:StopNode {rideId: {0}}) return n")
     Set<StopNode> findByRideId(Long rideId);
+
+    @Query("match (n:StopNode {stationId: {0}}) return n order by case when n.departureInMillis is not null then n.departureInMillis else n.arrivalInMillis end")
+    List<StopNode> findStopNodesByStationIdOrderByActionTime(Long stationId);
+
+    //todo
+    @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis >= {1} return n order by n.departureInMillis limit 1")
+    Node findPathFirstNode(Long stationId, Long minDeparture);
 
 }

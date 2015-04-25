@@ -53,4 +53,12 @@ public class JpaGoogleTripDao extends AbstractGenericJpaDao<GoogleTrip> implemen
         return null;
     }
 
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<GoogleTrip> findAllForImport() {
+        //jen pro route kde agencyId = 18
+        TypedQuery<GoogleTrip> query = em.createQuery("select g from GoogleTrip g where agencyId = 1 and id % 40 = 0", GoogleTrip.class);
+        return query.getResultList();
+    }
+
 }

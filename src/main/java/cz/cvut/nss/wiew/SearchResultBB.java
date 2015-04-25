@@ -80,15 +80,15 @@ public class SearchResultBB {
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 2, maxNumberOfTransfers, -1);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 18, maxNumberOfTransfers, 3);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 }
             }
 
@@ -105,6 +105,7 @@ public class SearchResultBB {
                 Stop from = wrapper.getStops().get(0);
                 Stop to = wrapper.getStops().get(wrapper.getStops().size() - 1);
 
+                //todo hours and minutes
                 Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
                 Minutes minutes = Minutes.minutesBetween(from.getDeparture(), to.getArrival());
 
@@ -126,7 +127,9 @@ public class SearchResultBB {
             //jako bernou minci beru posledni nalazeny spoj a cas odjezdu z vychozi stanice
             FoundedPathsWrapper lastFoundedPathWrapper = foundResults.get(foundResults.size() - 1);
             Stop firstStop = lastFoundedPathWrapper.getStops().get(0);
-            DateTime dateTime = firstStop.getDeparture().toDateTime();
+            //todo
+            DateTime dateTime = firstStop.getDeparture().toDateTimeToday();
+            //DateTime dateTime = firstStop.getDeparture().toDateTime();
             newDateTime = dateTime.plusMillis(1);
             timeType = "departure";
         } else {
@@ -145,7 +148,9 @@ public class SearchResultBB {
             //jako bernou minci beru prvni nalazeny spoj a cas prijezdu do cilove stanice
             FoundedPathsWrapper firstFoundedPathWrapper = foundResults.get(0);
             Stop lastStop = firstFoundedPathWrapper.getStops().get(firstFoundedPathWrapper.getStops().size() - 1);
-            DateTime dateTime = lastStop.getArrival().toDateTime();
+            //todo
+            DateTime dateTime = lastStop.getArrival().toDateTimeToday();
+            //DateTime dateTime = lastStop.getArrival().toDateTime();
             newDateTime = dateTime.minusMillis(1);
             timeType = "arrival";
         } else {
@@ -159,8 +164,8 @@ public class SearchResultBB {
     }
 
     private void prepareAndValidateInputs() {
-        stationFrom = stationService.getStationByTitle(stationFromTitle);
-        stationTo = stationService.getStationByTitle(stationToTitle);
+        stationFrom = stationService.getStationByName(stationFromTitle);
+        stationTo = stationService.getStationByName(stationToTitle);
 
         if(stationFrom == null || stationTo == null) {
             errorInputs = true;

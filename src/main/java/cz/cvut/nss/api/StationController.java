@@ -44,7 +44,7 @@ public class StationController {
 
         List<String> stationTitleList = new ArrayList<>();
         for(Station station : stationList) {
-            stationTitleList.add(station.getTitle());
+            stationTitleList.add(station.getName());
         }
 
         return stationTitleList;

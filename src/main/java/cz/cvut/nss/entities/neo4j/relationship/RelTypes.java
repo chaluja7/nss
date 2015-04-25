@@ -11,6 +11,8 @@ import org.neo4j.graphdb.RelationshipType;
 public enum RelTypes implements RelationshipType {
 
     NEXT_STOP,
-    NEXT_AWAITING_STOP
+    NEXT_AWAITING_STOP,
+    IN_RIDE,
+    IN_INTERVAL
 
 }

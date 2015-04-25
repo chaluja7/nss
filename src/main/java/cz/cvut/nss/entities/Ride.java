@@ -21,8 +21,13 @@ public class Ride extends AbstractEntity {
     @Index(name = "ride_line_index")
     private Line line;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "operation_interval_id")
+    @Index(name = "ride_operation_interval_index")
+    private OperationInterval operationInterval;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "ride")
-    @OrderBy("departure ASC")
+    @OrderBy("stopOrder ASC")
     private List<Stop> stops;
 
     public Line getLine() {
@@ -31,6 +36,14 @@ public class Ride extends AbstractEntity {
 
     public void setLine(Line line) {
         this.line = line;
+    }
+
+    public OperationInterval getOperationInterval() {
+        return operationInterval;
+    }
+
+    public void setOperationInterval(OperationInterval operationInterval) {
+        this.operationInterval = operationInterval;
     }
 
     public List<Stop> getStops() {

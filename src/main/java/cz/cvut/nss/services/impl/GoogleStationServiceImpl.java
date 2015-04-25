@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author jakubchalupa
  * @since 14.04.15
@@ -73,6 +75,33 @@ public class GoogleStationServiceImpl implements GoogleStationService {
         }
 
         return googleStationDao.findByName(name);
+    }
+
+    @Override
+    @Transactional
+    public void handleMetroStations() {
+        final String mustekId = "U1072N8";
+        final String muzeumId = "U400Z3";
+        final String florencId = "U689Z5";
+
+        List<GoogleStation> muzeumList = googleStationDao.findByNamePattern("Muzeum");
+        for(GoogleStation muzeum : muzeumList) {
+            muzeum.setParentStation(getGoogleStationByStationId(muzeumId));
+            updateGoogleStation(muzeum);
+        }
+
+        List<GoogleStation> mustekList = googleStationDao.findByNamePattern("Můstek");
+        for(GoogleStation mustek : mustekList) {
+            mustek.setParentStation(getGoogleStationByStationId(mustekId));
+            updateGoogleStation(mustek);
+        }
+
+        List<GoogleStation> florencList = googleStationDao.findByNamePattern("Florenc");
+        for(GoogleStation florenc : florencList) {
+            florenc.setParentStation(getGoogleStationByStationId(florencId));
+            updateGoogleStation(florenc);
+        }
+
     }
 
 }

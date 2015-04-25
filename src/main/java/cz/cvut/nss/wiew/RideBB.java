@@ -77,8 +77,11 @@ public class RideBB {
         Stop stop = new Stop();
         stop.setStation(newRideStop);
         stop.setRide(ride);
-        stop.setDeparture(newStopDeparture);
-        stop.setArrival(newStopArrival);
+        //todo
+        stop.setDeparture(null);
+        stop.setArrival(null);
+//        stop.setDeparture(newStopDeparture);
+//        stop.setArrival(newStopArrival);
 
         stopService.createStop(stop);
         return "ride?id=" + id + "&faces-redirect=true";

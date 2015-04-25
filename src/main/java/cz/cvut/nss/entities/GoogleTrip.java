@@ -27,6 +27,10 @@ public class GoogleTrip extends AbstractEntity {
     @Index(name = "google_trip_service_index")
     private Integer serviceId;
 
+    @Column
+    @Index(name = "google_trip_agency_index")
+    private Integer agencyId;
+
     public Integer getTripId() {
         return tripId;
     }
@@ -49,5 +53,13 @@ public class GoogleTrip extends AbstractEntity {
 
     public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
+    }
+
+    public Integer getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(Integer agencyId) {
+        this.agencyId = agencyId;
     }
 }

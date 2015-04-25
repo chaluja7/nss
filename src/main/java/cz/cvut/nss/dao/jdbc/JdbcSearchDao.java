@@ -5,12 +5,15 @@ import cz.cvut.nss.SearchWrappers.StopSearchWrapper;
 import cz.cvut.nss.dao.SearchDao;
 import cz.cvut.nss.dao.StopDao;
 import cz.cvut.nss.entities.Stop;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
+import java.sql.Time;
 import java.util.*;
 
 /**
@@ -65,11 +68,20 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                               Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
                               int maxTransfers) {
 
+        LocalDateTime tempDateDeparture = new LocalDateTime(departure);
+        LocalDateTime tempMaxDateDeparture = new LocalDateTime(maxDateDeparture);
+
+        if(tempMaxDateDeparture.isBefore(tempDateDeparture)) {
+            return;
+        }
+        
         //Nejdrive najdu vsechny stopy, ktere jsou na stanici, ze ktere jedu serazene dle data odjezdu
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         namedParameters.addValue("stationId", stationFromId);
-        namedParameters.addValue("departure", departure);
-        namedParameters.addValue("maxDeparture", maxDateDeparture);
+        namedParameters.addValue("trueParam", true);
+        namedParameters.addValue("departureDate", new java.sql.Date(departure.getTime()));
+        namedParameters.addValue("departure", new Time(departure.getTime()));
+        namedParameters.addValue("maxDeparture", new Time(maxDateDeparture.getTime()));
         if(visitedRides.size() == 0) {
             List<Long> tempList = new ArrayList<>();
             tempList.add(0l);
@@ -78,11 +90,38 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
             namedParameters.addValue("visitedRides", visitedRides);
         }
 
-        String initialStopsSql = "select id, ride_id, station_id, departure, arrival from stops " +
-                "where station_id = :stationId and departure >= :departure and departure <= :maxDeparture and ride_id not in(:visitedRides) " +
-                "order by departure asc";
+        StringBuilder initialStopsSql = new StringBuilder().append("select s.id, s.ride_id, s.station_id, s.departure, s.arrival, s.stopOrder from stops s " +
+                "inner join rides r on s.ride_id = r.id inner join operation_intervals i on r.operation_interval_id = i.id " +
+                "where s.station_id = :stationId and s.ride_id not in(:visitedRides) ");
 
-        List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql, namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+        //osetreni, jestli nejedu zpet na stanici, ze ktere jsem prijel
+        if(visitedStops.size() > 0) {
+            initialStopsSql.append("and not exists (select id from stops where station_id = (select station_id from stops where id = :prevStopId) ")
+                .append("and ride_id = s.ride_id and stopOrder = s.stopOrder + 1) ");
+
+            namedParameters.addValue("prevStopId", visitedStops.get(visitedStops.size() - 1));
+        }
+
+        //osetreni prehoupnuti pres pulnoc
+        if(tempMaxDateDeparture.getMillisOfDay() > tempDateDeparture.getMillisOfDay()) {
+            //neprehoupl jsem se pres pulnoc
+            initialStopsSql.append("and i.startDate <= :departureDate and i.endDate >= :departureDate ");
+            initialStopsSql.append("and " + getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = :trueParam ");
+            initialStopsSql.append("and s.departure >= :departure and s.departure <= :maxDeparture ");
+        } else {
+            //prehoupl jsem se pres pulnoc
+            initialStopsSql.append("and ((i.startDate <= :departureDate and i.endDate >= :departureDate ");
+            initialStopsSql.append("and ").append(getDayOfWeekCondition(tempDateDeparture.getDayOfWeek())).append(" = :trueParam ");
+            initialStopsSql.append("and s.departure >= :departure) ");
+
+            initialStopsSql.append("or (i.startDate <= :maxDepartureDate and i.endDate >= :maxDepartureDate ");
+            initialStopsSql.append("and ").append(getDayOfWeekCondition(tempMaxDateDeparture.getDayOfWeek())).append(" = :trueParam ");
+            initialStopsSql.append("and s.departure < :maxDeparture))");
+
+            namedParameters.addValue("maxDepartureDate", new java.sql.Date(maxDateDeparture.getTime()));
+        }
+
+        List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql.toString(), namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
 
         //pro tyto stopy iteruji
         for(StopSearchWrapper stop : stops) {
@@ -91,18 +130,30 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
             List<Long> newVisitedRides = new ArrayList<>(visitedRides);
             newVisitedRides.add(stop.getRideId());
 
-            String rideSql = "select id, ride_id, station_id, departure, arrival from stops where ride_id = ? and (departure is null or departure > ?) order by departure asc";
+            String rideSql = "select id, ride_id, station_id, departure, arrival, stopOrder from stops where ride_id = ? and stopOrder > ? order by stopOrder asc";
 
             List<StopSearchWrapper> stopsOnRide =
                     getJdbcTemplate().
-                            query(rideSql, new Object[]{stop.getRideId(), stop.getDeparture()}, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+                            query(rideSql, new Object[]{stop.getRideId(), stop.getStopOrder()}, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
 
-            //pro vsechny nalezen stopy iteruji
+            //pro vsechny nalezene stopy iteruji
             for(StopSearchWrapper stopOnRide : stopsOnRide) {
 
                 List<Long> newVisitedStops = new ArrayList<>(visitedStops);
                 newVisitedStops.add(stop.getId());
                 newVisitedStops.add(stopOnRide.getId());
+
+                LocalTime arrivalDayTime = new LocalTime(stopOnRide.getArrival());
+                int millisOfArrivalDay = arrivalDayTime.getMillisOfDay();
+
+                LocalDateTime currentStopArrivalDateTime = new LocalDateTime(departure);
+                if(millisOfArrivalDay < currentStopArrivalDateTime.getMillisOfDay()) {
+                    //prehoupl jsem se pres pulnoc
+                    currentStopArrivalDateTime = currentStopArrivalDateTime.plusDays(1);
+                }
+
+                currentStopArrivalDateTime = currentStopArrivalDateTime.millisOfDay().withMinimumValue();
+                currentStopArrivalDateTime = currentStopArrivalDateTime.plusMillis(millisOfArrivalDay);
 
                 if (stopOnRide.getStationId() == stationToId) {
                     //pokud jsem narazil na cilovou stanici tak ulozim cestu do ridesMapy pokud tam jiz neni na stejnych ridach s lepsim casem
@@ -115,13 +166,20 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                     }
 
                     String pathIdentifier = stringBuilder.toString();
-
                     Stop departureStop = stopDao.find(newVisitedStops.get(0));
-                    long travelTime = stopOnRide.getArrival().getTime() - departureStop.getDeparture().toDate().getTime();
+                    long travelTime;
+                    int departureMillis = departureStop.getDeparture().getMillisOfDay();
+                    if(millisOfArrivalDay > departureMillis) {
+                        travelTime = millisOfArrivalDay - departureMillis;
+                    } else {
+                        travelTime = (86400000 - departureMillis) + millisOfArrivalDay;
+                    }
+
                     if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
                         SearchResultWrapper wrapper = new SearchResultWrapper();
-                        wrapper.setArrival(stopOnRide.getArrival().getTime());
+                        wrapper.setArrival(currentStopArrivalDateTime.toDateTime().getMillis());
                         wrapper.setTravelTime(travelTime);
+                        wrapper.setNumberOfTransfers(stepNumber);
                         wrapper.setStops(newVisitedStops);
                         ridesMap.put(pathIdentifier, wrapper);
                     }
@@ -130,10 +188,31 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                 } else if(stepNumber < maxTransfers) {
                     //pokud toto neni cilova stanice a jeste jsem neprestoupil MAX krat, zavolam rekurzivne algoritmus
                     //vychozi stanice bude aktualni stanice z cyklu a hledam vyjezd od data, kdy je prijezd do tohoto stopu
-                    findRidesByDepartureDateAlgorithm(stopOnRide.getStationId(), stationToId, stopOnRide.getArrival(), maxDateDeparture,
+                    findRidesByDepartureDateAlgorithm(stopOnRide.getStationId(), stationToId, currentStopArrivalDateTime.toDate(), maxDateDeparture,
                             stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides, maxTransfers);
                 }
             }
+        }
+    }
+
+    public static final String getDayOfWeekCondition(int dayOfWeek) {
+        switch(dayOfWeek) {
+            case 1:
+                return "i.monday";
+            case 2:
+                return "i.tuesday";
+            case 3:
+                return "i.wednesday";
+            case 4:
+                return "i.thursday";
+            case 5:
+                return "i.friday";
+            case 6:
+                return "i.saturday";
+            case 7:
+                return "i.sunday";
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -141,11 +220,20 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                                                    Map<String, SearchResultWrapper> ridesMap, List<Long> visitedStops, List<Long> visitedRides,
                                                    int maxTransfers) {
 
-        //Nejdrive najdu vsechny stopy, ktere jsou na stanici, do ktere jedu serazene dle data prijezdu sestupne
+        LocalDateTime tempDateArrival = new LocalDateTime(arrival);
+        LocalDateTime tempMinDateArrival = new LocalDateTime(minDateArrival);
+
+        if(tempDateArrival.isBefore(tempMinDateArrival)) {
+            return;
+        }
+
+        //Nejdrive najdu vsechny stopy, ktere jsou na stanici, do ktere jedu serazene dle data odjezdu
         MapSqlParameterSource namedParameters = new MapSqlParameterSource();
         namedParameters.addValue("stationId", stationToId);
-        namedParameters.addValue("arrival", arrival);
-        namedParameters.addValue("minArrival", minDateArrival);
+        namedParameters.addValue("trueParam", true);
+        namedParameters.addValue("arrivalDate", new java.sql.Date(arrival.getTime()));
+        namedParameters.addValue("arrival", new Time(arrival.getTime()));
+        namedParameters.addValue("minArrival", new Time(minDateArrival.getTime()));
         if(visitedRides.size() == 0) {
             List<Long> tempList = new ArrayList<>();
             tempList.add(0l);
@@ -154,11 +242,38 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
             namedParameters.addValue("visitedRides", visitedRides);
         }
 
-        String initialStopsSql = "select id, ride_id, station_id, departure, arrival from stops " +
-                "where station_id = :stationId and arrival <= :arrival and arrival >= :minArrival and ride_id not in(:visitedRides) " +
-                "order by arrival desc";
+        StringBuilder initialStopsSql = new StringBuilder().append("select s.id, s.ride_id, s.station_id, s.departure, s.arrival, s.stopOrder from stops s " +
+                "inner join rides r on s.ride_id = r.id inner join operation_intervals i on r.operation_interval_id = i.id " +
+                "where s.station_id = :stationId and s.ride_id not in(:visitedRides) ");
 
-        List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql, namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+        //osetreni, jestli nejedu zpet na stanici, ze ktere jsem prijel
+        if(visitedStops.size() > 0) {
+            initialStopsSql.append("and not exists (select id from stops where station_id = (select station_id from stops where id = :prevStopId) ")
+                    .append("and ride_id = s.ride_id and stopOrder = s.stopOrder - 1) ");
+
+            namedParameters.addValue("prevStopId", visitedStops.get(0));
+        }
+
+        //osetreni prehoupnuti pres pulnoc
+        if(tempMinDateArrival.getMillisOfDay() < tempDateArrival.getMillisOfDay()) {
+            //neprehoupl jsem se pres pulnoc
+            initialStopsSql.append("and i.startDate <= :arrivalDate and i.endDate >= :arrivalDate ");
+            initialStopsSql.append("and " + getDayOfWeekCondition(tempDateArrival.getDayOfWeek()) + " = :trueParam ");
+            initialStopsSql.append("and s.arrival <= :arrival and s.arrival >= :minArrival ");
+        } else {
+            //prehoupl jsem se pres pulnoc
+            initialStopsSql.append("and ((i.startDate <= :arrivalDate and i.endDate >= :arrivalDate ");
+            initialStopsSql.append("and ").append(getDayOfWeekCondition(tempDateArrival.getDayOfWeek())).append(" = :trueParam ");
+            initialStopsSql.append("and s.arrival <= :arrival) ");
+
+            initialStopsSql.append("or (i.startDate <= :minDateArrival and i.endDate >= :minDateArrival ");
+            initialStopsSql.append("and ").append(getDayOfWeekCondition(tempMinDateArrival.getDayOfWeek())).append(" = :trueParam ");
+            initialStopsSql.append("and s.arrival > :minArrival)) order by arrival asc");
+
+            namedParameters.addValue("minDateArrival", new java.sql.Date(minDateArrival.getTime()));
+        }
+
+        List<StopSearchWrapper> stops = namedParameterJdbcTemplate.query(initialStopsSql.toString(), namedParameters, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
 
         //pro tyto stopy iteruji
         for(StopSearchWrapper stop : stops) {
@@ -167,11 +282,11 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
             List<Long> newVisitedRides = new ArrayList<>(visitedRides);
             newVisitedRides.add(0, stop.getRideId());
 
-            String rideSql = "select id, ride_id, station_id, departure, arrival from stops where ride_id = ? and (arrival is null or arrival < ?) order by arrival desc nulls last";
+            String rideSql = "select id, ride_id, station_id, departure, arrival, stopOrder from stops where ride_id = ? and stopOrder < ? order by stopOrder desc";
 
             List<StopSearchWrapper> stopsOnRide =
                     getJdbcTemplate().
-                            query(rideSql, new Object[]{stop.getRideId(), stop.getArrival()}, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
+                            query(rideSql, new Object[]{stop.getRideId(), stop.getStopOrder()}, new BeanPropertyRowMapper<>(StopSearchWrapper.class));
 
             //pro vsechny nalezen stopy iteruji
             for(StopSearchWrapper stopOnRide : stopsOnRide) {
@@ -179,6 +294,18 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                 List<Long> newVisitedStops = new ArrayList<>(visitedStops);
                 newVisitedStops.add(0, stop.getId());
                 newVisitedStops.add(0, stopOnRide.getId());
+
+                LocalTime departureDateTime = new LocalTime(stopOnRide.getDeparture());
+                int millisOfDepartureDay = departureDateTime.getMillisOfDay();
+
+                LocalDateTime currentStopDepartureDateTime = new LocalDateTime(arrival);
+                if(millisOfDepartureDay > currentStopDepartureDateTime.getMillisOfDay()) {
+                    //prehoupl jsem se pres pulnoc
+                    currentStopDepartureDateTime = currentStopDepartureDateTime.minusDays(1);
+                }
+
+                currentStopDepartureDateTime = currentStopDepartureDateTime.millisOfDay().withMinimumValue();
+                currentStopDepartureDateTime = currentStopDepartureDateTime.plusMillis(millisOfDepartureDay);
 
                 if (stopOnRide.getStationId() == stationFromId) {
                     //pokud jsem narazil na cilovou stanici tak ulozim cestu do ridesMapy pokud tam jiz neni na stejnych ridach s lepsim casem
@@ -193,11 +320,23 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                     String pathIdentifier = stringBuilder.toString();
 
                     Stop arrivalStop = stopDao.find(newVisitedStops.get(newVisitedStops.size() - 1));
-                    long travelTime = arrivalStop.getArrival().toDate().getTime() - stopOnRide.getDeparture().getTime();
+                    LocalDateTime arrivalStopDateTime = new LocalDateTime(minDateArrival);
+                    long travelTime;
+                    int arrivalMillis = arrivalStop.getArrival().getMillisOfDay();
+                    if(millisOfDepartureDay < arrivalMillis) {
+                        travelTime = arrivalMillis - millisOfDepartureDay;
+                    } else {
+                        travelTime = (86400000 - millisOfDepartureDay) + arrivalMillis;
+                        arrivalStopDateTime = arrivalStopDateTime.plusDays(1);
+                    }
                     if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
+                        arrivalStopDateTime = arrivalStopDateTime.millisOfDay().withMinimumValue();
+                        arrivalStopDateTime = arrivalStopDateTime.plusMillis(arrivalMillis);
+
                         SearchResultWrapper wrapper = new SearchResultWrapper();
-                        wrapper.setArrival(arrivalStop.getArrival().toDate().getTime());
+                        wrapper.setArrival(arrivalStopDateTime.toDateTime().getMillis());
                         wrapper.setTravelTime(travelTime);
+                        wrapper.setNumberOfTransfers(stepNumber);
                         wrapper.setStops(newVisitedStops);
                         ridesMap.put(pathIdentifier, wrapper);
                     }
@@ -206,7 +345,7 @@ public class JdbcSearchDao extends JdbcDaoSupport implements SearchDao {
                 } else if(stepNumber < maxTransfers) {
                     //pokud toto neni cilova stanice a jeste jsem neprestoupil MAX krat, zavolam rekurzivne algoritmus
                     //vychozi stanice bude aktualni stanice z cyklu a hledam vyjezd od data, kdy je prijezd do tohoto stopu
-                    findRidesByArrivalDateAlgorithm(stationFromId, stopOnRide.getStationId(), stopOnRide.getDeparture(), minDateArrival,
+                    findRidesByArrivalDateAlgorithm(stationFromId, stopOnRide.getStationId(), currentStopDepartureDateTime.toDate(), minDateArrival,
                             stepNumber + 1, ridesMap, newVisitedStops, newVisitedRides, maxTransfers);
                 }
             }

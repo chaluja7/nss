@@ -55,6 +55,6 @@ public interface RideService {
      * import the whole ride into neo4j graph db
      * @param id ride id
      */
-    public void importRideToNeo4j(long id);
+    public void importRideToNeo4j(Ride id);
 
 }

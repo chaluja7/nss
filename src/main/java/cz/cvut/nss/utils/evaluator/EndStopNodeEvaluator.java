@@ -1,15 +1,15 @@
 package cz.cvut.nss.utils.evaluator;
 
 import cz.cvut.nss.entities.neo4j.StopNode;
-import cz.cvut.nss.entities.neo4j.relationship.RelTypes;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.Evaluator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Evaluator for neo4j traversal (finding paths to end station)
@@ -21,96 +21,78 @@ public final class EndStopNodeEvaluator implements Evaluator {
 
     private final Long endStationId;
 
-    private final Long maxDepartureOrMinArrivalInMillis;
-
-    private final int maxTransfers;
-
     private final EndStopNodeEvaluatorType searchingType;
 
-    public EndStopNodeEvaluator(Long endStationId, Long maxDepartureOrMinArrivalInMillis, int maxTransfers, EndStopNodeEvaluatorType searchingType) {
+    List<Long> foundedPathsArrival = new ArrayList<>();
+
+    Map<Long, Long> foundedPaths = new HashMap<>();
+
+    public EndStopNodeEvaluator(Long endStationId, EndStopNodeEvaluatorType searchingType) {
         this.endStationId = endStationId;
-        this.maxDepartureOrMinArrivalInMillis = maxDepartureOrMinArrivalInMillis;
-        this.maxTransfers = maxTransfers;
         this.searchingType = searchingType;
     }
 
     @Override
     public Evaluation evaluate(Path path) {
+        //todo pres pulnoc
+
+        Node startNode = path.startNode();
+        long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
 
         Node currentNode = path.endNode();
+        long currentNodeStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
 
-        int totalNumberOfRelationships = 0;
-        int numberOfAwaitingRelationships = 0;
-        RelTypes prevRelationShipType = null;
-
-        for(Relationship relationship : path.relationships()) {
-            totalNumberOfRelationships++;
-
-            if(relationship.isType(RelTypes.NEXT_AWAITING_STOP)) {
-                numberOfAwaitingRelationships++;
-            }
-
-            //pokud je tam jiz vice prestupu, nez je povoleno nebo pokud jsou za sebou 2 hrany next_awaiting_stop
-            if(numberOfAwaitingRelationships > maxTransfers || (prevRelationShipType != null && prevRelationShipType.equals(RelTypes.NEXT_AWAITING_STOP) && relationship.isType(RelTypes.NEXT_AWAITING_STOP))) {
-                return Evaluation.EXCLUDE_AND_PRUNE;
-            }
-
-            if(relationship.isType(RelTypes.NEXT_AWAITING_STOP)) {
-                prevRelationShipType = RelTypes.NEXT_AWAITING_STOP;
-            } else {
-                prevRelationShipType = RelTypes.NEXT_STOP;
-            }
+        //rozhodujici je arrival time pokud existuje, jinak departure time
+        Long currentNodeArrival = null;
+        Long currentNodeDeparture = null;
+        if (currentNode.hasProperty(StopNode.ARRIVAL_PROPERTY)) {
+            currentNodeArrival = (Long) currentNode.getProperty(StopNode.ARRIVAL_PROPERTY);
+        }
+        if (currentNode.hasProperty(StopNode.DEPARTURE_PROPERTY)) {
+            currentNodeDeparture = (Long) currentNode.getProperty(StopNode.DEPARTURE_PROPERTY);
         }
 
-        //zjistim, jestli se nahodou nevracim zpatky - tedy stalo se napr STOP(Station1) - STOP(Station2) - STOP(Station1)
-        int totalNumberOfNodes = 0;
-        List<Node> lastNodesList = new ArrayList();
-        for(Node node : path.reverseNodes()) {
-            lastNodesList.add(node);
-
-            if(++totalNumberOfNodes >= 3) {
-                break;
-            }
+        if(currentNodeArrival == null && currentNodeDeparture == null) {
+            throw new RuntimeException();
         }
 
-        if(totalNumberOfNodes >= 3) {
-            Node lastNode = lastNodesList.get(0);
-            Node prevPrevNode = lastNodesList.get(2);
+        Long currentNodeTimeProperty = currentNodeArrival != null ? currentNodeArrival : currentNodeDeparture;
 
-            if(lastNode.getProperty(StopNode.STATION_PROPERTY).equals(prevPrevNode.getProperty(StopNode.STATION_PROPERTY))) {
-                return Evaluation.EXCLUDE_AND_PRUNE;
-            }
-        }
-
-        //pokud byla prvni hrana next_awaiting_stop
-        if(totalNumberOfRelationships == 1 && prevRelationShipType.equals(RelTypes.NEXT_AWAITING_STOP)) {
+        //POKUD jsem jiz na teto ceste (od start node) nasel cil v lepsim case
+        if(foundedPaths.containsKey(startNodeStopId) && foundedPaths.get(startNodeStopId) <= currentNodeTimeProperty) {
             return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
-        //nasel jsem
-        if(currentNode.getProperty(StopNode.STATION_PROPERTY).equals(endStationId)) {
-            return Evaluation.INCLUDE_AND_PRUNE;
+        //jestli uz jsem nenasel 3 lepsi vysledky
+//        int i = 0;
+//        for(Long alreadyFoundedArrival : foundedPathsArrival) {
+//            if(alreadyFoundedArrival <= currentNodeTimeProperty) {
+//                i++;
+//            }
+//
+//            if(i >= 3) {
+//                return Evaluation.EXCLUDE_AND_PRUNE;
+//            }
+//        }
+
+        //uz jsem nasel 3 vysledky
+        int i = 0;
+        if(foundedPaths.size() >= 3) {
+            for(long arrival : foundedPaths.values()) {
+                if(arrival <= currentNodeTimeProperty) {
+                    i++;
+                }
+
+                if(i >= 3) {
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            }
         }
 
-        //mimo casovy rozsah
-        if(prevRelationShipType != null && prevRelationShipType.equals(RelTypes.NEXT_AWAITING_STOP)) {
-            if(searchingType.equals(EndStopNodeEvaluatorType.DEPARTURE)) {
-                //pokud hledam dle data odjezdu
-                if(currentNode.hasProperty(StopNode.DEPARTURE_PROPERTY) &&
-                        ((Long) currentNode.getProperty(StopNode.DEPARTURE_PROPERTY) > maxDepartureOrMinArrivalInMillis)) {
-
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
-            } else if(searchingType.equals(EndStopNodeEvaluatorType.ARRIVAL)) {
-                //pokud hledam dle data prijezdu
-                if(currentNode.hasProperty(StopNode.ARRIVAL_PROPERTY) &&
-                        ((Long) currentNode.getProperty(StopNode.ARRIVAL_PROPERTY) < maxDepartureOrMinArrivalInMillis)) {
-
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
-            } else {
-                throw new RuntimeException("this path finding method is not yet implemented");
-            }
+        //nasel jsem
+        if(currentNodeStationId == endStationId) {
+            foundedPaths.put(startNodeStopId, currentNodeTimeProperty);
+            return Evaluation.INCLUDE_AND_PRUNE;
         }
 
         return Evaluation.EXCLUDE_AND_CONTINUE;

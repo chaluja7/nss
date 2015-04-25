@@ -14,6 +14,8 @@ public class SearchResultWrapper {
 
     private long arrival;
 
+    private int numberOfTransfers;
+
     private List<Long> stops;
 
     public long getTravelTime() {
@@ -30,6 +32,14 @@ public class SearchResultWrapper {
 
     public void setArrival(long arrival) {
         this.arrival = arrival;
+    }
+
+    public int getNumberOfTransfers() {
+        return numberOfTransfers;
+    }
+
+    public void setNumberOfTransfers(int numberOfTransfers) {
+        this.numberOfTransfers = numberOfTransfers;
     }
 
     public List<Long> getStops() {

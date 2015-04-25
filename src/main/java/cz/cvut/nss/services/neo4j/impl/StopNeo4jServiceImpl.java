@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -56,18 +57,30 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
 
     @Override
     public void connectStopNodesOnStationWithWaitingStopRelationship(long stationId) {
-        //Vyberu stanice, ktere mohou mit next awaiting stop
-        Set<StopNode> notStartingStopNodesByStationOrderByArrival = findNotStartingStopNodesByStationOrderByArrival(stationId);
-        for (StopNode stopNodeFrom : notStartingStopNodesByStationOrderByArrival) {
+        //Vyberu vsechny stopy na dane stanici serazene dle data odjezdu, pokud neni null, jinak dle data prijezdu
+        List<StopNode> orderedStopNodes = findStopNodesByStationIdOrderByActionTime(stationId);
 
-            long maxDepartureInMillis = stopNodeFrom.getArrivalInMillis() + MAX_MILLIS_TO_TRANSFER_RELATIONSHIP;
-            Set<StopNode> possibleAwaitingTransferStopNodes = findByStationAndDepartureRange(stopNodeFrom.getStationId(), stopNodeFrom.getArrivalInMillis(), maxDepartureInMillis);
-
-            for (StopNode stopNodeTo : possibleAwaitingTransferStopNodes) {
-                stopNodeFrom.hasNextAwaitingStopNodeRelationShip(stopNodeTo, stopNodeTo.getDepartureInMillis() - stopNodeFrom.getArrivalInMillis());
+        int i = 0;
+        StopNode firstStopNode = null;
+        StopNode stopNodeFrom = null;
+        for (StopNode stopNodeTo : orderedStopNodes) {
+            if(i == 0) {
+                firstStopNode = stopNodeTo;
             }
 
-            save(stopNodeFrom);
+            if(stopNodeFrom != null) {
+                stopNodeFrom.hasNextAwaitingStopNodeRelationShip(stopNodeTo, 0l);
+                save(stopNodeFrom);
+            }
+
+            //propojeni v kruhu (posledni s prvnim)
+            if(i != 0 && i == orderedStopNodes.size() - 1) {
+                stopNodeTo.hasNextAwaitingStopNodeRelationShip(firstStopNode, 0l);
+                save(stopNodeTo);
+            }
+
+            stopNodeFrom = stopNodeTo;
+            i++;
         }
     }
 
@@ -84,6 +97,11 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
         for(StopNode stopNode : stopNeo4jRepository.findByRideId(rideId)) {
             stopNeo4jRepository.delete(stopNode);
         }
+    }
+
+    @Override
+    public List<StopNode> findStopNodesByStationIdOrderByActionTime(Long stationId) {
+        return stopNeo4jRepository.findStopNodesByStationIdOrderByActionTime(stationId);
     }
 
 }

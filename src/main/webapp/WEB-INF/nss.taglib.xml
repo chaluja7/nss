@@ -16,4 +16,9 @@
         <source>cz/cvut/nss/selectOne.xhtml</source>
     </tag>
 
+    <tag>
+        <tag-name>booleanCheckbox</tag-name>
+        <source>cz/cvut/nss/booleanCheckbox.xhtml</source>
+    </tag>
+
 </facelet-taglib>

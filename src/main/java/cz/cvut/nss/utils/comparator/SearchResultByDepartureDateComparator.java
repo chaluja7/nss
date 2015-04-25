@@ -29,6 +29,14 @@ public class SearchResultByDepartureDateComparator implements Comparator<SearchR
             return 1;
         }
 
+        if(o1.getNumberOfTransfers() < o2.getNumberOfTransfers()) {
+            return -1;
+        }
+
+        if(o1.getNumberOfTransfers() > o2.getNumberOfTransfers()) {
+            return 1;
+        }
+
         return 0;
     }
 }

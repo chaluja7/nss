@@ -3,6 +3,7 @@ package cz.cvut.nss.services.neo4j;
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.entities.*;
 import cz.cvut.nss.entities.enums.LineType;
+import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.services.*;
 import cz.cvut.nss.utils.EosDateTimeUtils;
 import org.joda.time.LocalDateTime;
@@ -22,6 +23,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +44,12 @@ public class StationNeo4jServiceTest {
     private StopNeo4jService stopNeo4jService;
 
     @Autowired
+    private RideNeo4jService rideNeo4jService;
+
+    @Autowired
+    private OperationIntervalNeo4jService operationIntervalNeo4jService;
+
+    @Autowired
     private StationService stationService;
 
     @Autowired
@@ -56,6 +66,9 @@ public class StationNeo4jServiceTest {
 
     @Autowired
     private RouteStopService routeStopService;
+
+    @Autowired
+    private OperationIntervalService operationIntervalService;
 
     @Autowired
     @Qualifier("neo4jSearchService")
@@ -89,7 +102,7 @@ public class StationNeo4jServiceTest {
         //do neo4j vrazim jednotlive RIDES
         List<Ride> rideList = rideService.getAll();
         for(Ride ride : rideList) {
-            rideService.importRideToNeo4j(ride.getId());
+            rideService.importRideToNeo4j(ride);
         }
 
         //Nyni proiteruji vsechny stanice a propojim prislusne stopy na dane stanici cekacimi hranamy
@@ -109,10 +122,70 @@ public class StationNeo4jServiceTest {
     }
 
     @Test
+    public void importOperationIntervalsToNeo4j() {
+        operationIntervalNeo4jService.deleteAll();
+
+        for(OperationInterval operationInterval : operationIntervalService.getAll()) {
+            OperationIntervalNode node = new OperationIntervalNode();
+
+            node.setOperationIntervalId(operationInterval.getId());
+            node.setMonday(operationInterval.getMonday());
+            node.setTuesday(operationInterval.getTuesday());
+            node.setWednesday(operationInterval.getWednesday());
+            node.setThursday(operationInterval.getThursday());
+            node.setFriday(operationInterval.getFriday());
+            node.setSaturday(operationInterval.getSaturday());
+            node.setSunday(operationInterval.getSunday());
+            node.setFromDateInMillis(operationInterval.getStartDate().toDate().getTime());
+            node.setToDateInMillis(operationInterval.getEndDate().toDate().getTime());
+
+            operationIntervalNeo4jService.save(node);
+        }
+
+    }
+
+    @Test
+    public void deleteRidesAndStopsFromNeo4j() {
+        rideNeo4jService.deleteAll();
+        stopNeo4jService.deleteAll();
+    }
+
+    @Test
+    public void importRidesToNeo4j() {
+        for(Ride ride : rideService.getAll()) {
+            rideService.importRideToNeo4j(ride);
+        }
+    }
+
+    @Test
+    public void connectStopsOnStationInNeo4j() {
+        for(Station station : stationService.getAll()) {
+            stopNeo4jService.connectStopNodesOnStationWithWaitingStopRelationship(station.getId());
+        }
+    }
+
+    @Test
+    public void ttt() {
+        Date date = new Date();
+        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+
+        try {
+            date = dateFormat.parse("29.06.2015 15:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return;
+        }
+
+
+        searchService.findPathByDepartureDate(2449, 2876, date, 6, 1, -1);
+    }
+
+
+    @Test
     public void importStations() throws IOException {
         //googleStationService.deleteAll();
-//        importParentStations();
-//        importChildStations();
+        //importParentStations();
+        //importChildStations();
 
         //googleRouteService.deleteAll();
         //importRoutes();
@@ -126,7 +199,10 @@ public class StationNeo4jServiceTest {
         //googleStopService.deleteAll();
         //importStops();
 
-        //importLines();
+
+        //transferLines();
+        //transferServices();
+        //transferTrips();
     }
 
     public void importParentStations() throws IOException {
@@ -216,6 +292,8 @@ public class StationNeo4jServiceTest {
                     googleStationService.createGoogleStation(stationId, stationName, latitude, longitude, stationByName.getTitle());
                 }
             }
+
+            googleStationService.handleMetroStations();
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -447,9 +525,10 @@ public class StationNeo4jServiceTest {
         }
     }
 
-    public void importLines() {
+    @Test
+    public void transferLines() {
         for(GoogleRoute googleRoute : googleRouteService.findAll()) {
-            //chci jen data dpp
+            //chci jen data veolia
             if(googleRoute.getAgencyId() != 1) {
                 continue;
             }
@@ -514,6 +593,84 @@ public class StationNeo4jServiceTest {
             line.setRoute(route);
 
             lineService.createLine(line);
+        }
+    }
+
+    public void transferServices() {
+        List<GoogleService> googleServices = googleServiceService.getAll();
+        for(GoogleService googleService : googleServices) {
+            OperationInterval operationInterval = new OperationInterval();
+            operationInterval.setMonday(googleService.getMonday());
+            operationInterval.setTuesday(googleService.getTuesday());
+            operationInterval.setWednesday(googleService.getWednesday());
+            operationInterval.setThursday(googleService.getThursday());
+            operationInterval.setFriday(googleService.getFriday());
+            operationInterval.setSaturday(googleService.getSaturday());
+            operationInterval.setSunday(googleService.getSunday());
+            operationInterval.setStartDate(googleService.getStartDate().toLocalDate());
+            operationInterval.setEndDate(googleService.getEndDate().toLocalDate());
+
+            operationIntervalService.createOperationInterval(operationInterval);
+        }
+    }
+
+    @Test
+    public void aa() {
+        Long a = new Long(5);
+        Long b = new Long(3);
+
+        Long c = a - b;
+        int i = 0;
+
+    }
+
+    @Test
+    public void transferTrips() {
+        List<GoogleTrip> allForImport = googleTripService.getAllForImport();
+        for(GoogleTrip googleTrip : allForImport) {
+            OperationInterval operationInterval = operationIntervalService.getOperationInterval(googleTrip.getServiceId());
+            if(operationInterval == null) {
+                throw new RuntimeException();
+            }
+
+            GoogleRoute googleRoute = googleRouteService.getGoogleRouteByRouteId(googleTrip.getRouteId());
+            Line line = lineService.getByName(googleRoute.getName());
+            if(line == null) {
+                throw new RuntimeException();
+            }
+
+            Ride ride = new Ride();
+            ride.setOperationInterval(operationInterval);
+            ride.setLine(line);
+
+            List<GoogleStop> googleStops = googleStopService.getGoogleStopsByTripId(googleTrip.getTripId());
+            int i = 0;
+            for(GoogleStop googleStop : googleStops) {
+                GoogleStation googleStation = googleStationService.getGoogleStationByStationId(googleStop.getStationId());
+                if(googleStation.getParentStation() != null) {
+                    googleStation = googleStation.getParentStation();
+                }
+
+                Station station = stationService.getStationByTitle(googleStation.getStationId());
+
+                Stop stop = new Stop();
+                stop.setStation(station);
+                stop.setArrival(googleStop.getArrivalTime().toLocalTime());
+                stop.setDeparture(googleStop.getDepartureTime().toLocalTime());
+                stop.setStopOrder(googleStop.getOrder());
+
+                if(i == 0) {
+                    stop.setArrival(null);
+                }
+                if(i == googleStops.size() - 1) {
+                    stop.setDeparture(null);
+                }
+
+                ride.addStop(stop);
+                i++;
+            }
+
+            rideService.createRide(ride);
         }
     }
 

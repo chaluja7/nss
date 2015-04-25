@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:nss="http://cz.cvut.eos/facelets"
+                xmlns:rich="http://richfaces.org/rich"
+                template="/WEB-INF/templates/adminDefault.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="id" value="#{operationIntervalBB.id}"/>
+        <f:event type="preRenderView" listener="#{operationIntervalBB.loadOperationInterval}"/>
+    </f:metadata>
+
+    <ui:define name="innerContent">
+
+        <h:messages styleClass="errorJsf"/>
+        <h2><h:outputText value="Přidání nového intervalu jízd" rendered="#{operationIntervalBB.id == null}" /></h2>
+        <h2><h:outputText value="Editace intervalu jízd" rendered="#{operationIntervalBB.id != null}" /></h2>
+
+        <h:form>
+
+            <h:panelGroup layout="block" styleClass="inputRow">
+                <label for="startDate">Platí od:</label>
+                <rich:calendar id="startDate" value="#{operationIntervalBB.operationInterval.startDate}"  datePattern="dd.MM.yyyy"
+                               locale="#{operationIntervalBB.locale}" enableManualInput="true">
+                    <f:converter binding="#{localDateConverter}" />
+                </rich:calendar>
+            </h:panelGroup>
+
+            <h:panelGroup layout="block" styleClass="inputRow">
+                <label for="endDate">Platí do:</label>
+                <rich:calendar id="endDate" value="#{operationIntervalBB.operationInterval.endDate}"  datePattern="dd.MM.yyyy"
+                               locale="#{operationIntervalBB.locale}" enableManualInput="true">
+                    <f:converter binding="#{localDateConverter}" />
+                </rich:calendar>
+            </h:panelGroup>
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.monday}" title="monday" label="#{msg['operationIntervals.monday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.tuesday}" title="tuesday" label="#{msg['operationIntervals.tuesday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.wednesday}" title="wednesday" label="#{msg['operationIntervals.wednesday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.thursday}" title="thursday" label="#{msg['operationIntervals.thursday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.friday}" title="friday" label="#{msg['operationIntervals.friday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.saturday}" title="saturday" label="#{msg['operationIntervals.saturday']}" />
+
+            <nss:booleanCheckbox value="#{operationIntervalBB.operationInterval.sunday}" title="sunday" label="#{msg['operationIntervals.sunday']}" />
+
+            <h:commandButton value="Vytvořit" action="#{operationIntervalBB.saveOperationInterval}" rendered="#{operationIntervalBB.id == null}" styleClass="submitButton"/>
+            <h:commandButton value="Uložit" action="#{operationIntervalBB.updateOperationInterval}"  rendered="#{operationIntervalBB.id != null}" styleClass="submitButton"/>
+
+        </h:form>
+
+    </ui:define>
+</ui:composition>
