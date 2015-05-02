@@ -45,27 +45,13 @@ public class Neo4jSearchDao implements SearchDao {
     @Override
     public List<SearchResultWrapper> findRidesByDepartureDate(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers) {
 
-        InitialBranchState<StationRideWrapper> initialBranchState = new InitialBranchState<StationRideWrapper>() {
-
-            @Override
-            public InitialBranchState<StationRideWrapper> reverse() {
-                return this;
-            }
-
-            @Override
-            public StationRideWrapper initialState(Path path) {
-                return new StationRideWrapper();
-            }
-
-        };
-
         TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
                 .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
                 .uniqueness(Uniqueness.NODE_PATH)
-                .expand(new CustomExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), initialBranchState)
-                .evaluator(new EndStopNodeEvaluator(stationToId, new LocalDateTime(departure), EndStopNodeEvaluatorType.DEPARTURE, 3));
+                .expand(new DepartureTypeExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), getEmptyInitialBranchState())
+                .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(departure), 3));
         long la = System.currentTimeMillis();
-        Iterable<Node> startNodes = this.findStartNodes(stationFromId, departure, maxDeparture);
+        Iterable<Node> startNodes = findStartNodesForDepartureTypePathFinding(stationFromId, departure, maxDeparture);
 
 //        for(Node n : startNodes) {
 //            int i = 0;
@@ -161,17 +147,14 @@ public class Neo4jSearchDao implements SearchDao {
     @Override
     public List<SearchResultWrapper> findRidesByArrivalDate(long stationFromId, long stationToId, Date arrival, Date minArrival, int maxTransfers) {
 
-        return new ArrayList<>();
+        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
+                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
+                .uniqueness(Uniqueness.NODE_PATH)
+                .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
+                .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(arrival), 3));
 
-//        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-//                .breadthFirst()
-//                .relationships(RelTypes.NEXT_STOP, Direction.INCOMING)
-//                .relationships(RelTypes.NEXT_AWAITING_STOP, Direction.INCOMING)
-//                .uniqueness(Uniqueness.NODE_PATH)
-//                .order(BranchOrderingPolicies.PREORDER_BREADTH_FIRST)
-//                .evaluator(new EndStopNodeEvaluator(stationFromId, minArrival.getTime(), maxTransfers, EndStopNodeEvaluatorType.ARRIVAL));
-//
-//        Iterable<Node> iterable = stopNeo4jRepository.findByStationAndArrivalRangeReturnIterable(stationToId, minArrival.getTime(), arrival.getTime());
+        Iterable<Node> startNodes = findStartNodesForArrivalTypePathFinding(stationToId, arrival, minArrival);
+
 //
 //        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
 //        Traverser traverser = traversalDescription.traverse(iterable);
@@ -228,6 +211,8 @@ public class Neo4jSearchDao implements SearchDao {
 //
 //        //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
 //        return transformSearchResultWrapperMapToList(ridesMap);
+
+        return null;
     }
 
     /**
@@ -244,7 +229,7 @@ public class Neo4jSearchDao implements SearchDao {
         return resultList;
     }
 
-    protected Iterable<Node> findStartNodes(long stationId, Date departure, Date maxDateDeparture) {
+    protected Iterable<Node> findStartNodesForDepartureTypePathFinding(long stationId, Date departure, Date maxDateDeparture) {
         LocalDateTime tempDateDeparture = new LocalDateTime(departure);
         LocalDateTime tempMaxDateDeparture = new LocalDateTime(maxDateDeparture);
 
@@ -282,6 +267,63 @@ public class Neo4jSearchDao implements SearchDao {
 
         Result<Map<String, Object>> query = neo4jTemplate.query(queryString, params);
         return query.to(Node.class);
+    }
+
+    protected Iterable<Node> findStartNodesForArrivalTypePathFinding(long stationId, Date arrival, Date minDateArrival) {
+        LocalDateTime tempDateArrival = new LocalDateTime(arrival);
+        LocalDateTime tempMinDateArrival = new LocalDateTime(minDateArrival);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("stationId", stationId);
+        params.put("arrivalDateInMillis", arrival.getTime());
+        params.put("arrivalDateMinusOneDayInMillis", arrival.getTime() - DateTimeUtils.MILLIS_IN_DAY);
+        params.put("trueParameter", true);
+        params.put("arrivalTimeInMillis", tempDateArrival.getMillisOfDay());
+        params.put("minArrivalTimeInMillis", tempMinDateArrival.getMillisOfDay());
+
+        String queryString = "match (s:StopNode {stationId: {stationId}})-[IN_RIDE]->(r:RideNode)-[IN_INTERVAL]->(i:OperationIntervalNode) ";
+        queryString += "where s.arrivalInMillis is not null ";
+
+        if(tempDateArrival.getMillisOfDay() > tempMinDateArrival.getMillisOfDay()) {
+            //neprehoupl jsem se pres pulnoc
+            queryString += "and i.fromDateInMillis <= {arrivalDateInMillis} and i.toDateInMillis >= {arrivalDateMinusOneDayInMillis} ";
+            queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateArrival.getDayOfWeek()) + " = {trueParameter} ";
+            queryString += "and s.arrivalInMillis <= {arrivalTimeInMillis} and s.arrivalInMillis > {minArrivalTimeInMillis} ";
+        } else {
+            //prehoupl jsem se s rozsahem pres pulnoc
+            queryString += "and ((i.fromDateInMillis <= {arrivalDateInMillis} and i.toDateInMillis >= {arrivalDateMinusOneDayInMillis} ";
+            queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateArrival.getDayOfWeek()) + " = {trueParameter} ";
+            queryString += "and s.arrivalInMillis <= {arrivalTimeInMillis}) ";
+
+            queryString += "or (i.fromDateInMillis <= {minArrivalDateInMillis} and i.toDateInMillis >= {minArrivalDateMinusOneDayInMillis} ";
+            queryString += "and  " + JdbcSearchDao.getDayOfWeekCondition(tempMinDateArrival.getDayOfWeek()) + " = {trueParameter} ";
+            queryString += "and s.arrivalInMillis > {minArrivalTimeInMillis})) ";
+
+            params.put("minArrivalDateInMillis", minDateArrival.getTime());
+            params.put("minArrivalDateMinusOneDayInMillis", minDateArrival.getTime() - DateTimeUtils.MILLIS_IN_DAY);
+        }
+
+        queryString += "return s order by case when s.arrivalInMillis > {arrivalTimeInMillis} then 2 else 1 end, s.arrivalInMillis desc";
+
+        Result<Map<String, Object>> query = neo4jTemplate.query(queryString, params);
+        return query.to(Node.class);
+    }
+
+    protected InitialBranchState<StationRideWrapper> getEmptyInitialBranchState() {
+
+        return new InitialBranchState<StationRideWrapper>() {
+
+            @Override
+            public InitialBranchState<StationRideWrapper> reverse() {
+                return this;
+            }
+
+            @Override
+            public StationRideWrapper initialState(Path path) {
+                return new StationRideWrapper();
+            }
+
+        };
     }
 
 }

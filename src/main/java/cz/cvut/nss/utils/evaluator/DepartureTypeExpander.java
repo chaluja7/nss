@@ -16,7 +16,7 @@ import java.util.*;
  * @author jakubchalupa
  * @since 19.04.15
  */
-public class CustomExpander implements PathExpander<StationRideWrapper> {
+public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
     private final LocalDateTime departureDateTime;
 
@@ -46,7 +46,7 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
 
     private final Map<Long, Map<Long, Long>> visitedStationsOnPathMap = new HashMap<>();
 
-    public CustomExpander(LocalDateTime departureDateTime, LocalDateTime maxDepartureDateTime, int maxNumberOfTransfers) {
+    public DepartureTypeExpander(LocalDateTime departureDateTime, LocalDateTime maxDepartureDateTime, int maxNumberOfTransfers) {
         this.departureDateTime = departureDateTime;
         this.maxDepartureDateTime = maxDepartureDateTime;
         this.maxNumberOfTransfers = maxNumberOfTransfers;

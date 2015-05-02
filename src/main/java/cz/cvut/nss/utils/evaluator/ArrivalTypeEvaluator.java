@@ -14,16 +14,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Evaluator for neo4j traversal (finding paths to end station)
+ * Evaluator for neo4j traversal (finding paths from end station)
  *
  * @author jakubchalupa
  * @since 28.03.15
  */
-public final class EndStopNodeEvaluator implements Evaluator {
+public final class ArrivalTypeEvaluator implements Evaluator {
 
     private final Long endStationId;
-
-    private final EndStopNodeEvaluatorType searchingType;
 
     private final int departureMillisOfDay;
 
@@ -33,10 +31,9 @@ public final class EndStopNodeEvaluator implements Evaluator {
 
     Map<Long, Set<Long>> foundedPathsDetails = new HashMap<>();
 
-    public EndStopNodeEvaluator(Long endStationId, LocalDateTime departureDateTime, EndStopNodeEvaluatorType searchingType, int maxNumberOfResults) {
+    public ArrivalTypeEvaluator(Long endStationId, LocalDateTime departureDateTime, int maxNumberOfResults) {
         this.endStationId = endStationId;
         this.departureMillisOfDay = departureDateTime.getMillisOfDay();
-        this.searchingType = searchingType;
         this.maxNumberOfResults = maxNumberOfResults;
     }
 
