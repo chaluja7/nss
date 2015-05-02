@@ -9,8 +9,6 @@ import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
 import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -86,43 +84,36 @@ public class SearchResultBB {
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 }
             }
 
             foundResults = new ArrayList<>();
             for(SearchResultWrapper resultWrapper : path) {
                 FoundedPathsWrapper wrapper = new FoundedPathsWrapper();
-
                 wrapper.setStops(new ArrayList<Stop>());
 
                 for(Long stopId : resultWrapper.getStops()) {
                     wrapper.getStops().add(stopService.getStop(stopId));
                 }
 
-                Stop from = wrapper.getStops().get(0);
-                Stop to = wrapper.getStops().get(wrapper.getStops().size() - 1);
+                int travelTimeMillis = (int) resultWrapper.getTravelTime();
+                int travelTimeSeconds = travelTimeMillis / 1000;
+                int travelTimeMinutes = travelTimeSeconds / 60;
+                int travelTimeHours = travelTimeMinutes / 60;
 
-                //from.getArrival().
-
-                //todo hours and minutes
-                Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
-                Minutes minutes = Minutes.minutesBetween(from.getDeparture(), to.getArrival());
-
-                wrapper.setTravelTimeHours(hours.getHours());
-                wrapper.setTravelTimeMinutes(minutes.getMinutes() % 60);
-
+                wrapper.setTravelTimeHours(travelTimeHours);
+                wrapper.setTravelTimeMinutes(travelTimeMinutes % 60);
                 foundResults.add(wrapper);
             }
-
         }
 
         long executionTime = System.currentTimeMillis() - l;
@@ -202,7 +193,6 @@ public class SearchResultBB {
             departureDay = dt.toString(DateTimeUtils.datePattern);
             arrivalDay = dt.plusDays(1).toString(DateTimeUtils.datePattern);
         }
-
     }
 
     public String getStationFromTitle() {

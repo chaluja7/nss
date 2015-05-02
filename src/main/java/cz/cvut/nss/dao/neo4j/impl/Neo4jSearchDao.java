@@ -75,7 +75,7 @@ public class Neo4jSearchDao implements SearchDao {
         Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
         la = System.currentTimeMillis();
 
-
+        int millisOfDepartureDay = new LocalDateTime(departure).getMillisOfDay();
         Traverser traverser = traversalDescription.traverse(startNodes);
         for(Path path : traverser) {
             Node startNode = path.startNode();
@@ -88,6 +88,16 @@ public class Neo4jSearchDao implements SearchDao {
                 travelTime = millisOfArrival - millisOfDeparture;
             } else {
                 travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;
+            }
+
+            boolean overMidnightDeparture = false;
+            if(millisOfDeparture < millisOfDepartureDay) {
+                overMidnightDeparture = true;
+            }
+
+            boolean overMidnightArrival = false;
+            if(millisOfArrival < millisOfDepartureDay) {
+                overMidnightArrival = true;
             }
 
             //vyberu ridy, po kterych jede cesta
@@ -131,8 +141,11 @@ public class Neo4jSearchDao implements SearchDao {
             String pathIdentifier = stringBuilder.toString();
             if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
                 SearchResultWrapper wrapper = new SearchResultWrapper();
-                wrapper.setArrival((long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY));
+                wrapper.setDeparture(millisOfDeparture);
+                wrapper.setArrival(millisOfArrival);
                 wrapper.setTravelTime(travelTime);
+                wrapper.setOverMidnightDeparture(overMidnightDeparture);
+                wrapper.setOverMidnightArrival(overMidnightArrival);
                 wrapper.setStops(stopsOnPath);
                 ridesMap.put(pathIdentifier, wrapper);
             }
@@ -252,6 +265,7 @@ public class Neo4jSearchDao implements SearchDao {
             queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis >= {departureTimeInMillis} and s.departureInMillis < {maxDepartureTimeInMillis} ";
         } else {
+            //prehoupl jsem se s rozsahem pres pulnoc
             queryString += "and ((i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateMinusOneDayInMillis} ";
             queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis >= {departureTimeInMillis}) ";
@@ -264,7 +278,7 @@ public class Neo4jSearchDao implements SearchDao {
             params.put("maxDepartureDateMinusOneDayInMillis", maxDateDeparture.getTime() - DateTimeUtils.MILLIS_IN_DAY);
         }
 
-        queryString += "return s order by s.departureInMillis asc";
+        queryString += "return s order by case when s.departureInMillis < {departureTimeInMillis} then 2 else 1 end, s.departureInMillis asc";
 
         Result<Map<String, Object>> query = neo4jTemplate.query(queryString, params);
         return query.to(Node.class);

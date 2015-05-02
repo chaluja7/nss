@@ -11,8 +11,18 @@ import java.util.Comparator;
  * @since 12.03.15
  */
 public class SearchResultByDepartureDateComparator implements Comparator<SearchResultWrapper> {
+
     @Override
     public int compare(SearchResultWrapper o1, SearchResultWrapper o2) {
+
+        if(!o1.isOverMidnightArrival() && o2.isOverMidnightArrival()) {
+            return -1;
+        }
+
+        if(o1.isOverMidnightArrival() && !o2.isOverMidnightArrival()) {
+            return 1;
+        }
+
         if(o1.getArrival() < o2.getArrival()) {
             return -1;
         }
@@ -39,4 +49,5 @@ public class SearchResultByDepartureDateComparator implements Comparator<SearchR
 
         return 0;
     }
+
 }

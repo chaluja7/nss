@@ -24,13 +24,21 @@ public class SearchResultFilter {
         List<SearchResultWrapper> finalList = new ArrayList<>();
         Set<Long> alreadyUsed = new HashSet<>();
         //kazdy STOP uzivateli zobrazim pouze na te nejlepsi trase.
-        Long prevDeparture = null;
+        SearchResultWrapper prevWrapper = null;
         for(SearchResultWrapper wrapper : resultList) {
-            long currentDeparture = wrapper.getArrival() - wrapper.getTravelTime();
-            if(prevDeparture != null && prevDeparture > currentDeparture) {
-                continue;
+
+            //zkontroluji, jestli minuly vysledek nemel pozdejsi departure nez ten aktualni, pokud ano tak aktualni nechci
+            if(prevWrapper != null) {
+                if(!prevWrapper.isOverMidnightDeparture() && !wrapper.isOverMidnightDeparture() && prevWrapper.getDeparture() > wrapper.getDeparture()) {
+                    continue;
+                }
+
+                if(prevWrapper.isOverMidnightDeparture() && wrapper.isOverMidnightDeparture() && prevWrapper.getDeparture() > wrapper.getDeparture()) {
+                    continue;
+                }
             }
 
+            //zkontroluji, jestli nejaky z nodu v aktualnim wrapperu jiz nebyl pouzit drive
             boolean skip = false;
             for(Long stopId : wrapper.getStops()) {
                 if(alreadyUsed.contains(stopId)) {
@@ -48,7 +56,7 @@ public class SearchResultFilter {
                 alreadyUsed.add(stopId);
             }
 
-            prevDeparture = currentDeparture;
+            prevWrapper = wrapper;
         }
 
         return finalList;
