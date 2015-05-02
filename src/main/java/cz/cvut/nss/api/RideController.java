@@ -5,7 +5,7 @@ import cz.cvut.nss.api.datatable.resource.RideResource;
 import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.services.RideService;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +62,8 @@ public class RideController {
                 Stop to = stopList.get(stopList.size() - 1);
 
                 if(from.getDeparture() != null && to.getArrival() != null) {
-                    resource.setDeparture(from.getDeparture().toString(EosDateTimeUtils.timePattern));
-                    resource.setArrival(to.getArrival().toString(EosDateTimeUtils.timePattern));
+                    resource.setDeparture(from.getDeparture().toString(DateTimeUtils.timePattern));
+                    resource.setArrival(to.getArrival().toString(DateTimeUtils.timePattern));
 
                     //todo?
                     Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());

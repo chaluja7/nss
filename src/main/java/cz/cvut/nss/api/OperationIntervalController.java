@@ -4,7 +4,7 @@ import cz.cvut.nss.api.datatable.DataTableResource;
 import cz.cvut.nss.api.datatable.resource.OperationIntervalResource;
 import cz.cvut.nss.entities.OperationInterval;
 import cz.cvut.nss.services.OperationIntervalService;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,8 +48,8 @@ public class OperationIntervalController {
             resource.setFriday(operationInterval.getFriday());
             resource.setSaturday(operationInterval.getSaturday());
             resource.setSunday(operationInterval.getSunday());
-            resource.setStartDate(operationInterval.getStartDate().toString(EosDateTimeUtils.datePattern));
-            resource.setEndDate(operationInterval.getEndDate().toString(EosDateTimeUtils.datePattern));
+            resource.setStartDate(operationInterval.getStartDate().toString(DateTimeUtils.datePattern));
+            resource.setEndDate(operationInterval.getEndDate().toString(DateTimeUtils.datePattern));
 
             resourceList.add(resource);
         }

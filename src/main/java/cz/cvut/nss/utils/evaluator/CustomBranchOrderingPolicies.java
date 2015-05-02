@@ -15,5 +15,6 @@ public enum CustomBranchOrderingPolicies implements BranchOrderingPolicy {
         public BranchSelector create(TraversalBranch startBranch, PathExpander expander) {
             return new CustomBranchSelector(startBranch, expander);
         }
-    };
+    }
+
 }

@@ -6,6 +6,7 @@ import cz.cvut.nss.dao.jdbc.JdbcSearchDao;
 import cz.cvut.nss.dao.neo4j.StopNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.entities.neo4j.relationship.RelTypes;
+import cz.cvut.nss.utils.DateTimeUtils;
 import cz.cvut.nss.utils.evaluator.*;
 import org.joda.time.LocalDateTime;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -62,7 +63,7 @@ public class Neo4jSearchDao implements SearchDao {
                 .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
                 .uniqueness(Uniqueness.NODE_PATH)
                 .expand(new CustomExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), initialBranchState)
-                .evaluator(new EndStopNodeEvaluator(stationToId, EndStopNodeEvaluatorType.DEPARTURE));
+                .evaluator(new EndStopNodeEvaluator(stationToId, new LocalDateTime(departure), EndStopNodeEvaluatorType.DEPARTURE, 3));
         long la = System.currentTimeMillis();
         Iterable<Node> startNodes = this.findStartNodes(stationFromId, departure, maxDeparture);
 
@@ -70,9 +71,6 @@ public class Neo4jSearchDao implements SearchDao {
 //            int i = 0;
 //        }
 
-
-        //todo
-        //Node startSearchNode = stopNeo4jRepository.findPathFirstNode(stationFromId, (long) new LocalDateTime(departure).getMillisOfDay());
         la = System.currentTimeMillis() - la;
         Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
         la = System.currentTimeMillis();
@@ -89,7 +87,7 @@ public class Neo4jSearchDao implements SearchDao {
             if(millisOfArrival > millisOfDeparture) {
                 travelTime = millisOfArrival - millisOfDeparture;
             } else {
-                travelTime = (86400000 - millisOfDeparture) + millisOfArrival;
+                travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;
             }
 
             //vyberu ridy, po kterych jede cesta
@@ -240,6 +238,7 @@ public class Neo4jSearchDao implements SearchDao {
         Map<String, Object> params = new HashMap<>();
         params.put("stationId", stationId);
         params.put("departureDateInMillis", departure.getTime());
+        params.put("departureDateMinusOneDayInMillis", departure.getTime() - DateTimeUtils.MILLIS_IN_DAY);
         params.put("trueParameter", true);
         params.put("departureTimeInMillis", tempDateDeparture.getMillisOfDay());
         params.put("maxDepartureTimeInMillis", tempMaxDateDeparture.getMillisOfDay());
@@ -249,19 +248,20 @@ public class Neo4jSearchDao implements SearchDao {
 
         if(tempMaxDateDeparture.getMillisOfDay() > tempDateDeparture.getMillisOfDay()) {
             //neprehoupl jsem se pres pulnoc
-            queryString += "and i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateInMillis} ";
+            queryString += "and i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateMinusOneDayInMillis} ";
             queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis >= {departureTimeInMillis} and s.departureInMillis < {maxDepartureTimeInMillis} ";
         } else {
-            queryString += "and ((i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateInMillis} ";
+            queryString += "and ((i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateMinusOneDayInMillis} ";
             queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis >= {departureTimeInMillis}) ";
 
-            queryString += "or (i.fromDateInMillis <= {maxDepartureDateInMillis} and i.toDateInMillis >= {maxDepartureDateInMillis} ";
+            queryString += "or (i.fromDateInMillis <= {maxDepartureDateInMillis} and i.toDateInMillis >= {maxDepartureDateMinusOneDayInMillis} ";
             queryString += "and  " + JdbcSearchDao.getDayOfWeekCondition(tempMaxDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis < {maxDepartureTimeInMillis})) ";
 
-            params.put("maxDepartureDateInMillis", maxDateDeparture.getTime() - 86400000);
+            params.put("maxDepartureDateInMillis", maxDateDeparture.getTime());
+            params.put("maxDepartureDateMinusOneDayInMillis", maxDateDeparture.getTime() - DateTimeUtils.MILLIS_IN_DAY);
         }
 
         queryString += "return s order by s.departureInMillis asc";

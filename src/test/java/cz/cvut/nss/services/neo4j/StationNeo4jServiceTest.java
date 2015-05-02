@@ -5,7 +5,7 @@ import cz.cvut.nss.entities.*;
 import cz.cvut.nss.entities.enums.LineType;
 import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.services.*;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -167,7 +167,7 @@ public class StationNeo4jServiceTest {
     @Test
     public void ttt() {
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
 
         try {
             date = dateFormat.parse("29.06.2015 15:00");
@@ -356,7 +356,7 @@ public class StationNeo4jServiceTest {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(EosDateTimeUtils.noDelimiterEnDatePattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.noDelimiterEnDatePattern);
 
         try {
 
@@ -464,7 +464,7 @@ public class StationNeo4jServiceTest {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(EosDateTimeUtils.timeWithSecondsPattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.timeWithSecondsPattern);
 
 
         try {

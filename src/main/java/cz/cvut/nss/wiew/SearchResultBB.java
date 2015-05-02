@@ -7,7 +7,7 @@ import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.services.SearchService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
@@ -146,8 +146,8 @@ public class SearchResultBB {
         }
 
         departureOrArrival = newDateTime.toDate();
-        departureOrArrivalDate = newDateTime.toString(EosDateTimeUtils.datePattern);
-        departureOrArrivalTime = newDateTime.toString(EosDateTimeUtils.timePattern);
+        departureOrArrivalDate = newDateTime.toString(DateTimeUtils.datePattern);
+        departureOrArrivalTime = newDateTime.toString(DateTimeUtils.timePattern);
     }
 
     public void findPrevRides() {
@@ -167,8 +167,8 @@ public class SearchResultBB {
         }
 
         departureOrArrival = newDateTime.toDate();
-        departureOrArrivalDate = newDateTime.toString(EosDateTimeUtils.datePattern);
-        departureOrArrivalTime = newDateTime.toString(EosDateTimeUtils.timePattern);
+        departureOrArrivalDate = newDateTime.toString(DateTimeUtils.datePattern);
+        departureOrArrivalTime = newDateTime.toString(DateTimeUtils.timePattern);
     }
 
     private void prepareAndValidateInputs() {
@@ -181,7 +181,7 @@ public class SearchResultBB {
         }
 
         if(departureOrArrival == null) {
-            DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+            DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
             try {
                 departureOrArrival = dateFormat.parse(departureOrArrivalDate + " " + departureOrArrivalTime);
             } catch (ParseException e) {
@@ -199,8 +199,8 @@ public class SearchResultBB {
         }
 
         if(timeType.equals("departure")) {
-            departureDay = dt.toString(EosDateTimeUtils.datePattern);
-            arrivalDay = dt.plusDays(1).toString(EosDateTimeUtils.datePattern);
+            departureDay = dt.toString(DateTimeUtils.datePattern);
+            arrivalDay = dt.plusDays(1).toString(DateTimeUtils.datePattern);
         }
 
     }

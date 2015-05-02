@@ -6,17 +6,13 @@ import org.neo4j.graphdb.traversal.BranchSelector;
 import org.neo4j.graphdb.traversal.TraversalBranch;
 import org.neo4j.graphdb.traversal.TraversalContext;
 
-import java.util.LinkedList;
-
 /**
  * @author jakubchalupa
  * @since 23.04.15
  */
 public class CustomBranchSelector implements BranchSelector {
 
-    private final CustomPriorityQueue queue2 = new CustomPriorityQueue();
-
-    private final LinkedList<TraversalBranch> queue = new LinkedList<>();
+    private final CustomPriorityQueue queue = new CustomPriorityQueue();
     private TraversalBranch current;
     private final PathExpander expander;
 
@@ -29,49 +25,32 @@ public class CustomBranchSelector implements BranchSelector {
     @Override
     public TraversalBranch next(TraversalContext metadata) {
         TraversalBranch result = null;
-        while ( result == null )
-        {
 
+        while (result == null) {
             TraversalBranch next = current.next(expander, metadata);
             if(next != null) {
+                //dle zpusobu, kterym jsem se sem dostal to prislusne zaradim do fronty
                 if(next.lastRelationship() == null) {
-                    queue2.addPath(next);
+                    //prvni node Path
+                    queue.addPath(next);
                 } else if(next.lastRelationship().isType(RelTypes.NEXT_STOP)) {
-                    queue2.addNextStop(next);
+                    //node po NEXT_STOP relaci
+                    queue.addNextStop(next);
                 } else {
-                    queue2.addNextAwaitingStop(next);
+                    //node po NEXT_AWAITING_STOP relaci
+                    queue.addNextAwaitingStop(next);
                 }
 
                 result = next;
             } else {
-                current = queue2.poll();
-
+                current = queue.poll();
                 if(current == null) {
                     return null;
                 }
             }
 
-//            TraversalBranch next = current.next( expander, metadata );
-//            if ( next != null )
-//            {
-//
-//                if(next.lastRelationship() != null && next.lastRelationship().isType(RelTypes.NEXT_STOP)) {
-//                    queue.addFirst(next);
-//                } else {
-//                    queue.add(next);
-//                }
-//
-//                result = next;
-//            }
-//            else
-//            {
-//                current = queue.poll();
-//                if ( current == null )
-//                {
-//                    return null;
-//                }
-//            }
         }
+
         return result;
     }
 

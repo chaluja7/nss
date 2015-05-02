@@ -1,7 +1,7 @@
 package cz.cvut.nss.services;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,7 +26,7 @@ public class SearchServiceTest extends AbstractServiceTest {
     public void superTest() {
 
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
 
         try {
             date = dateFormat.parse("26.06.2015 19:13");
@@ -47,7 +47,7 @@ public class SearchServiceTest extends AbstractServiceTest {
     public void superTest2() {
 
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(EosDateTimeUtils.dateTimePattern);
+        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
 
         try {
             date = dateFormat.parse("08.12.2014 19:14");

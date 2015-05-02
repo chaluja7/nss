@@ -1,6 +1,6 @@
 package cz.cvut.nss.wiew.converters;
 
-import cz.cvut.nss.utils.EosDateTimeUtils;
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -21,13 +21,13 @@ public class LocalDateConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(EosDateTimeUtils.datePattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.datePattern);
         return formatter.parseLocalDate(s);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
-        return o == null ? null : ((LocalDate)o).toString(EosDateTimeUtils.datePattern);
+        return o == null ? null : ((LocalDate)o).toString(DateTimeUtils.datePattern);
     }
 
 }

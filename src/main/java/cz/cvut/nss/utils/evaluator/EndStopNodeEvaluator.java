@@ -2,6 +2,7 @@ package cz.cvut.nss.utils.evaluator;
 
 import com.google.common.collect.Sets;
 import cz.cvut.nss.entities.neo4j.StopNode;
+import org.joda.time.LocalDateTime;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.traversal.Evaluation;
@@ -24,19 +25,23 @@ public final class EndStopNodeEvaluator implements Evaluator {
 
     private final EndStopNodeEvaluatorType searchingType;
 
+    private final int departureMillisOfDay;
+
+    private final int maxNumberOfResults;
+
     Map<Long, Long> foundedPaths = new HashMap<>();
 
     Map<Long, Set<Long>> foundedPathsDetails = new HashMap<>();
 
-    public EndStopNodeEvaluator(Long endStationId, EndStopNodeEvaluatorType searchingType) {
+    public EndStopNodeEvaluator(Long endStationId, LocalDateTime departureDateTime, EndStopNodeEvaluatorType searchingType, int maxNumberOfResults) {
         this.endStationId = endStationId;
+        this.departureMillisOfDay = departureDateTime.getMillisOfDay();
         this.searchingType = searchingType;
+        this.maxNumberOfResults = maxNumberOfResults;
     }
 
     @Override
     public Evaluation evaluate(Path path) {
-        //todo pres pulnoc
-
         Node startNode = path.startNode();
         long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
 
@@ -60,19 +65,43 @@ public final class EndStopNodeEvaluator implements Evaluator {
         Long currentNodeTimeProperty = currentNodeArrival != null ? currentNodeArrival : currentNodeDeparture;
 
         //POKUD jsem jiz na teto ceste (od start node) nasel cil v lepsim case
-        if(foundedPaths.containsKey(startNodeStopId) && foundedPaths.get(startNodeStopId) < currentNodeTimeProperty) {
-            return Evaluation.EXCLUDE_AND_PRUNE;
+        if(foundedPaths.containsKey(startNodeStopId)) {
+            Long prevBestFoundedPathStart = foundedPaths.get(startNodeStopId);
+            if(prevBestFoundedPathStart >= departureMillisOfDay) {
+                //minuly nejlepsi cil byl pred pulnoci
+                if((currentNodeTimeProperty > prevBestFoundedPathStart && currentNodeTimeProperty >= departureMillisOfDay) || currentNodeTimeProperty < departureMillisOfDay) {
+                    //momentalne jsem taky pred pulnoci ale v horsim case nebo jsem az po pulnoci
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            } else {
+                //minuly nejlepsi cil byl po pulnoci
+                if(currentNodeTimeProperty > prevBestFoundedPathStart && currentNodeTimeProperty < departureMillisOfDay) {
+                    //momentalne jsem taky po pulnoci ale s horsim casem
+                    return Evaluation.EXCLUDE_AND_PRUNE;
+                }
+            }
         }
 
-        //uz jsem nasel 3 vysledky
         int i = 0;
-        if(foundedPathsDetails.size() >= 3) {
+        if(foundedPathsDetails.size() >= maxNumberOfResults) {
             for(Long key : foundedPathsDetails.keySet()) {
-                if(foundedPaths.get(key) < currentNodeTimeProperty) {
-                    i++;
+                Long actualArrival = foundedPaths.get(key);
+                if(actualArrival >= departureMillisOfDay) {
+                    //tento prijezd byl pred pulnoci
+                    if((currentNodeTimeProperty >= departureMillisOfDay && actualArrival < currentNodeTimeProperty) || currentNodeTimeProperty < departureMillisOfDay) {
+                        //aktualne jsem taky pred pulnoci ale pozdeji nebo jsem az po pulnoci
+                        i++;
+                    }
+                } else {
+                    //tento prijezd byl po pulnoci
+                    if(currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty > actualArrival) {
+                        //momentalne jsem taky po pulnoci a s horsim casem
+                        i++;
+                    }
                 }
 
-                if(i >= 3) {
+                if(i >= maxNumberOfResults) {
+                    //Jiz jsem nasel maxNumberOfResults vice lepsich vysledku
                     return Evaluation.EXCLUDE_AND_PRUNE;
                 }
             }
@@ -91,12 +120,27 @@ public final class EndStopNodeEvaluator implements Evaluator {
                 Set<Long> value = entry.getValue();
 
                 if(!Sets.intersection(tmpRides, value).isEmpty()) {
-                    if(foundedPaths.get(key) < currentNodeTimeProperty) {
-                        saveMe = false;
-                        break;
+                    Long pathArrival = foundedPaths.get(key);
+                    if(pathArrival >= departureMillisOfDay) {
+                        //cil aktualni cesty byl pred pulnoci
+                        if((currentNodeTimeProperty >= departureMillisOfDay && currentNodeTimeProperty > pathArrival) || currentNodeTimeProperty < departureMillisOfDay) {
+                            //momentalne jsem v cili taky pred pulnoci, ale s horsim casem nez jsem jiz byl, nebo jsem v cili az po pulnoci
+                            saveMe = false;
+                            break;
+                        } else {
+                            foundedPathsDetails.remove(key);
+                            break;
+                        }
                     } else {
-                        foundedPathsDetails.remove(key);
-                        break;
+                        //cil aktualni cesty byl po pulnoci
+                        if(currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty > pathArrival) {
+                            //momentalne jsem taky po pulnoci ale pozdeji
+                            saveMe = false;
+                            break;
+                        } else {
+                            foundedPathsDetails.remove(key);
+                            break;
+                        }
                     }
                 }
             }
