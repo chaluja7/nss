@@ -35,6 +35,8 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
 
     private final Map<Long, Long> operationIntervalForRideToDate = new HashMap<>();
 
+    private final Map<Long, Map<Integer, Boolean>> operationDaysForRide = new HashMap<>();
+
     private final Map<Long, Long> firstNodeOnRideDepartureMap = new HashMap<>();
 
     private final Map<Long, Long> visitedRidesGlobal = new HashMap<>();
@@ -60,14 +62,36 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
         return clone;
     }
 
+    public static List<Long> cloneList(List<Long> list) {
+        List<Long> clone = new ArrayList<>(list.size());
+        for(Long item : list) {
+            clone.add(new Long(item));
+        }
+        return clone;
+    }
+
+    public static Map<Long, List<Long>> cloneMap(Map<Long, List<Long>> map) {
+        Map<Long, List<Long>> clone = new HashMap<>(map.size());
+        for (Map.Entry<Long, List<Long>> entry : map.entrySet()) {
+            List<Long> cloneList = new ArrayList<>();
+            for(Long item : entry.getValue()) {
+                cloneList.add(new Long(item));
+            }
+
+            clone.put(new Long(entry.getKey()), cloneList);
+        }
+
+        return clone;
+    }
+
     @Override
     public Iterable<Relationship> expand(Path path, BranchState<StationRideWrapper> stateBranchState) {
 
         //Predavani parametru PATH
         StationRideWrapper stationRideWrapperOld = stateBranchState.getState();
-        Set<Long> visitedStations = cloneSet(stationRideWrapperOld.getVisitedStations());
+        Map<Long, List<Long>> visitedStations = cloneMap(stationRideWrapperOld.getVisitedStations());
         Set<Long> visitedRides = cloneSet(stationRideWrapperOld.getVisitedRides());
-        final StationRideWrapper stationRideWrapper = new StationRideWrapper();
+        StationRideWrapper stationRideWrapper = new StationRideWrapper();
         stationRideWrapper.setVisitedStations(visitedStations);
         stationRideWrapper.setVisitedRides(visitedRides);
         stateBranchState.setState(stationRideWrapper);
@@ -75,8 +99,9 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
         //inicializace parametru PATH
         Node startNode = path.startNode();
         Node currentNode = path.endNode();
-        long startNodeDeparture = (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
+        long startNodeStationId = (long) startNode.getProperty(StopNode.STATION_PROPERTY);
         long currentNodeStopId = (long) currentNode.getProperty(StopNode.STOP_PROPERTY);
+        long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
         Relationship lastRelationShip = path.lastRelationship();
         long currentRideId = (long) currentNode.getProperty(StopNode.RIDE_PROPERTY);
         long currentStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
@@ -112,13 +137,19 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
 
         //Jsem na prvnim NODu
         if(lastRelationShip == null) {
-            visitedStations.add(currentStationId);
+            List<Long> tmpVisitedRides = new ArrayList<>();
+            tmpVisitedRides.add(currentRideId);
+            visitedStations.put(currentStationId, tmpVisitedRides);
             visitedRides.add(currentRideId);
             visitedStops.put(currentNodeStopId, startNodeMillisTime);
             visitedRidesGlobal.put(currentRideId, startNodeMillisTime);
             return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
         }
 
+
+        if(currentStationId == startNodeStationId) {
+            return Collections.EMPTY_SET;
+        }
 
         //musim zkonrolovat, zda aktualni node nema time jiz po case maxDepartureTime
         if (departureDayOfYear == maxDepartureDayOfYear) {
@@ -145,12 +176,14 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
             long operationIntervalNodeFromDateInMillis;
             long operationIntervalNodeToDateInMillis;
             long firstNodeOnRideDeparture;
+            Map<Integer, Boolean> operationDayForRideMap;
 
             //jiz mam v pameti interval platnosti teto RIDE
             if (firstNodeOnRideDepartureMap.containsKey(currentRideId)) {
                 operationIntervalNodeFromDateInMillis = operationIntervalForRidesFromDate.get(currentRideId);
                 operationIntervalNodeToDateInMillis = operationIntervalForRideToDate.get(currentRideId);
                 firstNodeOnRideDeparture = firstNodeOnRideDepartureMap.get(currentRideId);
+                operationDayForRideMap = operationDaysForRide.get(currentRideId);
             } else {
                 //interval platnosti RIDE musim zjistit
                 Relationship toRideRelationShip = currentNode.getSingleRelationship(RelTypes.IN_RIDE, Direction.OUTGOING);
@@ -170,6 +203,16 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
 
                 firstNodeOnRideDeparture = (Long) firstNodeOnRide.getProperty(StopNode.DEPARTURE_PROPERTY);
 
+                operationDayForRideMap = new HashMap<>();
+                operationDayForRideMap.put(1, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.MONDAY));
+                operationDayForRideMap.put(2, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.TUESDAY));
+                operationDayForRideMap.put(3, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.WEDNESDAY));
+                operationDayForRideMap.put(4, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.THURSDAY));
+                operationDayForRideMap.put(5, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.FRIDAY));
+                operationDayForRideMap.put(6, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.SATURDAY));
+                operationDayForRideMap.put(7, (Boolean) operationIntervalNode.getProperty(OperationIntervalNode.SUNDAY));
+
+                operationDaysForRide.put(currentRideId, operationDayForRideMap);
                 firstNodeOnRideDepartureMap.put(currentRideId, firstNodeOnRideDeparture);
                 operationIntervalForRidesFromDate.put(currentRideId, operationIntervalNodeFromDateInMillis);
                 operationIntervalForRideToDate.put(currentRideId, operationIntervalNodeToDateInMillis);
@@ -182,14 +225,16 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                     //neprehoupl jsem se pres pulnoc
                     //zjistuji datum pro depratureDateTime
                     if (operationIntervalNodeFromDateInMillis > departureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime()) {
+                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(departureDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
                         return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
                     }
                 } else {
                     //zjistuji datum pro maxDepartureDateTime
                     if (operationIntervalNodeFromDateInMillis > maxDepartureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < maxDepartureDateTime.toDate().getTime()) {
+                            operationIntervalNodeToDateInMillis < maxDepartureDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(maxDepartureDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
                         return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
                     }
@@ -200,7 +245,8 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                     //neprehoupl jsem se pres pulnoc
                     //zjistuji datum pro departureDateTime - 1 den
                     if (operationIntervalNodeFromDateInMillis > (departureDateTime.toDate().getTime() - 86400000) ||
-                            operationIntervalNodeToDateInMillis < (departureDateTime.toDate().getTime() - 86400000)) {
+                            operationIntervalNodeToDateInMillis < (departureDateTime.toDate().getTime() - 86400000) ||
+                            !operationDayForRideMap.get(new LocalDateTime(departureDateTime).minusDays(1).getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
                         return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
                     }
@@ -208,7 +254,8 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                     //prehoupl jsem se pres pulnoc
                     //zjistuji datum pro departureDateTime
                     if (operationIntervalNodeFromDateInMillis > departureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime()) {
+                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(departureDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
                         return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
                     }
@@ -221,11 +268,16 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
             //posledni hrana byla next_stop
 
             //v ramci teto path jsem na teto stanici jiz byl (tedy se vracim, coz je nezadouci)
-            if(visitedStations.contains(currentStationId)) {
-                return Collections.EMPTY_SET;
+            if(visitedStations.containsKey(currentStationId)) {
+                List<Long> ridesWithThisStation = visitedStations.get(currentStationId);
+                for(Long r : ridesWithThisStation) {
+                    if(r != currentRideId) {
+                        return Collections.EMPTY_SET;
+                    }
+                }
+            } else {
+                visitedStations.put(currentStationId, new ArrayList<Long>());
             }
-
-            visitedStations.add(currentStationId);
 
             //kontrola casu na teto stanici v ramci path od zacatku
 
@@ -243,14 +295,14 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
             long currentNodeMillis = currentStopDepartureDateTime.toDateTime().getMillis();
 
 
-            if(!visitedStationsOnPathMap.containsKey(currentNodeStopId)) {
+            if(!visitedStationsOnPathMap.containsKey(startNodeStopId)) {
                 //jeste vubec neni vytvorena mapa navstivenych stanic pro tuto PATH
                 Map<Long, Long> stationsAndArrivalMap = new HashMap<>();
                 stationsAndArrivalMap.put(currentStationId, currentNodeMillis);
-                visitedStationsOnPathMap.put(currentNodeStopId, stationsAndArrivalMap);
+                visitedStationsOnPathMap.put(startNodeStopId, stationsAndArrivalMap);
             } else {
                 //mapa navstivenych stanic pro tuto path je jiz vytvorena
-                Map<Long, Long> currentVisitedStationsOnPathMap = visitedStationsOnPathMap.get(currentNodeStopId);
+                Map<Long, Long> currentVisitedStationsOnPathMap = visitedStationsOnPathMap.get(startNodeStopId);
                 if(!currentVisitedStationsOnPathMap.containsKey(currentStationId)) {
                     //na teto stanici jsem v ramci PATH jeste nebyl
                     currentVisitedStationsOnPathMap.put(currentStationId, currentNodeMillis);
@@ -259,14 +311,17 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                     //porovnání
                     Long currentStationOnPathPrevBestArrival = currentVisitedStationsOnPathMap.get(currentStationId);
 
-                    if(currentStationOnPathPrevBestArrival <= currentNodeMillis) {
+                    //TODO tohle nefunguje, melo by se to smazat
+                    if(currentStationOnPathPrevBestArrival < currentNodeMillis && !visitedStations.get(currentStationId).contains(currentRideId)) {
                         return Collections.EMPTY_SET;
-                    } else {
+                    } else if(!visitedStations.get(currentStationId).contains(currentRideId) && currentStationOnPathPrevBestArrival < currentNodeMillis) {
                         currentVisitedStationsOnPathMap.put(currentStationId, currentNodeMillis);
                     }
 
                 }
             }
+
+            visitedStations.get(currentStationId).add(currentRideId);
 
             //max pocet prestupu
             if(visitedRides.size() > maxNumberOfTransfers) {
@@ -284,7 +339,7 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                     //na tomto stopu jsem jiz drive byl
                     if(visitedStops.containsKey(currentNodeStopId)) {
                         //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
-                        if(visitedStops.get(currentNodeStopId) >= startNodeMillisTime) {
+                        if(visitedStops.get(currentNodeStopId) > startNodeMillisTime) {
                             return Collections.EMPTY_SET;
                         }
                     }
@@ -296,7 +351,7 @@ public class CustomExpander implements PathExpander<StationRideWrapper> {
                         return Collections.EMPTY_SET;
                     } else {
                         if (visitedRidesGlobal.containsKey(currentRideId)) {
-                            if (visitedRidesGlobal.get(currentRideId) >= startNodeMillisTime) {
+                            if (visitedRidesGlobal.get(currentRideId) > startNodeMillisTime) {
                                 return Collections.EMPTY_SET;
                             }
                         } else {

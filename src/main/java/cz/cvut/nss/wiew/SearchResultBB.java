@@ -66,6 +66,12 @@ public class SearchResultBB {
 
     private String timeType;
 
+    private int millisOfDepartureDay;
+
+    private String departureDay;
+
+    private String arrivalDay;
+
     private boolean errorInputs = false;
 
     private List<FoundedPathsWrapper> foundResults;
@@ -82,13 +88,13 @@ public class SearchResultBB {
                 if(isWithNeo4j()) {
                     path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 2, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 4, maxNumberOfTransfers, -1);
                 }
             }
 
@@ -104,6 +110,8 @@ public class SearchResultBB {
 
                 Stop from = wrapper.getStops().get(0);
                 Stop to = wrapper.getStops().get(wrapper.getStops().size() - 1);
+
+                //from.getArrival().
 
                 //todo hours and minutes
                 Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
@@ -182,9 +190,17 @@ public class SearchResultBB {
             }
         }
 
+        DateTime dt = new DateTime(departureOrArrival);
+        millisOfDepartureDay = dt.getMillisOfDay();
+
         if(timeType == null || (!timeType.equals("departure") && !timeType.equals("arrival"))) {
             errorInputs = true;
             return;
+        }
+
+        if(timeType.equals("departure")) {
+            departureDay = dt.toString(EosDateTimeUtils.datePattern);
+            arrivalDay = dt.plusDays(1).toString(EosDateTimeUtils.datePattern);
         }
 
     }
@@ -261,12 +277,36 @@ public class SearchResultBB {
         return foundResults;
     }
 
+    public int getMillisOfDepartureDay() {
+        return millisOfDepartureDay;
+    }
+
+    public void setMillisOfDepartureDay(int millisOfDepartureDay) {
+        this.millisOfDepartureDay = millisOfDepartureDay;
+    }
+
     public void setStationService(StationService stationService) {
         this.stationService = stationService;
     }
 
     public void setStopService(StopService stopService) {
         this.stopService = stopService;
+    }
+
+    public String getDepartureDay() {
+        return departureDay;
+    }
+
+    public String getArrivalDay() {
+        return arrivalDay;
+    }
+
+    public void setDepartureDay(String departureDay) {
+        this.departureDay = departureDay;
+    }
+
+    public void setArrivalDay(String arrivalDay) {
+        this.arrivalDay = arrivalDay;
     }
 
     public void setNeo4jSearchService(SearchService neo4jSearchService) {

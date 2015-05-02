@@ -1,7 +1,6 @@
 package cz.cvut.nss.utils.evaluator;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author jakubchalupa
@@ -11,7 +10,7 @@ public class StationRideWrapper {
 
     private Set<Long> visitedRides;
 
-    private Set<Long> visitedStations;
+    private Map<Long, List<Long>> visitedStations;
 
     public Set<Long> getVisitedRides() {
         if(visitedRides == null) {
@@ -25,15 +24,15 @@ public class StationRideWrapper {
         this.visitedRides = visitedRides;
     }
 
-    public Set<Long> getVisitedStations() {
+    public Map<Long, List<Long>> getVisitedStations() {
         if(visitedStations == null) {
-            visitedStations = new HashSet<>();
+            visitedStations = new HashMap<>();
         }
 
         return visitedStations;
     }
 
-    public void setVisitedStations(Set<Long> visitedStations) {
+    public void setVisitedStations(Map<Long, List<Long>> visitedStations) {
         this.visitedStations = visitedStations;
     }
 }

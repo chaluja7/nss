@@ -14,6 +14,8 @@ import java.util.LinkedList;
  */
 public class CustomBranchSelector implements BranchSelector {
 
+    private final CustomPriorityQueue queue2 = new CustomPriorityQueue();
+
     private final LinkedList<TraversalBranch> queue = new LinkedList<>();
     private TraversalBranch current;
     private final PathExpander expander;
@@ -30,26 +32,45 @@ public class CustomBranchSelector implements BranchSelector {
         while ( result == null )
         {
 
-            TraversalBranch next = current.next( expander, metadata );
-            if ( next != null )
-            {
-
-                if(next.lastRelationship() != null && next.lastRelationship().isType(RelTypes.NEXT_STOP)) {
-                    queue.addFirst(next);
+            TraversalBranch next = current.next(expander, metadata);
+            if(next != null) {
+                if(next.lastRelationship() == null) {
+                    queue2.addPath(next);
+                } else if(next.lastRelationship().isType(RelTypes.NEXT_STOP)) {
+                    queue2.addNextStop(next);
                 } else {
-                    queue.add(next);
+                    queue2.addNextAwaitingStop(next);
                 }
 
                 result = next;
-            }
-            else
-            {
-                current = queue.poll();
-                if ( current == null )
-                {
+            } else {
+                current = queue2.poll();
+
+                if(current == null) {
                     return null;
                 }
             }
+
+//            TraversalBranch next = current.next( expander, metadata );
+//            if ( next != null )
+//            {
+//
+//                if(next.lastRelationship() != null && next.lastRelationship().isType(RelTypes.NEXT_STOP)) {
+//                    queue.addFirst(next);
+//                } else {
+//                    queue.add(next);
+//                }
+//
+//                result = next;
+//            }
+//            else
+//            {
+//                current = queue.poll();
+//                if ( current == null )
+//                {
+//                    return null;
+//                }
+//            }
         }
         return result;
     }

@@ -248,7 +248,7 @@ public class Neo4jSearchDao implements SearchDao {
         queryString += "where s.departureInMillis is not null ";
 
         if(tempMaxDateDeparture.getMillisOfDay() > tempDateDeparture.getMillisOfDay()) {
-            //prehoupl jsem se pres pulnoc
+            //neprehoupl jsem se pres pulnoc
             queryString += "and i.fromDateInMillis <= {departureDateInMillis} and i.toDateInMillis >= {departureDateInMillis} ";
             queryString += "and " + JdbcSearchDao.getDayOfWeekCondition(tempDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis >= {departureTimeInMillis} and s.departureInMillis < {maxDepartureTimeInMillis} ";
@@ -261,7 +261,7 @@ public class Neo4jSearchDao implements SearchDao {
             queryString += "and  " + JdbcSearchDao.getDayOfWeekCondition(tempMaxDateDeparture.getDayOfWeek()) + " = {trueParameter} ";
             queryString += "and s.departureInMillis < {maxDepartureTimeInMillis})) ";
 
-            params.put("maxDepartureDateInMillis", maxDateDeparture.getTime());
+            params.put("maxDepartureDateInMillis", maxDateDeparture.getTime() - 86400000);
         }
 
         queryString += "return s order by s.departureInMillis asc";

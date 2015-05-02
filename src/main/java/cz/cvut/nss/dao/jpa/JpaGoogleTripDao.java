@@ -5,6 +5,7 @@ import cz.cvut.nss.dao.generics.AbstractGenericJpaDao;
 import cz.cvut.nss.entities.GoogleTrip;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -56,9 +57,14 @@ public class JpaGoogleTripDao extends AbstractGenericJpaDao<GoogleTrip> implemen
     @Override
     @SuppressWarnings("JpaQlInspection")
     public List<GoogleTrip> findAllForImport() {
-        //jen pro route kde agencyId = 18
-        TypedQuery<GoogleTrip> query = em.createQuery("select g from GoogleTrip g where agencyId = 1 and id % 40 = 0", GoogleTrip.class);
-        return query.getResultList();
+        String sql = "select id, routeid, serviceid, tripid, agencyid from google_trips where agencyid = 1 ";
+        sql += "and serviceid in (select serviceid from google_services where '2015-07-05' between startdate and enddate and '2015-08-31' between startdate and enddate) and id % 20 = 0";
+
+//        String sql = "select id, routeid, serviceid, tripid, agencyid from google_trips where agencyid = 10 ";
+//        sql += "and serviceid in (select serviceid from google_services where '2015-07-05' between startdate and enddate and '2015-08-31' between startdate and enddate)";
+
+        Query query2 = em.createNativeQuery(sql, GoogleTrip.class);
+        return query2.getResultList();
     }
 
 }
