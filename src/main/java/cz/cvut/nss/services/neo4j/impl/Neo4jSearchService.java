@@ -46,7 +46,6 @@ public class Neo4jSearchService implements SearchService {
 
         //vratim jen ty nejrelevantnejsi vyfiltrovane vysledky
         List<SearchResultWrapper> filteredList = SearchResultFilter.getFilteredResults(resultList);
-        //List<SearchResultWrapper> filteredList = resultList;
 
         if(filteredList.size() <= maxResults || maxResults < 0) {
             return filteredList;

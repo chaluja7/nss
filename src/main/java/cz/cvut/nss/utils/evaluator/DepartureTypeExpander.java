@@ -178,7 +178,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                 operationIntervalForRideToDate.put(currentRideId, operationIntervalNodeToDateInMillis);
             }
 
-            if (firstNodeOnRideDeparture < currentNodeTimeProperty) {
+            if (firstNodeOnRideDeparture <= currentNodeTimeProperty) {
                 //neprehoupl jsem se s ridou pres pulnoc (rida vyjela pred pulnoci a momentalne jsem porad pred pulnoci)
                 if (currentNodeTimeProperty >= departureMillisOfDay) {
                     //neprehoupl jsem se pres pulnoc (pohybuji se v ramci dne, ve kterem jsem hledal odjezd)
@@ -253,25 +253,19 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                 //sel jsem (N)-[NEXT_AWAITING_STOP]-(m)-[NEXT_STOP]-(o)
                 if(prevRelationShipType != null && relationshipIsTypeNextAwaitingStop && prevRelationShipType.equals(RelTypes.NEXT_STOP)) {
                     //+1 jde k visitedRides protoze ted jsem zcela urcite prestoupil na novou ridu
-                    long startNodeMillisTimeWithPenalty = startNodeDeparture - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * visitedRides.size());
-                    if(startNodeMillisTimeWithPenalty < 0) {
-                        //prehoupl jsem se s penalizaci do predchoziho dne
-                        startNodeMillisTimeWithPenalty = DateTimeUtils.MILLIS_IN_DAY - startNodeMillisTimeWithPenalty;
-                    }
-
                     //na tomto stopu jsem jiz drive byl
                     if(visitedStops.containsKey(currentNodeStopId)) {
                         //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
                         Long prevBestTimeOnStop = visitedStops.get(currentNodeStopId);
                         if(prevBestTimeOnStop >= departureMillisOfDay) {
                             //predchozi nejlepsi cas byl pred pulnoci
-                            if(startNodeMillisTimeWithPenalty < prevBestTimeOnStop && startNodeMillisTimeWithPenalty >= departureMillisOfDay) {
+                            if(startNodeDeparture < prevBestTimeOnStop && startNodeDeparture >= departureMillisOfDay) {
                                 //momentalne jsem taky pred pulnoci ale s drivejsim vyjezdem, to nechci :)
                                 return Iterables.empty();
                             }
                         } else {
                             //prechozi nejlepsi cas byl po pulnoci
-                            if((startNodeMillisTimeWithPenalty < prevBestTimeOnStop && startNodeMillisTimeWithPenalty < departureMillisOfDay) || startNodeMillisTimeWithPenalty >= departureMillisOfDay) {
+                            if((startNodeDeparture < prevBestTimeOnStop && startNodeDeparture < departureMillisOfDay) || startNodeDeparture >= departureMillisOfDay) {
                                 //momentalne jsem taky po pulnoci ale s drivejsim vyjezdem, nebo jsem dokonce pred pulnoci, to nechci :)
                                 return Iterables.empty();
                             }
@@ -279,7 +273,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                     }
 
                     //pokud to prislo sem, tak mam aktualne nejlepsi mozny cas vyjezdu k tomuto stopu
-                    visitedStops.put(currentNodeStopId, startNodeMillisTimeWithPenalty);
+                    visitedStops.put(currentNodeStopId, startNodeDeparture);
 
                     //kontrola unikatnosti ridy v ramci path
                     if (visitedRides.contains(currentRideId)) {

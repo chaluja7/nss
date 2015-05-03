@@ -7,10 +7,7 @@ import cz.cvut.nss.dao.neo4j.StopNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.entities.neo4j.relationship.RelTypes;
 import cz.cvut.nss.utils.DateTimeUtils;
-import cz.cvut.nss.utils.evaluator.CustomBranchOrderingPolicies;
-import cz.cvut.nss.utils.evaluator.DepartureTypeEvaluator;
-import cz.cvut.nss.utils.evaluator.DepartureTypeExpander;
-import cz.cvut.nss.utils.evaluator.StationRideWrapper;
+import cz.cvut.nss.utils.evaluator.*;
 import org.joda.time.LocalDateTime;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -55,10 +52,6 @@ public class Neo4jSearchDao implements SearchDao {
                 .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(departure), 3));
 
         Iterable<Node> startNodes = findStartNodesForDepartureTypePathFinding(stationFromId, departure, maxDeparture);
-
-//        for(Node n : startNodes) {
-//            int i = 0;
-//        }
 
         Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
         int millisOfDepartureDay = new LocalDateTime(departure).getMillisOfDay();
@@ -140,72 +133,89 @@ public class Neo4jSearchDao implements SearchDao {
     @Override
     public List<SearchResultWrapper> findRidesByArrivalDate(long stationFromId, long stationToId, Date arrival, Date minArrival, int maxTransfers) {
 
-//        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-//                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
-//                .uniqueness(Uniqueness.NODE_PATH)
-//                .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
-//                .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(arrival), 3));
-//
-//        Iterable<Node> startNodes = findStartNodesForArrivalTypePathFinding(stationToId, arrival, minArrival);
+        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
+                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
+                .uniqueness(Uniqueness.NODE_PATH)
+                .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
+                .evaluator(new ArrivalTypeEvaluator(stationFromId, new LocalDateTime(arrival), 3));
 
-//
-//        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
-//        Traverser traverser = traversalDescription.traverse(iterable);
-//        for(Path path : traverser) {
-//            Node startNode = path.endNode();
-//            Node endNode = path.startNode();
-//
-//            long travelTime = (long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY) - (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
-//
-//            //vyberu ridy, po kterych jede cesta
-//            List<Long> ridesOnPath = new ArrayList<>();
-//            List<Long> stopsOnPath = new ArrayList<>();
-//            Node prevNode = null;
-//            for(Node node : path.reverseNodes()) {
-//                long rideId = (long) node.getProperty(StopNode.RIDE_PROPERTY);
-//
-//                if(ridesOnPath.size() == 0 || ridesOnPath.get(ridesOnPath.size() - 1) != rideId) {
-//                    if(ridesOnPath.size() == 0) {
-//                        stopsOnPath.add((long) node.getProperty(StopNode.STOP_PROPERTY));
-//                    } else {
-//                        stopsOnPath.add((long) prevNode.getProperty(StopNode.STOP_PROPERTY));
-//                        stopsOnPath.add((long) node.getProperty(StopNode.STOP_PROPERTY));
-//                    }
-//
-//                    ridesOnPath.add(rideId);
-//                }
-//
-//                prevNode = node;
-//            }
-//
-//            long lastStopId = (long) endNode.getProperty(StopNode.STOP_PROPERTY);
-//            if(stopsOnPath.get(stopsOnPath.size() - 1) != lastStopId) {
-//                stopsOnPath.add(lastStopId);
-//            }
-//
-//            StringBuilder stringBuilder = new StringBuilder();
-//            for(Long l : ridesOnPath) {
-//                if(stringBuilder.length() != 0) {
-//                    stringBuilder.append("-");
-//                }
-//                stringBuilder.append(l);
-//            }
-//
-//            String pathIdentifier = stringBuilder.toString();
-//            if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
-//                SearchResultWrapper wrapper = new SearchResultWrapper();
-//                wrapper.setArrival((long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY));
-//                wrapper.setTravelTime(travelTime);
-//                wrapper.setStops(stopsOnPath);
-//                ridesMap.put(pathIdentifier, wrapper);
-//            }
-//
-//        }
-//
-//        //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
-//        return transformSearchResultWrapperMapToList(ridesMap);
+        Iterable<Node> startNodes = findStartNodesForArrivalTypePathFinding(stationToId, arrival, minArrival);
 
-        return null;
+        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
+        int millisOfMinArrivalDate = new LocalDateTime(minArrival).getMillisOfDay();
+        Traverser traverser = traversalDescription.traverse(startNodes);
+        for(Path path : traverser) {
+            Node startNode = path.endNode();
+            Node endNode = path.startNode();
+
+            long millisOfArrival = ((long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY));
+            long millisOfDeparture = ((long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY));
+            long travelTime;
+            if(millisOfArrival > millisOfDeparture) {
+                travelTime = millisOfArrival - millisOfDeparture;
+            } else {
+                travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;
+            }
+
+            boolean overMidnightArrival = false;
+            if(millisOfArrival < millisOfMinArrivalDate) {
+                overMidnightArrival = true;
+            }
+
+            //vyberu ridy, po kterych jede cesta
+            List<Long> ridesOnPath = new ArrayList<>();
+            List<Long> stopsOnPath = new ArrayList<>();
+            RelTypes prevRelationshipType = null;
+            for(Relationship relationship : path.reverseRelationships()) {
+                Node relationshipStartNode = relationship.getStartNode();
+                long nodeStopProperty = (long) relationshipStartNode.getProperty(StopNode.STOP_PROPERTY);
+                long nodeRideProperty = (long) relationshipStartNode.getProperty(StopNode.RIDE_PROPERTY);
+
+                if(prevRelationshipType != null && prevRelationshipType.equals(RelTypes.NEXT_STOP) && relationship.isType(RelTypes.NEXT_AWAITING_STOP)) {
+                    stopsOnPath.add(nodeStopProperty);
+                }
+
+                if(relationship.isType(RelTypes.NEXT_STOP) && !ridesOnPath.contains(nodeRideProperty)) {
+                    stopsOnPath.add(nodeStopProperty);
+                    ridesOnPath.add(nodeRideProperty);
+                }
+
+                if(relationship.isType(RelTypes.NEXT_AWAITING_STOP)) {
+                    prevRelationshipType = RelTypes.NEXT_AWAITING_STOP;
+                } else {
+                    prevRelationshipType = RelTypes.NEXT_STOP;
+                }
+            }
+
+            long lastStopId = (long) endNode.getProperty(StopNode.STOP_PROPERTY);
+            if(stopsOnPath.get(stopsOnPath.size() - 1) != lastStopId) {
+                stopsOnPath.add(lastStopId);
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for(Long l : ridesOnPath) {
+                if(stringBuilder.length() != 0) {
+                    stringBuilder.append("-");
+                }
+                stringBuilder.append(l);
+            }
+
+            String pathIdentifier = stringBuilder.toString();
+            if(!ridesMap.containsKey(pathIdentifier) || travelTime < ridesMap.get(pathIdentifier).getTravelTime()) {
+                SearchResultWrapper wrapper = new SearchResultWrapper();
+                wrapper.setDeparture(millisOfDeparture);
+                wrapper.setArrival(millisOfArrival);
+                wrapper.setTravelTime(travelTime);
+                wrapper.setOverMidnightArrival(overMidnightArrival);
+                wrapper.setStops(stopsOnPath);
+                wrapper.setNumberOfTransfers(ridesOnPath.size() - 1);
+                ridesMap.put(pathIdentifier, wrapper);
+            }
+
+        }
+
+        //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
+        return transformSearchResultWrapperMapToList(ridesMap);
     }
 
     /**

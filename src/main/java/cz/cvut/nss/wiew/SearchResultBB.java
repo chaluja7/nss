@@ -75,7 +75,6 @@ public class SearchResultBB {
     private List<FoundedPathsWrapper> foundResults;
 
     public void performSearch() {
-        long l = System.currentTimeMillis();
         prepareAndValidateInputs();
 
         if(!errorInputs) {
@@ -116,8 +115,6 @@ public class SearchResultBB {
             }
         }
 
-        long executionTime = System.currentTimeMillis() - l;
-        int i = 0;
     }
 
     public void findNextRides() {
@@ -275,14 +272,6 @@ public class SearchResultBB {
         this.millisOfDepartureDay = millisOfDepartureDay;
     }
 
-    public void setStationService(StationService stationService) {
-        this.stationService = stationService;
-    }
-
-    public void setStopService(StopService stopService) {
-        this.stopService = stopService;
-    }
-
     public String getDepartureDay() {
         return departureDay;
     }
@@ -297,6 +286,14 @@ public class SearchResultBB {
 
     public void setArrivalDay(String arrivalDay) {
         this.arrivalDay = arrivalDay;
+    }
+
+    public void setStationService(StationService stationService) {
+        this.stationService = stationService;
+    }
+
+    public void setStopService(StopService stopService) {
+        this.stopService = stopService;
     }
 
     public void setNeo4jSearchService(SearchService neo4jSearchService) {
