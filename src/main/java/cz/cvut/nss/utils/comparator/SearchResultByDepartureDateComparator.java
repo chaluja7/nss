@@ -1,11 +1,12 @@
 package cz.cvut.nss.utils.comparator;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
+import cz.cvut.nss.utils.DateTimeUtils;
 
 import java.util.Comparator;
 
 /**
- * Slouzi pro serazeni vysledku vyhledavani spojeni dle data odjezdu.
+ * Slouzi pro serazeni vysledku vyhledavani spojeni.
  *
  * @author jakubchalupa
  * @since 12.03.15
@@ -31,11 +32,15 @@ public class SearchResultByDepartureDateComparator implements Comparator<SearchR
             return 1;
         }
 
-        if(o1.getTravelTime() < o2.getTravelTime()) {
+        //do razeni chci zakomponovat i penalizace za prestup! Toto funguje i pres pulnoc (dostanu se do zapornych cisel ale porovnani je stejne)
+        long o1DepartureWithPenalty = o1.getDeparture() - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * o1.getNumberOfTransfers());
+        long o2DepartureWithPenalty = o2.getDeparture() - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * o2.getNumberOfTransfers());
+
+        if(o1DepartureWithPenalty > o2DepartureWithPenalty) {
             return -1;
         }
 
-        if(o1.getTravelTime() > o2.getTravelTime()) {
+        if(o1DepartureWithPenalty < o2DepartureWithPenalty) {
             return 1;
         }
 

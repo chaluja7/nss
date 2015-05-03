@@ -18,6 +18,14 @@ public class DateTimeUtils {
 
     public static final String timeWithSecondsPattern = "HH:mm:ss";
 
+    /**
+     * pocet milisekund za 24 hodin
+     */
     public static final int MILLIS_IN_DAY = 86400000;
+
+    /**
+     * 5 minut penalizace za prestup
+     */
+    public static final int TRANSFER_PENALTY_MILLIS = 300000;
 
 }

@@ -7,7 +7,10 @@ import cz.cvut.nss.dao.neo4j.StopNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.entities.neo4j.relationship.RelTypes;
 import cz.cvut.nss.utils.DateTimeUtils;
-import cz.cvut.nss.utils.evaluator.*;
+import cz.cvut.nss.utils.evaluator.CustomBranchOrderingPolicies;
+import cz.cvut.nss.utils.evaluator.DepartureTypeEvaluator;
+import cz.cvut.nss.utils.evaluator.DepartureTypeExpander;
+import cz.cvut.nss.utils.evaluator.StationRideWrapper;
 import org.joda.time.LocalDateTime;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -50,17 +53,14 @@ public class Neo4jSearchDao implements SearchDao {
                 .uniqueness(Uniqueness.NODE_PATH)
                 .expand(new DepartureTypeExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), getEmptyInitialBranchState())
                 .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(departure), 3));
-        long la = System.currentTimeMillis();
+
         Iterable<Node> startNodes = findStartNodesForDepartureTypePathFinding(stationFromId, departure, maxDeparture);
 
 //        for(Node n : startNodes) {
 //            int i = 0;
 //        }
 
-        la = System.currentTimeMillis() - la;
         Map<String, SearchResultWrapper> ridesMap = new HashMap<>();
-        la = System.currentTimeMillis();
-
         int millisOfDepartureDay = new LocalDateTime(departure).getMillisOfDay();
         Traverser traverser = traversalDescription.traverse(startNodes);
         for(Path path : traverser) {
@@ -74,11 +74,6 @@ public class Neo4jSearchDao implements SearchDao {
                 travelTime = millisOfArrival - millisOfDeparture;
             } else {
                 travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;
-            }
-
-            boolean overMidnightDeparture = false;
-            if(millisOfDeparture < millisOfDepartureDay) {
-                overMidnightDeparture = true;
             }
 
             boolean overMidnightArrival = false;
@@ -130,15 +125,13 @@ public class Neo4jSearchDao implements SearchDao {
                 wrapper.setDeparture(millisOfDeparture);
                 wrapper.setArrival(millisOfArrival);
                 wrapper.setTravelTime(travelTime);
-                wrapper.setOverMidnightDeparture(overMidnightDeparture);
                 wrapper.setOverMidnightArrival(overMidnightArrival);
                 wrapper.setStops(stopsOnPath);
+                wrapper.setNumberOfTransfers(ridesOnPath.size() - 1);
                 ridesMap.put(pathIdentifier, wrapper);
             }
 
         }
-
-        la = System.currentTimeMillis() - la;
 
         //vysledky vyhledavani dam do listu a vratim. momentalne tam jsou vysledky, ktere dale musi byt vyfiltrovany!
         return transformSearchResultWrapperMapToList(ridesMap);
@@ -147,13 +140,13 @@ public class Neo4jSearchDao implements SearchDao {
     @Override
     public List<SearchResultWrapper> findRidesByArrivalDate(long stationFromId, long stationToId, Date arrival, Date minArrival, int maxTransfers) {
 
-        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
-                .uniqueness(Uniqueness.NODE_PATH)
-                .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
-                .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(arrival), 3));
-
-        Iterable<Node> startNodes = findStartNodesForArrivalTypePathFinding(stationToId, arrival, minArrival);
+//        TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
+//                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
+//                .uniqueness(Uniqueness.NODE_PATH)
+//                .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
+//                .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(arrival), 3));
+//
+//        Iterable<Node> startNodes = findStartNodesForArrivalTypePathFinding(stationToId, arrival, minArrival);
 
 //
 //        Map<String, SearchResultWrapper> ridesMap = new HashMap<>();

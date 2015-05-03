@@ -58,7 +58,7 @@ public class JpaGoogleTripDao extends AbstractGenericJpaDao<GoogleTrip> implemen
     @SuppressWarnings("JpaQlInspection")
     public List<GoogleTrip> findAllForImport() {
         String sql = "select id, routeid, serviceid, tripid, agencyid from google_trips where agencyid = 1 ";
-        sql += "and serviceid in (select serviceid from google_services where '2015-07-05' between startdate and enddate and '2015-08-31' between startdate and enddate) and id % 20 = 0";
+        sql += "and serviceid in (select serviceid from google_services where '2015-07-05' between startdate and enddate and '2015-08-31' between startdate and enddate) and id % 5 = 0";
 
 //        String sql = "select id, routeid, serviceid, tripid, agencyid from google_trips where agencyid = 10 ";
 //        sql += "and serviceid in (select serviceid from google_services where '2015-07-05' between startdate and enddate and '2015-08-31' between startdate and enddate)";

@@ -42,10 +42,6 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
     private final Map<Long, Long> firstNodeOnRideDepartureMap = new HashMap<>();
 
-    private final Map<Long, Long> visitedRidesGlobal = new HashMap<>();
-
-    private final Map<Long, Map<Long, Long>> visitedStationsOnPathMap = new HashMap<>();
-
     public DepartureTypeExpander(LocalDateTime departureDateTime, LocalDateTime maxDepartureDateTime, int maxNumberOfTransfers) {
         this.departureDateTime = departureDateTime;
         this.maxDepartureDateTime = maxDepartureDateTime;
@@ -73,8 +69,8 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
         //inicializace parametru PATH
         Node startNode = path.startNode();
         Node currentNode = path.endNode();
-        long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
         long startNodeStationId = (long) startNode.getProperty(StopNode.STATION_PROPERTY);
+        long startNodeDeparture = (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
         long currentNodeStopId = (long) currentNode.getProperty(StopNode.STOP_PROPERTY);
         long currentRideId = (long) currentNode.getProperty(StopNode.RIDE_PROPERTY);
         long currentStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
@@ -96,19 +92,6 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
         Long currentNodeTimeProperty = currentNodeDeparture != null ? currentNodeDeparture : currentNodeArrival;
 
-        //osetreni pres pulnoc
-        LocalDateTime startNodeDepartureDateTime = new LocalDateTime(departureDateTime);
-        if(departureMillisOfDay > currentNodeTimeProperty) {
-            //prehoupl jsem se pres pulnoc
-            startNodeDepartureDateTime = startNodeDepartureDateTime.plusDays(1);
-        }
-
-        startNodeDepartureDateTime = startNodeDepartureDateTime.millisOfDay().withMinimumValue();
-        startNodeDepartureDateTime = startNodeDepartureDateTime.plusMillis(currentNodeTimeProperty.intValue());
-        long startNodeMillisTime = startNodeDepartureDateTime.toDateTime().getMillis();
-        //startNodeDepartureDateTime nyni obsahuje datum i cas vyjezdu currentNodu
-        //startNodeMillisTime obsahuje jen cas vyjezdu (v millis od pulnoci) currentNodu
-
         //Jsem na prvnim NODu
         if(lastRelationShip == null) {
             List<Long> tmpVisitedRides = new ArrayList<>();
@@ -116,8 +99,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
             visitedStations.put(currentStationId, tmpVisitedRides);
             visitedRides.add(currentRideId);
-            visitedStops.put(currentNodeStopId, startNodeMillisTime);
-            visitedRidesGlobal.put(currentRideId, startNodeMillisTime);
+            visitedStops.put(currentNodeStopId, startNodeDeparture);
 
             //vratit chci z prvniho nodu jen node na NEXT_STOP relaci
             return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
@@ -256,62 +238,6 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                 visitedStations.put(currentStationId, new ArrayList<Long>());
             }
 
-            //kontrola casu na teto stanici v ramci path od zacatku
-            //osetreni pres pulnoc
-            LocalDateTime currentStopArrivalDateTime = new LocalDateTime(departureDateTime);
-            if(departureMillisOfDay > currentNodeArrival) {
-                //prehoupl jsem se pres pulnoc
-                currentStopArrivalDateTime = currentStopArrivalDateTime.plusDays(1);
-            }
-
-            currentStopArrivalDateTime = currentStopArrivalDateTime.millisOfDay().withMinimumValue();
-            currentStopArrivalDateTime = currentStopArrivalDateTime.plusMillis(currentNodeArrival.intValue());
-            long currentNodeMillis = currentStopArrivalDateTime.toDateTime().getMillis();
-            //v currentStopArrivalDateTime je datum a cas aktualniho nodu
-            //v currentNodeMillis je jen cas aktualniho nodu
-
-            if(!visitedStationsOnPathMap.containsKey(startNodeStopId)) {
-                //jeste vubec neni vytvorena mapa navstivenych stanic pro tuto PATH
-                Map<Long, Long> stationsAndArrivalMap = new HashMap<>();
-                stationsAndArrivalMap.put(currentStationId, currentNodeMillis);
-                visitedStationsOnPathMap.put(startNodeStopId, stationsAndArrivalMap);
-            } else {
-                //mapa navstivenych stanic pro tuto path je jiz vytvorena
-                Map<Long, Long> currentVisitedStationsOnPathMap = visitedStationsOnPathMap.get(startNodeStopId);
-                if(!currentVisitedStationsOnPathMap.containsKey(currentStationId)) {
-                    //na teto stanici jsem v ramci PATH jeste nebyl
-                    currentVisitedStationsOnPathMap.put(currentStationId, currentNodeMillis);
-                } else {
-                    //porovnání, pozor na pulnoc :)
-                    Long currentStationOnPathPrevBestArrival = currentVisitedStationsOnPathMap.get(currentStationId);
-                    if(currentStationOnPathPrevBestArrival >= departureMillisOfDay) {
-                        //predchozi nejlepsi byl pred pulnoci
-                        if(currentStationOnPathPrevBestArrival < currentNodeMillis || currentNodeMillis < departureMillisOfDay) {
-                            //predtim byl jiz lepsi cas a nebo ten aktualni je az po pulnoci (Tedy ten predtim je lepsi v kazdem pripade
-                            if(!visitedStations.get(currentStationId).contains(currentRideId)) {
-                                //ukoncim to jen pokud jsem na teto stanici nebyl pri aktualni ride, to jsem tam totiz mohl byt vicekrat
-                                return Iterables.empty();
-                            }
-                        } else {
-                            //ulozim aktualni nejlepsi cas na teto stanici v ramci path
-                            currentVisitedStationsOnPathMap.put(currentStationId, currentNodeMillis);
-                        }
-                    } else {
-                        //predchozi nejlepsi byl po pulnoci
-                        if(currentNodeMillis < departureMillisOfDay && currentNodeMillis > currentStationOnPathPrevBestArrival) {
-                            //ted jsem taky po pulnoci ale pozdeji, nez byl predchozi nejlepsi
-                            if(!visitedStations.get(currentStationId).contains(currentRideId)) {
-                                //ukoncim to jen pokud jsem na teto stanici nebyl pri aktualni ride, to jsem tam totiz mohl byt vicekrat
-                                return Iterables.empty();
-                            }
-                        } else {
-                            //ulozim aktualni nejlepsi cas na teto stanici v ramci path
-                            currentVisitedStationsOnPathMap.put(currentStationId, currentNodeMillis);
-                        }
-                    }
-                }
-            }
-
             visitedStations.get(currentStationId).add(currentRideId);
 
             //max pocet prestupu
@@ -326,19 +252,26 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
                 //sel jsem (N)-[NEXT_AWAITING_STOP]-(m)-[NEXT_STOP]-(o)
                 if(prevRelationShipType != null && relationshipIsTypeNextAwaitingStop && prevRelationShipType.equals(RelTypes.NEXT_STOP)) {
+                    //+1 jde k visitedRides protoze ted jsem zcela urcite prestoupil na novou ridu
+                    long startNodeMillisTimeWithPenalty = startNodeDeparture - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * visitedRides.size());
+                    if(startNodeMillisTimeWithPenalty < 0) {
+                        //prehoupl jsem se s penalizaci do predchoziho dne
+                        startNodeMillisTimeWithPenalty = DateTimeUtils.MILLIS_IN_DAY - startNodeMillisTimeWithPenalty;
+                    }
+
                     //na tomto stopu jsem jiz drive byl
                     if(visitedStops.containsKey(currentNodeStopId)) {
                         //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
                         Long prevBestTimeOnStop = visitedStops.get(currentNodeStopId);
                         if(prevBestTimeOnStop >= departureMillisOfDay) {
                             //predchozi nejlepsi cas byl pred pulnoci
-                            if(startNodeMillisTime < prevBestTimeOnStop && startNodeMillisTime >= departureMillisOfDay) {
+                            if(startNodeMillisTimeWithPenalty < prevBestTimeOnStop && startNodeMillisTimeWithPenalty >= departureMillisOfDay) {
                                 //momentalne jsem taky pred pulnoci ale s drivejsim vyjezdem, to nechci :)
                                 return Iterables.empty();
                             }
                         } else {
                             //prechozi nejlepsi cas byl po pulnoci
-                            if((startNodeMillisTime < prevBestTimeOnStop && startNodeMillisTime < departureMillisOfDay) || startNodeMillisTime >= departureMillisOfDay) {
+                            if((startNodeMillisTimeWithPenalty < prevBestTimeOnStop && startNodeMillisTimeWithPenalty < departureMillisOfDay) || startNodeMillisTimeWithPenalty >= departureMillisOfDay) {
                                 //momentalne jsem taky po pulnoci ale s drivejsim vyjezdem, nebo jsem dokonce pred pulnoci, to nechci :)
                                 return Iterables.empty();
                             }
@@ -346,31 +279,12 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                     }
 
                     //pokud to prislo sem, tak mam aktualne nejlepsi mozny cas vyjezdu k tomuto stopu
-                    visitedStops.put(currentNodeStopId, startNodeMillisTime);
+                    visitedStops.put(currentNodeStopId, startNodeMillisTimeWithPenalty);
 
                     //kontrola unikatnosti ridy v ramci path
                     if (visitedRides.contains(currentRideId)) {
                         return Iterables.empty();
                     } else {
-                        if (visitedRidesGlobal.containsKey(currentRideId)) {
-                            Long prevBestTimeOnRide = visitedRidesGlobal.get(currentRideId);
-                            if(prevBestTimeOnRide >= departureMillisOfDay) {
-                                //predchozi nejlepsi cas byl pred pulnoci
-                                if(startNodeMillisTime < prevBestTimeOnRide && startNodeMillisTime >= departureMillisOfDay) {
-                                    //momentalne jsem taky pred pulnoci ale s drivejsim vyjezdem, to nechci :)
-                                    return Iterables.empty();
-                                }
-                            } else {
-                                //prechozi nejlepsi cas byl po pulnoci
-                                if((startNodeMillisTime < prevBestTimeOnRide && startNodeMillisTime < departureMillisOfDay) || startNodeMillisTime >= departureMillisOfDay) {
-                                    //momentalne jsem taky po pulnoci ale s drivejsim vyjezdem, nebo jsem po pulnoci to nechci
-                                    return Iterables.empty();
-                                }
-                            }
-                        }
-
-                        //pokud to prislo az sem, tak mam aktualne nejlepsi mozny cas vyjezdu k teto ride
-                        visitedRidesGlobal.put(currentRideId, startNodeMillisTime);
                         visitedRides.add(currentRideId);
                         if(visitedRides.size() > maxNumberOfTransfers) {
                             return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);

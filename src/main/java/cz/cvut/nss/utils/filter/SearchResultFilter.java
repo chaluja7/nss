@@ -1,6 +1,7 @@
 package cz.cvut.nss.utils.filter;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
+import cz.cvut.nss.utils.DateTimeUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,11 +30,11 @@ public class SearchResultFilter {
 
             //zkontroluji, jestli minuly vysledek nemel pozdejsi departure nez ten aktualni, pokud ano tak aktualni nechci
             if(prevWrapper != null) {
-                if(!prevWrapper.isOverMidnightDeparture() && !wrapper.isOverMidnightDeparture() && prevWrapper.getDeparture() > wrapper.getDeparture()) {
-                    continue;
-                }
+                //do razeni chci zakomponovat i penalizace za prestup! Toto funguje i pres pulnoc (dostanu se do zapornych cisel ale porovnani je stejne)
+                long wrapperDepartureWithPenalty = wrapper.getDeparture() - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * wrapper.getNumberOfTransfers());
+                long prevWrapperDepartureWithPenalty = prevWrapper.getDeparture() - (DateTimeUtils.TRANSFER_PENALTY_MILLIS * prevWrapper.getNumberOfTransfers());
 
-                if(prevWrapper.isOverMidnightDeparture() && wrapper.isOverMidnightDeparture() && prevWrapper.getDeparture() > wrapper.getDeparture()) {
+                if(wrapperDepartureWithPenalty < prevWrapperDepartureWithPenalty) {
                     continue;
                 }
             }
