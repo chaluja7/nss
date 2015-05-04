@@ -53,8 +53,8 @@ public class RouteController {
             //RouteStops jsou seřazeny podle km. 1. v listu je tedy stationFrom, poslední stationTo
             List<RouteStop> routeStops = route.getRouteStops();
             if(routeStops.size() > 0) {
-                resource.setStationFrom(routeStops.get(0).getStation().getTitle());
-                resource.setStationTo(routeStops.get(routeStops.size() - 1).getStation().getTitle());
+                resource.setStationFrom(routeStops.get(0).getStation().getName());
+                resource.setStationTo(routeStops.get(routeStops.size() - 1).getStation().getName());
             }
 
             resourceList.add(resource);

@@ -75,4 +75,6 @@ public interface StationService {
      */
     public int getCountAll();
 
+    public List<Station> getAllWithOrder(String orderColumn);
+
 }

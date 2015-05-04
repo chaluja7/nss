@@ -57,4 +57,6 @@ public interface StationDao extends GenericDao<Station> {
      */
     int getCountAll();
 
+    List<Station> getAllWithOrder(String orderColumn);
+
 }

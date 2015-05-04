@@ -57,4 +57,6 @@ public interface RideService {
      */
     public void importRideToNeo4j(Ride id);
 
+    public List<Ride> getByLineId(long lineId);
+
 }

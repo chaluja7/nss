@@ -12,9 +12,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Backing bean for route.
@@ -88,10 +88,10 @@ public class RouteBB {
     }
 
     public Map<String, Object> getAllAvailableStations() {
-        Map<String, Object> map = new HashMap<>();
-        for(Station station : stationService.getAll()) {
+        Map<String, Object> map = new TreeMap<>();
+        for(Station station : stationService.getAllWithOrder("name")) {
             if(!usedStations().contains(station)) {
-                map.put(station.getTitle(), station);
+                map.put(station.getName(), station);
             }
         }
 

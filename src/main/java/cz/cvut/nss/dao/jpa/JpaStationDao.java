@@ -182,4 +182,24 @@ public class JpaStationDao extends AbstractGenericJpaDao<Station> implements Sta
         return query.getSingleResult().intValue();
     }
 
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<Station> getAllWithOrder(String orderColumn) {
+        String sql = "select s from Station s";
+
+        String orderingColumn = "id";
+        if(orderColumn != null) {
+            switch (orderColumn) {
+                case "name":
+                    orderingColumn = "name";
+                    break;
+            }
+        }
+
+        sql += " order by " + orderingColumn;
+        TypedQuery<Station> query = em.createQuery(sql, Station.class);
+
+        return query.getResultList();
+    }
+
 }

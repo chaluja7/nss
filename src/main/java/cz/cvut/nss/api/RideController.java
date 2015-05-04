@@ -10,6 +10,7 @@ import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,16 +30,20 @@ public class RideController {
     @Autowired
     protected RideService rideService;
 
-    @RequestMapping(value ="/rides", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     @Transactional
+    @RequestMapping(value ="/rides", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     public List<RideResource> getRides() {
-        return getAllTransformedRides();
+        return getTransformedRides(rideService.getAll());
     }
 
-    @RequestMapping(value ="/ridesDataTable", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
     @Transactional
-    public DataTableResource<RideResource> getRidesForDataTable() {
-        return new DataTableResource<>(getAllTransformedRides());
+    @RequestMapping(value ="/ridesDataTable/{lineId}", method = RequestMethod.GET, produces = "application/json;charset=UTF-8")
+    public DataTableResource<RideResource> getRidesForDataTable(@PathVariable Long lineId) {
+        if(lineId == null) {
+            return new DataTableResource<>();
+        }
+
+        return new DataTableResource<>(getTransformedRides(rideService.getByLineId(lineId)));
     }
 
     /**
@@ -46,17 +51,21 @@ public class RideController {
      *
      * @return list line resourcu
      */
-    private List<RideResource> getAllTransformedRides() {
+    private List<RideResource> getTransformedRides(List<Ride> rideList) {
+        if(rideList == null) {
+            return new ArrayList<>();
+        }
+
         List<RideResource> resourceList = new ArrayList<>();
-        for(Ride ride: rideService.getAll()) {
+        for(Ride ride: rideList) {
             RideResource resource = new RideResource();
             resource.setId(ride.getId());
-            resource.setLine(ride.getLine().getName());
+            resource.setLine(ride.getLine().getLineType().name() + " - " + ride.getLine().getName());
 
             List<Stop> stopList = ride.getStops();
             if(stopList.size() > 0) {
-                resource.setStationFrom(stopList.get(0).getStation().getTitle());
-                resource.setStationTo(stopList.get(stopList.size() - 1).getStation().getTitle());
+                resource.setStationFrom(stopList.get(0).getStation().getName());
+                resource.setStationTo(stopList.get(stopList.size() - 1).getStation().getName());
 
                 Stop from = stopList.get(0);
                 Stop to = stopList.get(stopList.size() - 1);

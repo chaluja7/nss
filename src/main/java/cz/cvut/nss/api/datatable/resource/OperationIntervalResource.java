@@ -8,19 +8,19 @@ public class OperationIntervalResource {
 
     private long id;
 
-    private Boolean monday;
+    private int monday;
 
-    private Boolean tuesday;
+    private int tuesday;
 
-    private Boolean wednesday;
+    private int wednesday;
 
-    private Boolean thursday;
+    private int thursday;
 
-    private Boolean friday;
+    private int friday;
 
-    private Boolean saturday;
+    private int saturday;
 
-    private Boolean sunday;
+    private int sunday;
 
     private String startDate;
 
@@ -34,59 +34,59 @@ public class OperationIntervalResource {
         this.id = id;
     }
 
-    public Boolean getMonday() {
+    public int getMonday() {
         return monday;
     }
 
-    public void setMonday(Boolean monday) {
+    public void setMonday(int monday) {
         this.monday = monday;
     }
 
-    public Boolean getTuesday() {
+    public int getTuesday() {
         return tuesday;
     }
 
-    public void setTuesday(Boolean tuesday) {
+    public void setTuesday(int tuesday) {
         this.tuesday = tuesday;
     }
 
-    public Boolean getWednesday() {
+    public int getWednesday() {
         return wednesday;
     }
 
-    public void setWednesday(Boolean wednesday) {
+    public void setWednesday(int wednesday) {
         this.wednesday = wednesday;
     }
 
-    public Boolean getThursday() {
+    public int getThursday() {
         return thursday;
     }
 
-    public void setThursday(Boolean thursday) {
+    public void setThursday(int thursday) {
         this.thursday = thursday;
     }
 
-    public Boolean getFriday() {
+    public int getFriday() {
         return friday;
     }
 
-    public void setFriday(Boolean friday) {
+    public void setFriday(int friday) {
         this.friday = friday;
     }
 
-    public Boolean getSaturday() {
+    public int getSaturday() {
         return saturday;
     }
 
-    public void setSaturday(Boolean saturday) {
+    public void setSaturday(int saturday) {
         this.saturday = saturday;
     }
 
-    public Boolean getSunday() {
+    public int getSunday() {
         return sunday;
     }
 
-    public void setSunday(Boolean sunday) {
+    public void setSunday(int sunday) {
         this.sunday = sunday;
     }
 

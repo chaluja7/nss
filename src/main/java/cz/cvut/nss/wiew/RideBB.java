@@ -47,6 +47,8 @@ public class RideBB {
 
     private LocalDateTime newStopArrival;
 
+    private Long selectedLine;
+
     public void loadRide() {
         if(id != null) {
             ride = rideService.getRideLazyInitialized(id);
@@ -93,9 +95,9 @@ public class RideBB {
     }
 
     public Map<String, Object> getAllLines() {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new TreeMap<>();
         for(Line line : lineService.getAll()) {
-            map.put(line.getName(), line);
+            map.put(line.getLineType().name() + " - " + line.getName(), line);
         }
 
         return map;
@@ -168,6 +170,14 @@ public class RideBB {
 
     public void setNewStopArrival(LocalDateTime newStopArrival) {
         this.newStopArrival = newStopArrival;
+    }
+
+    public Long getSelectedLine() {
+        return selectedLine;
+    }
+
+    public void setSelectedLine(Long selectedLine) {
+        this.selectedLine = selectedLine;
     }
 
     public void setRideService(RideService rideService) {

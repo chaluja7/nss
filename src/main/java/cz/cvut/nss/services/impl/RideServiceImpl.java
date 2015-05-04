@@ -128,4 +128,10 @@ public class RideServiceImpl implements RideService {
         }
     }
 
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Ride> getByLineId(long lineId) {
+        return rideDao.getByLineId(lineId);
+    }
+
 }

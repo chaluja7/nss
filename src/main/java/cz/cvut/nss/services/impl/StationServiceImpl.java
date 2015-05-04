@@ -108,5 +108,11 @@ public class StationServiceImpl implements StationService {
         return stationDao.getCountAll();
     }
 
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public List<Station> getAllWithOrder(String orderColumn) {
+        return stationDao.getAllWithOrder(orderColumn);
+    }
+
 
 }

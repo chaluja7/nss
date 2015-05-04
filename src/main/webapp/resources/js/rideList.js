@@ -1,7 +1,9 @@
 $(document).ready(function() {
 
+    var mySelect = $('#tableData').prev().find('select');
+    var selectedLineId = mySelect.val();
     var table = $("#dataTableList").DataTable( {
-        "sAjaxSource": "../api/ridesDataTable",
+        "sAjaxSource": "../api/ridesDataTable/" + selectedLineId,
         "aoColumns": [
             {"mData": "line"},
             {"mData": "departure"},
@@ -20,5 +22,10 @@ $(document).ready(function() {
     });
 
     setUpDataTablesInlineFinding(table);
+
+    mySelect.change(function() {
+        selectedLineId = mySelect.val();
+        table.ajax.url("../api/ridesDataTable/" + selectedLineId).load();
+    });
 
 } );

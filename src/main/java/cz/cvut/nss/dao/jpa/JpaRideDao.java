@@ -5,6 +5,9 @@ import cz.cvut.nss.dao.generics.AbstractGenericJpaDao;
 import cz.cvut.nss.entities.Ride;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.TypedQuery;
+import java.util.List;
+
 /**
  * JPA implementation of RideDao.
  *
@@ -18,4 +21,12 @@ public class JpaRideDao extends AbstractGenericJpaDao<Ride> implements RideDao {
         super(Ride.class);
     }
 
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<Ride> getByLineId(long lineId) {
+        TypedQuery<Ride> query = em.createQuery("select r from Ride r where line.id = :lineId", Ride.class);
+        query.setParameter("lineId", lineId);
+
+        return query.getResultList();
+    }
 }

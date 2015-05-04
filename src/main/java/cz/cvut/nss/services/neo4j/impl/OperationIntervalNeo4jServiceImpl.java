@@ -41,8 +41,24 @@ public class OperationIntervalNeo4jServiceImpl implements OperationIntervalNeo4j
     }
 
     @Override
+    public OperationIntervalNode update(OperationIntervalNode operationIntervalNode) {
+        OperationIntervalNode byOperationIntervalId = operationIntervalNeo4jRepository.findByOperationIntervalId(operationIntervalNode.getOperationIntervalId());
+        operationIntervalNode.setId(byOperationIntervalId.getId());
+
+        return operationIntervalNeo4jRepository.save(operationIntervalNode);
+    }
+
+    @Override
     public void deleteAll() {
         operationIntervalNeo4jRepository.deleteAll();
+    }
+
+    @Override
+    public void deleteByOperationIntervalId(long operationIntervalId) {
+        OperationIntervalNode node = findByOperationIntervalId(operationIntervalId);
+        if(node != null) {
+            operationIntervalNeo4jRepository.delete(node);
+        }
     }
 
 }

@@ -18,6 +18,10 @@ public interface OperationIntervalNeo4jService {
 
     OperationIntervalNode findByOperationIntervalId(long operationIntervalId);
 
+    OperationIntervalNode update(OperationIntervalNode operationIntervalNode);
+
     void deleteAll();
+
+    void deleteByOperationIntervalId(long operationIntervalId);
 
 }

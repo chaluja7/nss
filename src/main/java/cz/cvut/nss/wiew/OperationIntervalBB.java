@@ -2,6 +2,7 @@ package cz.cvut.nss.wiew;
 
 import cz.cvut.nss.entities.OperationInterval;
 import cz.cvut.nss.services.OperationIntervalService;
+import cz.cvut.nss.services.SynchronizationService;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -21,6 +22,9 @@ public class OperationIntervalBB {
     @ManagedProperty(value = "#{operationIntervalServiceImpl}")
     private OperationIntervalService operationIntervalService;
 
+    @ManagedProperty(value = "#{synchronizationServiceImpl}")
+    private SynchronizationService synchronizationService;
+
     private Long id;
 
     private OperationInterval operationInterval = new OperationInterval();
@@ -32,17 +36,17 @@ public class OperationIntervalBB {
     }
 
     public String saveOperationInterval() {
-        operationIntervalService.createOperationInterval(operationInterval);
+        synchronizationService.saveOperationInterval(operationInterval);
         return "operationinterval-list?faces-redirect=true";
     }
 
     public String updateOperationInterval() {
-        operationIntervalService.updateOperationInterval(operationInterval);
+        synchronizationService.updateOperationInterval(operationInterval);
         return "operationinterval-list?faces-redirect=true";
     }
 
     public String deleteOperationInterval() {
-        operationIntervalService.deleteOperationInterval(operationInterval.getId());
+        synchronizationService.deleteOperationIntervalByOperationIntervalId(operationInterval.getId());
         return "operationinterval-list?faces-redirect=true";
     }
 
@@ -68,5 +72,9 @@ public class OperationIntervalBB {
 
     public void setOperationIntervalService(OperationIntervalService operationIntervalService) {
         this.operationIntervalService = operationIntervalService;
+    }
+
+    public void setSynchronizationService(SynchronizationService synchronizationService) {
+        this.synchronizationService = synchronizationService;
     }
 }

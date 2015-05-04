@@ -9,6 +9,7 @@ import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
 import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -83,15 +84,15 @@ public class SearchResultBB {
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 3, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 3, maxNumberOfTransfers, -1);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, 3);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, 3);
                 }
             }
 
@@ -123,14 +124,22 @@ public class SearchResultBB {
             //jako bernou minci beru posledni nalazeny spoj a cas odjezdu z vychozi stanice
             FoundedPathsWrapper lastFoundedPathWrapper = foundResults.get(foundResults.size() - 1);
             Stop firstStop = lastFoundedPathWrapper.getStops().get(0);
-            //todo
-            DateTime dateTime = firstStop.getDeparture().toDateTimeToday();
-            //DateTime dateTime = firstStop.getDeparture().toDateTime();
-            newDateTime = dateTime.plusMillis(1);
+
+            LocalDateTime currentDepartureLocalDateTime = new LocalDateTime(departureOrArrival);
+            LocalDateTime l = currentDepartureLocalDateTime.millisOfDay().withMinimumValue();
+            l = l.withMillisOfDay(firstStop.getDeparture().getMillisOfDay() + 1);
+
+            //TODO
+            if(firstStop.getDeparture().getMillisOfDay() < currentDepartureLocalDateTime.getMillisOfDay()) {
+                //posunul jsem se do dalsiho dne
+                l = l.plusDays(1);
+            }
+
+            newDateTime = l.toDateTime();
             timeType = "departure";
         } else {
             DateTime dateTime = new DateTime(departureOrArrival);
-            newDateTime = dateTime.plusHours(9);
+            newDateTime = dateTime.plusHours(6);
         }
 
         departureOrArrival = newDateTime.toDate();
@@ -144,14 +153,22 @@ public class SearchResultBB {
             //jako bernou minci beru prvni nalazeny spoj a cas prijezdu do cilove stanice
             FoundedPathsWrapper firstFoundedPathWrapper = foundResults.get(0);
             Stop lastStop = firstFoundedPathWrapper.getStops().get(firstFoundedPathWrapper.getStops().size() - 1);
-            //todo
-            DateTime dateTime = lastStop.getArrival().toDateTimeToday();
-            //DateTime dateTime = lastStop.getArrival().toDateTime();
-            newDateTime = dateTime.minusMillis(1);
+
+            LocalDateTime currentDepartureLocalDateTime = new LocalDateTime(departureOrArrival);
+            LocalDateTime l = currentDepartureLocalDateTime.millisOfDay().withMinimumValue();
+            l = l.withMillisOfDay(lastStop.getArrival().getMillisOfDay() - 1);
+
+            //TODO
+            if(lastStop.getArrival().getMillisOfDay() < currentDepartureLocalDateTime.getMillisOfDay()) {
+                //posunul jsem se do dalsiho dne
+                l = l.plusDays(1);
+            }
+
+            newDateTime = l.toDateTime();
             timeType = "arrival";
         } else {
             DateTime dateTime = new DateTime(departureOrArrival);
-            newDateTime = dateTime.minusHours(9);
+            newDateTime = dateTime.minusHours(6);
         }
 
         departureOrArrival = newDateTime.toDate();
@@ -186,7 +203,7 @@ public class SearchResultBB {
             return;
         }
 
-        if(timeType.equals("departure")) {
+        if(timeType.equals("departure") || timeType.equals("arrival")) {
             departureDay = dt.toString(DateTimeUtils.datePattern);
             arrivalDay = dt.plusDays(1).toString(DateTimeUtils.datePattern);
         }

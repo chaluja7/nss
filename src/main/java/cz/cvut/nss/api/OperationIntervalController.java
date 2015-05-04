@@ -41,13 +41,13 @@ public class OperationIntervalController {
             OperationIntervalResource resource = new OperationIntervalResource();
 
             resource.setId(operationInterval.getId());
-            resource.setMonday(operationInterval.getMonday());
-            resource.setTuesday(operationInterval.getTuesday());
-            resource.setWednesday(operationInterval.getWednesday());
-            resource.setThursday(operationInterval.getThursday());
-            resource.setFriday(operationInterval.getFriday());
-            resource.setSaturday(operationInterval.getSaturday());
-            resource.setSunday(operationInterval.getSunday());
+            resource.setMonday(transferBooleanToIntNote(operationInterval.getMonday()));
+            resource.setTuesday(transferBooleanToIntNote(operationInterval.getTuesday()));
+            resource.setWednesday(transferBooleanToIntNote(operationInterval.getWednesday()));
+            resource.setThursday(transferBooleanToIntNote(operationInterval.getThursday()));
+            resource.setFriday(transferBooleanToIntNote(operationInterval.getFriday()));
+            resource.setSaturday(transferBooleanToIntNote(operationInterval.getSaturday()));
+            resource.setSunday(transferBooleanToIntNote(operationInterval.getSunday()));
             resource.setStartDate(operationInterval.getStartDate().toString(DateTimeUtils.datePattern));
             resource.setEndDate(operationInterval.getEndDate().toString(DateTimeUtils.datePattern));
 
@@ -55,6 +55,10 @@ public class OperationIntervalController {
         }
 
         return resourceList;
+    }
+
+    private static int transferBooleanToIntNote(Boolean value) {
+        return value == null || value.equals(false) ? 0 : 1;
     }
 
 }
