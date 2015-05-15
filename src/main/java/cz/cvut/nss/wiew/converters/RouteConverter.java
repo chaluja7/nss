@@ -24,16 +24,13 @@ public class RouteConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
         Long id = Long.valueOf(s);
-        Route route = routeService.getRoute(id);
-
-        return route;
+        return routeService.getRoute(id);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
         Route route = (Route) o;
         Long id = route.getId();
-
         return String.valueOf(id);
     }
 

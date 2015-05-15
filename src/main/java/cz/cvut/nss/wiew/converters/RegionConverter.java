@@ -24,16 +24,13 @@ public class RegionConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
         Long id = Long.valueOf(s);
-        Region region = regionService.getRegion(id);
-
-        return region;
+        return regionService.getRegion(id);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
         Region region = (Region) o;
         Long id = region.getId();
-
         return String.valueOf(id);
     }
 

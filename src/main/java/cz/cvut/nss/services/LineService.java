@@ -19,46 +19,44 @@ public interface LineService {
      * @param id id of a line
      * @return line by id or null
      */
-    public Line getLine(long id);
+    Line getLine(long id);
 
     /**
      * update line
      * @param line line to update
      * @return updated line
      */
-    public Line updateLine(Line line);
+    Line updateLine(Line line);
 
     /**
      * persists line
      * @param line line to persist
      */
-    public void createLine(Line line);
+    void createLine(Line line);
 
     /**
      * delete line
      * @param id id of line to delete
      */
-    public void deleteLine(long id);
+    void deleteLine(long id);
 
     /**
      * find all lines
      * @return all lines
      */
-    public List<Line> getAll();
+    List<Line> getAll();
 
     /**
      * find all filtered lines for datatables and count
      * @param filter filter
      * @return list lines and count
      */
-    public EntitiesAndCountResult<Line> getAllForDatatables(CommonRequest filter);
+    EntitiesAndCountResult<Line> getAllForDatatables(CommonRequest filter);
 
     /**
      * get count of all lines
      * @return count of all lines
      */
-    public int getCountAll();
-
-    public Line getByName(String name);
+    int getCountAll();
 
 }

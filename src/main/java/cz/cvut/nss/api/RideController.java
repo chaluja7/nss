@@ -69,8 +69,8 @@ public class RideController {
                 Stop to = stopList.get(stopList.size() - 1);
 
                 if(from.getDeparture() != null && to.getArrival() != null) {
-                    resource.setDeparture(from.getDeparture().toString(DateTimeUtils.timePattern));
-                    resource.setArrival(to.getArrival().toString(DateTimeUtils.timePattern));
+                    resource.setDeparture(from.getDeparture().toString(DateTimeUtils.TIME_PATTERN));
+                    resource.setArrival(to.getArrival().toString(DateTimeUtils.TIME_PATTERN));
 
                     //pres pulnoc
                     int millisOfDepartureDay = from.getDeparture().getMillisOfDay();

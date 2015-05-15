@@ -144,18 +144,4 @@ public class JpaLineDao extends AbstractGenericJpaDao<Line> implements LineDao {
         return query.getSingleResult().intValue();
     }
 
-    @Override
-    @SuppressWarnings("JpaQlInspection")
-    public Line findByName(String name) {
-        TypedQuery<Line> query = em.createQuery("select l from Line l where l.name = :name", Line.class);
-        query.setParameter("name", name);
-
-        List<Line> lineList = query.getResultList();
-        if(lineList.size() == 1) {
-            return lineList.get(0);
-        }
-
-        return null;
-    }
-
 }

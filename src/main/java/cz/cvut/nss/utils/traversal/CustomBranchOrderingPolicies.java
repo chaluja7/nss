@@ -1,4 +1,4 @@
-package cz.cvut.nss.utils.evaluator;
+package cz.cvut.nss.utils.traversal;
 
 import org.neo4j.graphdb.PathExpander;
 import org.neo4j.graphdb.traversal.BranchOrderingPolicy;

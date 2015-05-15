@@ -26,7 +26,7 @@ public class SearchServiceTest extends AbstractServiceTest {
     public void superTest() {
 
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
+        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.DATE_TIME_PATTERN);
 
         try {
             date = dateFormat.parse("26.06.2015 19:13");
@@ -47,7 +47,7 @@ public class SearchServiceTest extends AbstractServiceTest {
     public void superTest2() {
 
         Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
+        DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.DATE_TIME_PATTERN);
 
         try {
             date = dateFormat.parse("08.12.2014 19:14");

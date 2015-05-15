@@ -20,8 +20,6 @@ import java.util.Set;
 @Transactional("neo4jTransactionManager")
 public class StopNeo4jServiceImpl implements StopNeo4jService {
 
-    private static final long MAX_MILLIS_TO_TRANSFER_RELATIONSHIP = 86400000;
-
     @Autowired
     protected StopNeo4jRepository stopNeo4jRepository;
 

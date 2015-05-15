@@ -2,7 +2,9 @@ package cz.cvut.nss.services.impl;
 
 import cz.cvut.nss.dao.OperationIntervalDao;
 import cz.cvut.nss.entities.OperationInterval;
+import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.services.OperationIntervalService;
+import cz.cvut.nss.services.neo4j.OperationIntervalNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,6 +21,9 @@ public class OperationIntervalServiceImpl implements OperationIntervalService {
 
     @Autowired
     protected OperationIntervalDao operationIntervalDao;
+
+    @Autowired
+    protected OperationIntervalNeo4jService operationIntervalNeo4jService;
 
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -48,6 +53,27 @@ public class OperationIntervalServiceImpl implements OperationIntervalService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<OperationInterval> getAll() {
         return operationIntervalDao.findAll();
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    public void importOperationIntervalToNeo4j(OperationInterval operationInterval) {
+
+        OperationIntervalNode node = new OperationIntervalNode();
+
+        node.setOperationIntervalId(operationInterval.getId());
+        node.setMonday(operationInterval.getMonday());
+        node.setTuesday(operationInterval.getTuesday());
+        node.setWednesday(operationInterval.getWednesday());
+        node.setThursday(operationInterval.getThursday());
+        node.setFriday(operationInterval.getFriday());
+        node.setSaturday(operationInterval.getSaturday());
+        node.setSunday(operationInterval.getSunday());
+        node.setFromDateInMillis(operationInterval.getStartDate().toDate().getTime());
+        node.setToDateInMillis(operationInterval.getEndDate().toDate().getTime());
+
+        operationIntervalNeo4jService.save(node);
+
     }
 
 }

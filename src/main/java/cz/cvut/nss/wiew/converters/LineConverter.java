@@ -24,16 +24,13 @@ public class LineConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
         Long id = Long.valueOf(s);
-        Line line = lineService.getLine(id);
-
-        return line;
+        return lineService.getLine(id);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
         Line line = (Line) o;
         Long id = line.getId();
-
         return String.valueOf(id);
     }
 

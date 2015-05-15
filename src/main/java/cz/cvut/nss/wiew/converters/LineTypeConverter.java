@@ -24,7 +24,6 @@ public class LineTypeConverter implements Converter {
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
         LineType lineType = (LineType) o;
-
         return lineType.name();
     }
 

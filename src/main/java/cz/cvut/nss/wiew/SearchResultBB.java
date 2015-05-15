@@ -9,7 +9,6 @@ import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
 import cz.cvut.nss.utils.DateTimeUtils;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDateTime;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -30,6 +29,10 @@ import java.util.List;
 @ManagedBean
 @ViewScoped
 public class SearchResultBB {
+
+    private static final int SEARCH_INTERVAL_HOURS = 6;
+
+    private static final int MAX_NUMBER_OF_RESULTS = 3;
 
     @ManagedProperty(value = "#{stationServiceImpl}")
     private StationService stationService;
@@ -84,15 +87,19 @@ public class SearchResultBB {
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
+                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
+                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 }
             } else {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, 3);
+                    path = neo4jSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
+                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 } else {
-                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, 3);
+                    path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
+                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 }
             }
 
@@ -118,64 +125,6 @@ public class SearchResultBB {
 
     }
 
-    public void findNextRides() {
-        DateTime newDateTime;
-        if(foundResults != null && !foundResults.isEmpty()) {
-            //jako bernou minci beru posledni nalazeny spoj a cas odjezdu z vychozi stanice
-            FoundedPathsWrapper lastFoundedPathWrapper = foundResults.get(foundResults.size() - 1);
-            Stop firstStop = lastFoundedPathWrapper.getStops().get(0);
-
-            LocalDateTime currentDepartureLocalDateTime = new LocalDateTime(departureOrArrival);
-            LocalDateTime l = currentDepartureLocalDateTime.millisOfDay().withMinimumValue();
-            l = l.withMillisOfDay(firstStop.getDeparture().getMillisOfDay() + 1);
-
-            //TODO
-            if(firstStop.getDeparture().getMillisOfDay() < currentDepartureLocalDateTime.getMillisOfDay()) {
-                //posunul jsem se do dalsiho dne
-                l = l.plusDays(1);
-            }
-
-            newDateTime = l.toDateTime();
-            timeType = "departure";
-        } else {
-            DateTime dateTime = new DateTime(departureOrArrival);
-            newDateTime = dateTime.plusHours(6);
-        }
-
-        departureOrArrival = newDateTime.toDate();
-        departureOrArrivalDate = newDateTime.toString(DateTimeUtils.datePattern);
-        departureOrArrivalTime = newDateTime.toString(DateTimeUtils.timePattern);
-    }
-
-    public void findPrevRides() {
-        DateTime newDateTime;
-        if(foundResults != null && !foundResults.isEmpty()) {
-            //jako bernou minci beru prvni nalazeny spoj a cas prijezdu do cilove stanice
-            FoundedPathsWrapper firstFoundedPathWrapper = foundResults.get(0);
-            Stop lastStop = firstFoundedPathWrapper.getStops().get(firstFoundedPathWrapper.getStops().size() - 1);
-
-            LocalDateTime currentDepartureLocalDateTime = new LocalDateTime(departureOrArrival);
-            LocalDateTime l = currentDepartureLocalDateTime.millisOfDay().withMinimumValue();
-            l = l.withMillisOfDay(lastStop.getArrival().getMillisOfDay() - 1);
-
-            //TODO
-            if(lastStop.getArrival().getMillisOfDay() < currentDepartureLocalDateTime.getMillisOfDay()) {
-                //posunul jsem se do dalsiho dne
-                l = l.plusDays(1);
-            }
-
-            newDateTime = l.toDateTime();
-            timeType = "arrival";
-        } else {
-            DateTime dateTime = new DateTime(departureOrArrival);
-            newDateTime = dateTime.minusHours(6);
-        }
-
-        departureOrArrival = newDateTime.toDate();
-        departureOrArrivalDate = newDateTime.toString(DateTimeUtils.datePattern);
-        departureOrArrivalTime = newDateTime.toString(DateTimeUtils.timePattern);
-    }
-
     private void prepareAndValidateInputs() {
         stationFrom = stationService.getStationByName(stationFromTitle);
         stationTo = stationService.getStationByName(stationToTitle);
@@ -186,7 +135,7 @@ public class SearchResultBB {
         }
 
         if(departureOrArrival == null) {
-            DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.dateTimePattern);
+            DateFormat dateFormat = new SimpleDateFormat(DateTimeUtils.DATE_TIME_PATTERN);
             try {
                 departureOrArrival = dateFormat.parse(departureOrArrivalDate + " " + departureOrArrivalTime);
             } catch (ParseException e) {
@@ -204,8 +153,8 @@ public class SearchResultBB {
         }
 
         if(timeType.equals("departure") || timeType.equals("arrival")) {
-            departureDay = dt.toString(DateTimeUtils.datePattern);
-            arrivalDay = dt.plusDays(1).toString(DateTimeUtils.datePattern);
+            departureDay = dt.toString(DateTimeUtils.DATE_PATTERN);
+            arrivalDay = dt.plusDays(1).toString(DateTimeUtils.DATE_PATTERN);
         }
     }
 

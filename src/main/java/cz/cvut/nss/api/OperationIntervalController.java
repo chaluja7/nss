@@ -48,8 +48,8 @@ public class OperationIntervalController {
             resource.setFriday(transferBooleanToIntNote(operationInterval.getFriday()));
             resource.setSaturday(transferBooleanToIntNote(operationInterval.getSaturday()));
             resource.setSunday(transferBooleanToIntNote(operationInterval.getSunday()));
-            resource.setStartDate(operationInterval.getStartDate().toString(DateTimeUtils.datePattern));
-            resource.setEndDate(operationInterval.getEndDate().toString(DateTimeUtils.datePattern));
+            resource.setStartDate(operationInterval.getStartDate().toString(DateTimeUtils.DATE_PATTERN));
+            resource.setEndDate(operationInterval.getEndDate().toString(DateTimeUtils.DATE_PATTERN));
 
             resourceList.add(resource);
         }

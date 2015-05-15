@@ -26,7 +26,7 @@ public class LocalTimeConverter implements Converter {
             return null;
         }
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.timePattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.TIME_PATTERN);
         LocalTime l;
         try {
             l = formatter.parseLocalTime(s);
@@ -39,7 +39,7 @@ public class LocalTimeConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
-        return o == null ? null : ((LocalTime)o).toString(DateTimeUtils.timePattern);
+        return o == null ? null : ((LocalTime)o).toString(DateTimeUtils.TIME_PATTERN);
     }
 
 }

@@ -1,4 +1,4 @@
-package cz.cvut.nss.utils.evaluator;
+package cz.cvut.nss.utils.traversal;
 
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.entities.neo4j.relationship.RelTypes;

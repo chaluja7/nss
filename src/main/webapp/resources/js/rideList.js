@@ -5,7 +5,6 @@ $(document).ready(function() {
     var table = $("#dataTableList").DataTable( {
         "sAjaxSource": "../api/ridesDataTable/" + selectedLineId,
         "aoColumns": [
-            {"mData": "line"},
             {"mData": "departure"},
             {"mData": "arrival"},
             {"mData": "duration"},

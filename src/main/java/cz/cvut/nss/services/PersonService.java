@@ -17,32 +17,32 @@ public interface PersonService {
      * @param id id of a person
      * @return person by id or null
      */
-    public Person getPerson(long id);
+    Person getPerson(long id);
 
     /**
      * update person
      * @param person person to update
      * @return updated person
      */
-    public Person updatePerson(Person person);
+    Person updatePerson(Person person);
 
     /**
      * persists person
      * @param person person to persist
      */
-    public void createPerson(Person person);
+    void createPerson(Person person);
 
     /**
      * delete person
      * @param id id of person to delete
      */
-    public void deletePerson(long id);
+    void deletePerson(long id);
 
     /**
      * find all persons
      * @return all persons
      */
-    public List<Person> getAll();
+    List<Person> getAll();
 
 
     /**
@@ -50,6 +50,6 @@ public interface PersonService {
      * @param username username of person
      * @return person with given username
      */
-    public Person getPersonByUsername(String username);
+    Person getPersonByUsername(String username);
 
 }

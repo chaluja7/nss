@@ -12,14 +12,16 @@ import java.util.List;
  */
 public interface OperationIntervalService {
 
-    public OperationInterval getOperationInterval(long id);
+    OperationInterval getOperationInterval(long id);
 
-    public OperationInterval updateOperationInterval(OperationInterval operationInterval);
+    OperationInterval updateOperationInterval(OperationInterval operationInterval);
 
-    public void createOperationInterval(OperationInterval operationInterval);
+    void createOperationInterval(OperationInterval operationInterval);
 
-    public void deleteOperationInterval(long id);
+    void deleteOperationInterval(long id);
 
-    public List<OperationInterval> getAll();
+    List<OperationInterval> getAll();
+
+    void importOperationIntervalToNeo4j(OperationInterval operationInterval);
 
 }

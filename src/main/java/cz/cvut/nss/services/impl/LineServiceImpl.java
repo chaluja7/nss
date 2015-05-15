@@ -81,10 +81,4 @@ public class LineServiceImpl implements LineService {
         return lineDao.getCountAll();
     }
 
-    @Override
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public Line getByName(String name) {
-        return lineDao.findByName(name);
-    }
-
 }

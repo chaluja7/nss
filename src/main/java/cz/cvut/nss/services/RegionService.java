@@ -17,31 +17,31 @@ public interface RegionService {
      * @param id id of a region
      * @return region by id or null
      */
-    public Region getRegion(long id);
+    Region getRegion(long id);
 
     /**
      * update region
      * @param region region to update
      * @return updated region
      */
-    public Region updateRegion(Region region);
+    Region updateRegion(Region region);
 
     /**
      * persists region
      * @param region region to persist
      */
-    public void createRegion(Region region);
+    void createRegion(Region region);
 
     /**
      * delete region
      * @param id id of region to delete
      */
-    public void deleteRegion(long id);
+    void deleteRegion(long id);
 
     /**
      * find all regions
      * @return all regions
      */
-    public List<Region> getAll();
+    List<Region> getAll();
 
 }

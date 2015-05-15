@@ -7,7 +7,7 @@ import cz.cvut.nss.dao.neo4j.StopNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.entities.neo4j.relationship.RelTypes;
 import cz.cvut.nss.utils.DateTimeUtils;
-import cz.cvut.nss.utils.evaluator.*;
+import cz.cvut.nss.utils.traversal.*;
 import org.joda.time.LocalDateTime;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

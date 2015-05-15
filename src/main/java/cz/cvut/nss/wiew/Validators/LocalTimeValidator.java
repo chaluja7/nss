@@ -26,8 +26,8 @@ public class LocalTimeValidator implements Validator {
             return;
         }
 
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.timePattern);
-        DateTimeFormatter formatterWithMillis = DateTimeFormat.forPattern(DateTimeUtils.timeWithMillisPattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.TIME_PATTERN);
+        DateTimeFormatter formatterWithMillis = DateTimeFormat.forPattern(DateTimeUtils.TIME_WITH_MILLIS_PATTERN);
         try {
             formatter.parseLocalTime(o.toString());
         } catch (IllegalArgumentException e) {

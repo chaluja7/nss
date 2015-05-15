@@ -24,16 +24,13 @@ public class StationConverter implements Converter {
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
         Long id = Long.valueOf(s);
-        Station station = stationService.getStation(id);
-
-        return station;
+        return stationService.getStation(id);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
         Station station = (Station) o;
         Long id = station.getId();
-
         return String.valueOf(id);
     }
 

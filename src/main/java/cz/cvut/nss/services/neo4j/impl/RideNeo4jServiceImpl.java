@@ -31,11 +31,6 @@ public class RideNeo4jServiceImpl implements RideNeo4jService {
     }
 
     @Override
-    public RideNode findById(long id) {
-        return rideNeo4jRepository.findOne(id);
-    }
-
-    @Override
     public void deleteAll() {
         rideNeo4jRepository.deleteAll();
     }

@@ -1,4 +1,4 @@
-package cz.cvut.nss.utils.evaluator;
+package cz.cvut.nss.utils.traversal;
 
 import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.entities.neo4j.StopNode;
@@ -16,21 +16,21 @@ import java.util.*;
  * @author jakubchalupa
  * @since 19.04.15
  */
-public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
+public class ArrivalTypeExpander implements PathExpander<StationRideWrapper> {
 
-    private final LocalDateTime departureDateTime;
+    private final LocalDateTime arrivalDateTime;
 
-    private final LocalDateTime maxDepartureDateTime;
+    private final LocalDateTime minArrivalDateTime;
 
     private final int maxNumberOfTransfers;
 
-    private final int departureDayOfYear;
+    private final int arrivalDayOfYear;
 
-    private final int maxDepartureDayOfYear;
+    private final int minArrivalDayOfYear;
 
-    private final int departureMillisOfDay;
+    private final int arrivalMillisOfDay;
 
-    private final int maxDepartureMillisOfDay;
+    private final int minArrivalMillisOfDay;
 
     private final Map<Long, Long> visitedStops = new HashMap<>();
 
@@ -42,15 +42,15 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
     private final Map<Long, Long> firstNodeOnRideDepartureMap = new HashMap<>();
 
-    public DepartureTypeExpander(LocalDateTime departureDateTime, LocalDateTime maxDepartureDateTime, int maxNumberOfTransfers) {
-        this.departureDateTime = departureDateTime;
-        this.maxDepartureDateTime = maxDepartureDateTime;
+    public ArrivalTypeExpander(LocalDateTime arrivalDateTime, LocalDateTime minArrivalDateTime, int maxNumberOfTransfers) {
+        this.arrivalDateTime = arrivalDateTime;
+        this.minArrivalDateTime = minArrivalDateTime;
         this.maxNumberOfTransfers = maxNumberOfTransfers;
 
-        this.departureDayOfYear = departureDateTime.getDayOfYear();
-        this.maxDepartureDayOfYear = maxDepartureDateTime.getDayOfYear();
-        this.departureMillisOfDay = departureDateTime.getMillisOfDay();
-        this.maxDepartureMillisOfDay = maxDepartureDateTime.getMillisOfDay();
+        this.arrivalDayOfYear = arrivalDateTime.getDayOfYear();
+        this.minArrivalDayOfYear = minArrivalDateTime.getDayOfYear();
+        this.arrivalMillisOfDay = arrivalDateTime.getMillisOfDay();
+        this.minArrivalMillisOfDay = minArrivalDateTime.getMillisOfDay();
     }
 
     @Override
@@ -70,13 +70,13 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
         Node startNode = path.startNode();
         Node currentNode = path.endNode();
         long startNodeStationId = (long) startNode.getProperty(StopNode.STATION_PROPERTY);
-        long startNodeDeparture = (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
+        long startNodeArrival = (long) startNode.getProperty(StopNode.ARRIVAL_PROPERTY);
         long currentNodeStopId = (long) currentNode.getProperty(StopNode.STOP_PROPERTY);
         long currentRideId = (long) currentNode.getProperty(StopNode.RIDE_PROPERTY);
         long currentStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
         Relationship lastRelationShip = path.lastRelationship();
 
-        //rozhodujici je departureTime pokud existuje, jinak arrival time
+        //rozhodujici je arrivalTime pokud existuje, jinak departure time
         Long currentNodeArrival = null;
         Long currentNodeDeparture = null;
         if (currentNode.hasProperty(StopNode.DEPARTURE_PROPERTY)) {
@@ -90,16 +90,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
             throw new RuntimeException();
         }
 
-        Long currentNodeTimeProperty = currentNodeDeparture != null ? currentNodeDeparture : currentNodeArrival;
-        Long inverseCurrentNodeTimeProperty = currentNodeArrival != null ? currentNodeArrival : currentNodeDeparture;
-
-        long travelTime;
-        if(inverseCurrentNodeTimeProperty >= startNodeDeparture) {
-            travelTime = inverseCurrentNodeTimeProperty - startNodeDeparture;
-        } else {
-            travelTime = DateTimeUtils.MILLIS_IN_DAY - startNodeDeparture + inverseCurrentNodeTimeProperty;
-        }
-        long travelTimeWithPenalty = travelTime + (visitedRides.size() * DateTimeUtils.TRANSFER_PENALTY_MILLIS);
+        Long currentNodeTimeProperty = currentNodeArrival != null ? currentNodeArrival : currentNodeDeparture;
 
         //Jsem na prvnim NODu
         if(lastRelationShip == null) {
@@ -108,26 +99,26 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
             visitedStations.put(currentStationId, tmpVisitedRides);
             visitedRides.add(currentRideId);
-            visitedStops.put(currentNodeStopId, travelTimeWithPenalty);
+            visitedStops.put(currentNodeStopId, startNodeArrival);
 
-            //vratit chci z prvniho nodu jen node na NEXT_STOP relaci
-            return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
+            //vratit chci z prvniho nodu jen node po NEXT_STOP relaci (samozrejme obraceny smer)
+            return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_STOP);
         }
 
         if(currentStationId == startNodeStationId) {
             return Iterables.empty();
         }
 
-        //musim zkonrolovat, zda aktualni node nema time jiz po case maxDepartureTime
-        if (departureDayOfYear == maxDepartureDayOfYear) {
+        //musim zkonrolovat, zda aktualni node nema time jiz pred casem minArrivalTime
+        if (arrivalDayOfYear == minArrivalDayOfYear) {
             //pohybuji se v ramci jednoho dne
-            if (currentNodeTimeProperty < departureMillisOfDay || currentNodeTimeProperty >= maxDepartureMillisOfDay) {
+            if (currentNodeTimeProperty > arrivalMillisOfDay || currentNodeTimeProperty <= minArrivalMillisOfDay) {
                 //presahl jsem casovy rozsah vyhledavani
                 return Iterables.empty();
             }
-        } else if (departureDayOfYear == maxDepartureDayOfYear - 1) {
-            //prehoupl jsem se pres pulnoc
-            if (currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty > maxDepartureMillisOfDay) {
+        } else if (arrivalDayOfYear == minArrivalDayOfYear + 1) {
+            //prehoupl jsem se zpet pres pulnoc
+            if (currentNodeTimeProperty > arrivalMillisOfDay && currentNodeTimeProperty < minArrivalMillisOfDay) {
                 //presahl jsem casovy rozsah vyhledavani
                 return Iterables.empty();
             }
@@ -189,50 +180,50 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
             if (firstNodeOnRideDeparture <= currentNodeTimeProperty) {
                 //neprehoupl jsem se s ridou pres pulnoc (rida vyjela pred pulnoci a momentalne jsem porad pred pulnoci)
-                if (currentNodeTimeProperty >= departureMillisOfDay) {
-                    //neprehoupl jsem se pres pulnoc (pohybuji se v ramci dne, ve kterem jsem hledal odjezd)
-                    //zjistuji datum pro departureDateTime
-                    if (operationIntervalNodeFromDateInMillis > departureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime() ||
-                            !operationDayForRideMap.get(departureDateTime.getDayOfWeek())) {
+                if (currentNodeTimeProperty <= arrivalMillisOfDay) {
+                    //neprehoupl jsem se pres pulnoc (pohybuji se v ramci dne, ve kterem jsem hledal prijezd)
+                    //zjistuji datum pro arrivalDateTime
+                    if (operationIntervalNodeFromDateInMillis > arrivalDateTime.toDate().getTime() ||
+                            operationIntervalNodeToDateInMillis < arrivalDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(arrivalDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
-                        return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
+                        return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_AWAITING_STOP);
                     }
                 } else {
-                    //zjistuji datum pro maxDepartureDateTime (pohybuji se v ramci dne nasledujiciho po dni, od kdy hledam odjezd)
-                    if (operationIntervalNodeFromDateInMillis > maxDepartureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < maxDepartureDateTime.toDate().getTime() ||
-                            !operationDayForRideMap.get(maxDepartureDateTime.getDayOfWeek())) {
+                    //zjistuji datum pro minArrivalDateTime (pohybuji se v ramci dne predchoziho pred dnem, do kdy hledam prijezd)
+                    if (operationIntervalNodeFromDateInMillis > minArrivalDateTime.toDate().getTime() ||
+                            operationIntervalNodeToDateInMillis < minArrivalDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(minArrivalDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
-                        return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
+                        return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_AWAITING_STOP);
                     }
                 }
             } else {
                 //prehoupl jsem se s ridou pres pulnoc (rida vyjizdela pred pulnoci, ted uz je po pulnoci)
-                if (currentNodeTimeProperty >= departureMillisOfDay) {
-                    //neprehoupl jsem se pres pulnoc (pohybuji se v ramci dne, ve kterem jsem hledal odjezd)
-                    //zjistuji datum pro departureDateTime - 1 den protoze rida vyjela vcera
-                    if (operationIntervalNodeFromDateInMillis > (departureDateTime.toDate().getTime() - DateTimeUtils.MILLIS_IN_DAY) ||
-                            operationIntervalNodeToDateInMillis < (departureDateTime.toDate().getTime() - DateTimeUtils.MILLIS_IN_DAY) ||
-                            !operationDayForRideMap.get(new LocalDateTime(departureDateTime).minusDays(1).getDayOfWeek())) {
+                if (currentNodeTimeProperty <= arrivalMillisOfDay) {
+                    //neprehoupl jsem se pres pulnoc (pohybuji se v ramci dne, do ktereho jsem hledal prijezd)
+                    //zjistuji datum pro arrivalDateTime - 1 den protoze rida vyjela vcera
+                    if (operationIntervalNodeFromDateInMillis > (arrivalDateTime.toDate().getTime() - DateTimeUtils.MILLIS_IN_DAY) ||
+                            operationIntervalNodeToDateInMillis < (arrivalDateTime.toDate().getTime() - DateTimeUtils.MILLIS_IN_DAY) ||
+                            !operationDayForRideMap.get(new LocalDateTime(arrivalDateTime).minusDays(1).getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
-                        return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
+                        return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_AWAITING_STOP);
                     }
                 } else {
                     //prehoupl jsem se pres pulnoc
-                    //zjistuji datum pro departureDateTime
-                    if (operationIntervalNodeFromDateInMillis > departureDateTime.toDate().getTime() ||
-                            operationIntervalNodeToDateInMillis < departureDateTime.toDate().getTime() ||
-                            !operationDayForRideMap.get(departureDateTime.getDayOfWeek())) {
+                    //zjistuji datum pro minArrivalDateTime
+                    if (operationIntervalNodeFromDateInMillis > minArrivalDateTime.toDate().getTime() ||
+                            operationIntervalNodeToDateInMillis < minArrivalDateTime.toDate().getTime() ||
+                            !operationDayForRideMap.get(minArrivalDateTime.getDayOfWeek())) {
                         //tato rida neni v platnosti, nesmim tedy pokracovat relaci next_stop
-                        return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_AWAITING_STOP);
+                        return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_AWAITING_STOP);
                     }
                 }
 
             }
         } else {
-            //posledni hrana byla next_stop, mimo jine to znamena, ze currentNodeArrival nemuze byt null
-            assert(currentNodeArrival != null);
+            //posledni hrana byla next_stop, mimo jine to znamena, ze currentNodeDeparture nemuze byt null
+            assert(currentNodeDeparture != null);
 
             //v ramci teto path jsem na teto stanici jiz byl (tedy se vracim, coz je nezadouci)
             //ovsem v ramci jedne ridy muzu na jednu stanici vicenasobne
@@ -251,19 +242,8 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
             //max pocet prestupu
             if(visitedRides.size() > maxNumberOfTransfers) {
-                return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
+                return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_STOP);
             }
-
-            //pareto-optimalita
-            if(visitedStops.containsKey(currentNodeStopId)) {
-                //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
-                if(visitedStops.get(currentNodeStopId) < travelTimeWithPenalty) {
-                    return Iterables.empty();
-                }
-            }
-
-            //pokud to prislo sem, tak mam aktualne nejlepsi mozny
-            visitedStops.put(currentNodeStopId, travelTimeWithPenalty);
 
             int i = 0;
             RelTypes prevRelationShipType = null;
@@ -272,15 +252,35 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
                 //sel jsem (N)-[NEXT_AWAITING_STOP]-(m)-[NEXT_STOP]-(o)
                 if(prevRelationShipType != null && relationshipIsTypeNextAwaitingStop && prevRelationShipType.equals(RelTypes.NEXT_STOP)) {
-                    //+1 jde k visitedRides protoze ted jsem zcela urcite prestoupil na novou ridu
                     //na tomto stopu jsem jiz drive byl
+                    if(visitedStops.containsKey(currentNodeStopId)) {
+                        //a byl jsem na nem v pro me s priznivejsim casem prijezdu
+                        Long prevBestTimeOnStop = visitedStops.get(currentNodeStopId);
+
+                        if(prevBestTimeOnStop <= arrivalMillisOfDay) {
+                            //predchozi nejlepsi cas byl ve stejny den jako arrival
+                            if(startNodeArrival > prevBestTimeOnStop && startNodeArrival <= arrivalMillisOfDay) {
+                                //momentalne jsem taky ve stejny den jako arrival ale s pozdejsim prijezdem, to nechci :)
+                                return Iterables.empty();
+                            }
+                        } else {
+                            //prechozi nejlepsi cas byl pred pulnoci
+                            if((startNodeArrival > prevBestTimeOnStop && startNodeArrival > arrivalMillisOfDay) || startNodeArrival <= arrivalMillisOfDay) {
+                                //momentalne jsem taky pred pulnoci ale s pozdejsim prijezdem, nebo jsem dokonce po pulnoci, to nechci :)
+                                return Iterables.empty();
+                            }
+                        }
+                    }
+                    //pokud to prislo sem, tak mam aktualne nejlepsi mozny cas vyjezdu k tomuto stopu
+                    visitedStops.put(currentNodeStopId, startNodeArrival);
+
                     //kontrola unikatnosti ridy v ramci path
                     if (visitedRides.contains(currentRideId)) {
                         return Iterables.empty();
                     } else {
                         visitedRides.add(currentRideId);
                         if(visitedRides.size() > maxNumberOfTransfers) {
-                            return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
+                            return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_STOP);
                         }
                     }
 
@@ -299,7 +299,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
             }
         }
 
-        return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP, RelTypes.NEXT_AWAITING_STOP);
+        return currentNode.getRelationships(Direction.INCOMING, RelTypes.NEXT_STOP, RelTypes.NEXT_AWAITING_STOP);
     }
 
     @Override

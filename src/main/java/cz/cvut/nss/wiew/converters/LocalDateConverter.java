@@ -21,13 +21,13 @@ public class LocalDateConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String s) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.datePattern);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern(DateTimeUtils.DATE_PATTERN);
         return formatter.parseLocalDate(s);
     }
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object o) {
-        return o == null ? null : ((LocalDate)o).toString(DateTimeUtils.datePattern);
+        return o == null ? null : ((LocalDate)o).toString(DateTimeUtils.DATE_PATTERN);
     }
 
 }

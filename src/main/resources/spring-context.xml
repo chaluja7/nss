@@ -2,15 +2,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
-       xmlns:batch="http://www.springframework.org/schema/batch"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
         http://www.springframework.org/schema/data/neo4j
-        http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd
-        http://www.springframework.org/schema/batch
-        http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
+        http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
 
     <context:spring-configured />
 
@@ -77,7 +74,7 @@
 
      <!-- NEO4J -->
     <bean id="graphDatabaseService" class="org.springframework.data.neo4j.support.GraphDatabaseServiceFactoryBean"
-          destroy-method="shutdown" scope="singleton">
+          destroy-method="shutdown">
         <property name="path" value="${neo4j.path}" />
     </bean>
 
@@ -103,42 +100,5 @@
     <bean class="org.springframework.data.neo4j.support.Neo4jTemplate" id="neo4jTemplate">
         <constructor-arg ref="graphDatabaseService" />
     </bean>
-
-
-
-    <bean class="cz.cvut.nss.services.batch.GoogleStationProcessor" id="googleStationProcessor" />
-    <bean class="cz.cvut.nss.services.batch.GoogleStationReader" id="googleStationReader" />
-    <bean class="cz.cvut.nss.services.batch.GoogleStationWriter" id="googleStationWriter" />
-
-    <bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-        <property name="transactionManager" ref="jpaTransactionManager"/>
-    </bean>
-
-    <bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
-        <property name="jobRepository" ref="jobRepository" />
-    </bean>
-
-    <bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher" id="jobLauncher">
-        <property name="jobRepository" ref="jobRepository" />
-        <property name="taskExecutor">
-            <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-        </property>
-    </bean>
-
-    <batch:job id="simpleJob1">
-        <batch:step id="step1">
-            <batch:tasklet transaction-manager="jpaTransactionManager">
-                <batch:chunk reader="googleStationReader" processor="googleStationProcessor" writer="googleStationWriter" commit-interval="1"/>
-            </batch:tasklet>
-        </batch:step>
-    </batch:job>
-
-    <batch:job id="simpleJob2">
-        <batch:step id="step">
-            <batch:tasklet transaction-manager="jpaTransactionManager">
-                <batch:chunk reader="googleStationReader" processor="googleStationProcessor" writer="googleStationWriter" commit-interval="1"/>
-            </batch:tasklet>
-        </batch:step>
-    </batch:job>
 
 </beans>

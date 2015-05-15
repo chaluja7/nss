@@ -49,7 +49,7 @@ public class AuthenticationProvider extends AbstractUserDetailsAuthenticationPro
             @Override
             public UserDetails doInTransaction(TransactionStatus status) {
                 try {
-                    UserDetails userDetails = null;
+                    UserDetails userDetails;
                     String password = (String) upat.getCredentials();
                     Person person = personService.getPersonByUsername(username);
                     if(person == null || person.getPassword() == null || !person.getPassword().equals(AuthUtils.getPasswordHash(password))) {

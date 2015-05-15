@@ -32,14 +32,6 @@
             <h4><h:outputText value="#{searchResultBB.timeType == 'departure' ? 'Výjezd: ' : 'Příjezd: '}"/><h:outputText value="#{searchResultBB.departureOrArrivalDate} #{searchResultBB.departureOrArrivalTime}"/></h4>
             <h:link value="Nové zadání" outcome="/index.xhtml" />
 
-            <h:panelGroup layout="block">
-                <h:form>
-                    <h:commandButton value="Zobrazit předchozí spoje &#9650;" action="#{searchResultBB.findPrevRides}" styleClass="nextOrPrevRidesButton" />
-                </h:form>
-            </h:panelGroup>
-
-            <h:panelGroup layout="block" styleClass="clearer" />
-
             <h:panelGroup layout="block" styleClass="errorBox" rendered="#{fn:length(searchResultBB.foundResults) == 0}">
                 Pro zadané hledání bohužel nebyly nalezeny žádné spoje.
             </h:panelGroup>
@@ -75,12 +67,6 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </ui:repeat>
-
-            <h:panelGroup layout="block">
-                <h:form>
-                    <h:commandButton value="Zobrazit následující spoje &#9660;" action="#{searchResultBB.findNextRides}" styleClass="nextOrPrevRidesButton" />
-                </h:form>
-            </h:panelGroup>
 
         </h:panelGroup>
 

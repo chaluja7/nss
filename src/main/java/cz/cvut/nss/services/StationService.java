@@ -19,62 +19,62 @@ public interface StationService {
      * @param id id of a station
      * @return station by id or null
      */
-    public Station getStation(long id);
+    Station getStation(long id);
 
     /**
      * update station
      * @param station station to update
      * @return updated station
      */
-    public Station updateStation(Station station);
+    Station updateStation(Station station);
 
     /**
      * persists station
      * @param station station to persist
      */
-    public void createStation(Station station);
+    void createStation(Station station);
 
     /**
      * delete station
      * @param id id of station to delete
      */
-    public void deleteStation(long id);
+    void deleteStation(long id);
 
     /**
      * find all stations
      * @return all stations
      */
-    public List<Station> getAll();
+    List<Station> getAll();
 
     /**
      * find all stations with pattern in name
      * @param pattern pattern of station name
      * @return all stations with pattern
      */
-    public List<Station> getAllByNamePattern(String pattern);
+    List<Station> getAllByNamePattern(String pattern);
 
     /**
      * find station by its title
      * @param title title of station
      * @return station with given title or null
      */
-    public Station getStationByTitle(String title);
+    Station getStationByTitle(String title);
 
-    public Station getStationByName(String name);
+    Station getStationByName(String name);
 
     /**
      * find all filtered stations for datatables and count
      * @param filter filter
      * @return list stations and count
      */
-    public EntitiesAndCountResult<Station> getAllForDatatables(CommonRequest filter);
+    EntitiesAndCountResult<Station> getAllForDatatables(CommonRequest filter);
 
     /**
      * get count of all stations
      * @return count of all stations
      */
-    public int getCountAll();
+    int getCountAll();
 
-    public List<Station> getAllWithOrder(String orderColumn);
+    List<Station> getAllWithOrder(String orderColumn);
 
 }

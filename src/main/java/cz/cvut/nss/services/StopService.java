@@ -17,31 +17,31 @@ public interface StopService {
      * @param id stop
      * @return stop by id or null
      */
-    public Stop getStop(long id);
+    Stop getStop(long id);
 
     /**
      * update stop
      * @param stop stop to update
      * @return updated stop
      */
-    public Stop updateStop(Stop stop);
+    Stop updateStop(Stop stop);
 
     /**
      * persists stop
      * @param stop stop to persist
      */
-    public void createStop(Stop stop);
+    void createStop(Stop stop);
 
     /**
      * delete stop
      * @param id id of stop to delete
      */
-    public void deleteStop(long id);
+    void deleteStop(long id);
 
     /**
      * find all stops
      * @return all stops
      */
-    public List<Stop> getAll();
+    List<Stop> getAll();
 
 }

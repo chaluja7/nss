@@ -17,46 +17,46 @@ public interface RideService {
      * @param id id of a ride
      * @return ride by id or null
      */
-    public Ride getRide(long id);
+    Ride getRide(long id);
 
     /**
      * find ride by id with pre-loaded lazy initialization
      * @param id id of a ride
      * @return ride by id or null
      */
-    public Ride getRideLazyInitialized(long id);
+    Ride getRideLazyInitialized(long id);
 
     /**
      * update ride
      * @param ride ride to update
      * @return updated ride
      */
-    public Ride updateRide(Ride ride);
+    Ride updateRide(Ride ride);
 
     /**
      * persists ride
      * @param ride ride to persist
      */
-    public void createRide(Ride ride);
+    void createRide(Ride ride);
 
     /**
      * delete ride
      * @param id id of ride to delete
      */
-    public void deleteRide(long id);
+    void deleteRide(long id);
 
     /**
      * find all rides
      * @return all rides
      */
-    public List<Ride> getAll();
+    List<Ride> getAll();
 
     /**
      * import the whole ride into neo4j graph db
      * @param id ride id
      */
-    public void importRideToNeo4j(Ride id);
+    void importRideToNeo4j(Ride id);
 
-    public List<Ride> getByLineId(long lineId);
+    List<Ride> getByLineId(long lineId);
 
 }

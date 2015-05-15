@@ -14,8 +14,6 @@ public interface RideNeo4jService {
 
     Iterable<RideNode> findAll();
 
-    RideNode findById(long id);
-
     void deleteAll();
 
 }

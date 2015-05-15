@@ -81,7 +81,7 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Ride> getAll() {
-        return rideDao.getAllForImport();
+        return rideDao.findAll();
     }
 
     @Override
