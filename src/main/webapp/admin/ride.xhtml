@@ -4,7 +4,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:nss="http://cz.cvut.eos/facelets"
-                xmlns:rich="http://richfaces.org/rich"
                 template="/WEB-INF/templates/adminDefault.xhtml">
 
     <f:metadata>
@@ -32,21 +31,21 @@
                 <h:dataTable value="#{rideBB.ride.stops}" var="stop">
                     <h:column>
                         <f:facet name="header">Stanice</f:facet>
-                        <h:outputText value="#{stop.station.title}" />
+                        <h:outputText value="#{stop.station.name}" />
                     </h:column>
                     <h:column>
                         <f:facet name="header">Příjezd</f:facet>
-                        <rich:calendar id="arrival" value="#{stop.arrival}" datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
-                                enableManualInput="true">
-                            <f:converter binding="#{localDateTimeConverter}" />
-                        </rich:calendar>
+                        <h:inputText value="#{stop.arrival}">
+                            <f:validator binding="#{localTimeValidator}" />
+                            <f:converter binding="#{localTimeConverter}" />
+                        </h:inputText>
                     </h:column>
                     <h:column>
                         <f:facet name="header">Výjezd</f:facet>
-                        <rich:calendar id="departure" value="#{stop.departure}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
-                                enableManualInput="true">
-                            <f:converter binding="#{localDateTimeConverter}" />
-                        </rich:calendar>
+                        <h:inputText value="#{stop.departure}">
+                            <f:validator binding="#{localTimeValidator}" />
+                            <f:converter binding="#{localTimeConverter}" />
+                        </h:inputText>
                     </h:column>
                     <h:column>
                         <f:facet name="header">Akce</f:facet>
@@ -62,18 +61,18 @@
 
             <h:panelGroup layout="block" styleClass="inputRow">
                 <label for="newArrival">Příjezd:</label>
-                <rich:calendar id="newArrival" value="#{rideBB.newStopArrival}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
-                       enableManualInput="true">
-                    <f:converter binding="#{localDateTimeConverter}" />
-                </rich:calendar>
+                <h:inputText id="newArrival" value="#{rideBB.newStopArrival}">
+                    <f:validator binding="#{localTimeValidator}" />
+                    <f:converter binding="#{localTimeConverter}" />
+                </h:inputText>
             </h:panelGroup>
 
             <h:panelGroup layout="block" styleClass="inputRow">
                 <label for="newDeparture">Výjezd:</label>
-                <rich:calendar id="newDeparture" value="#{rideBB.newStopDeparture}"  datePattern="dd.MM.yyyy HH:mm" locale="#{rideBB.locale}"
-                        enableManualInput="true">
-                    <f:converter binding="#{localDateTimeConverter}" />
-                </rich:calendar>
+                <h:inputText id="newDeparture" value="#{rideBB.newStopDeparture}">
+                    <f:validator binding="#{localTimeValidator}" />
+                    <f:converter binding="#{localTimeConverter}" />
+                </h:inputText>
             </h:panelGroup>
 
             <h:commandButton value="Přidat zastavení" action="#{rideBB.addStop}" styleClass="submitButton"/>

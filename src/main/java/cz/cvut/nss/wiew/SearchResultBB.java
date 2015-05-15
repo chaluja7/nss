@@ -84,9 +84,9 @@ public class SearchResultBB {
 
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
-                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 3, maxNumberOfTransfers, -1);
+                    path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 } else {
-                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 3, maxNumberOfTransfers, -1);
+                    path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival, 6, maxNumberOfTransfers, -1);
                 }
             } else {
                 if(isWithNeo4j()) {

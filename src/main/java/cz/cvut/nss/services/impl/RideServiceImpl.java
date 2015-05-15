@@ -81,7 +81,7 @@ public class RideServiceImpl implements RideService {
     @Override
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public List<Ride> getAll() {
-        return rideDao.findAll();
+        return rideDao.getAllForImport();
     }
 
     @Override
@@ -109,14 +109,10 @@ public class RideServiceImpl implements RideService {
                 stopNode.setRideId(stop.getRide().getId());
                 stopNode.setRideNode(rideNode);
                 if (stop.getArrival() != null) {
-                    //TODO?
                     stopNode.setArrivalInMillis((long) stop.getArrival().getMillisOfDay());
-                   //stopNode.setArrivalInMillis(stop.getArrival().toDateTime().getMillis());
                 }
                 if (stop.getDeparture() != null) {
-                    //TODO?
                     stopNode.setDepartureInMillis((long) stop.getDeparture().getMillisOfDay());
-                    //stopNode.setDepartureInMillis(stop.getDeparture().toDateTime().getMillis());
                 }
 
                 if (prevStopNode != null) {

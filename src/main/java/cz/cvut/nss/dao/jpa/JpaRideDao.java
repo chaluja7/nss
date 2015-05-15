@@ -29,4 +29,11 @@ public class JpaRideDao extends AbstractGenericJpaDao<Ride> implements RideDao {
 
         return query.getResultList();
     }
+
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<Ride> getAllForImport() {
+        TypedQuery<Ride> query = em.createQuery("select r from Ride r", Ride.class);
+        return query.getResultList();
+    }
 }

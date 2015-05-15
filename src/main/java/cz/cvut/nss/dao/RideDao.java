@@ -15,4 +15,6 @@ public interface RideDao extends GenericDao<Ride> {
 
     List<Ride> getByLineId(long lineId);
 
+    public List<Ride> getAllForImport();
+
 }

@@ -91,6 +91,15 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
         }
 
         Long currentNodeTimeProperty = currentNodeDeparture != null ? currentNodeDeparture : currentNodeArrival;
+        Long inverseCurrentNodeTimeProperty = currentNodeArrival != null ? currentNodeArrival : currentNodeDeparture;
+
+        long travelTime;
+        if(inverseCurrentNodeTimeProperty >= startNodeDeparture) {
+            travelTime = inverseCurrentNodeTimeProperty - startNodeDeparture;
+        } else {
+            travelTime = DateTimeUtils.MILLIS_IN_DAY - startNodeDeparture + inverseCurrentNodeTimeProperty;
+        }
+        long travelTimeWithPenalty = travelTime + (visitedRides.size() * DateTimeUtils.TRANSFER_PENALTY_MILLIS);
 
         //Jsem na prvnim NODu
         if(lastRelationShip == null) {
@@ -99,7 +108,7 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
             visitedStations.put(currentStationId, tmpVisitedRides);
             visitedRides.add(currentRideId);
-            visitedStops.put(currentNodeStopId, startNodeDeparture);
+            visitedStops.put(currentNodeStopId, travelTimeWithPenalty);
 
             //vratit chci z prvniho nodu jen node na NEXT_STOP relaci
             return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
@@ -245,6 +254,17 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                 return currentNode.getRelationships(Direction.OUTGOING, RelTypes.NEXT_STOP);
             }
 
+            //pareto-optimalita
+            if(visitedStops.containsKey(currentNodeStopId)) {
+                //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
+                if(visitedStops.get(currentNodeStopId) < travelTimeWithPenalty) {
+                    return Iterables.empty();
+                }
+            }
+
+            //pokud to prislo sem, tak mam aktualne nejlepsi mozny
+            visitedStops.put(currentNodeStopId, travelTimeWithPenalty);
+
             int i = 0;
             RelTypes prevRelationShipType = null;
             for(Relationship relationship : path.reverseRelationships()) {
@@ -254,27 +274,6 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
                 if(prevRelationShipType != null && relationshipIsTypeNextAwaitingStop && prevRelationShipType.equals(RelTypes.NEXT_STOP)) {
                     //+1 jde k visitedRides protoze ted jsem zcela urcite prestoupil na novou ridu
                     //na tomto stopu jsem jiz drive byl
-                    if(visitedStops.containsKey(currentNodeStopId)) {
-                        //a byl jsem na nem v pro me s priznivejsim casem vyjezdu
-                        Long prevBestTimeOnStop = visitedStops.get(currentNodeStopId);
-                        if(prevBestTimeOnStop >= departureMillisOfDay) {
-                            //predchozi nejlepsi cas byl pred pulnoci
-                            if(startNodeDeparture < prevBestTimeOnStop && startNodeDeparture >= departureMillisOfDay) {
-                                //momentalne jsem taky pred pulnoci ale s drivejsim vyjezdem, to nechci :)
-                                return Iterables.empty();
-                            }
-                        } else {
-                            //prechozi nejlepsi cas byl po pulnoci
-                            if((startNodeDeparture < prevBestTimeOnStop && startNodeDeparture < departureMillisOfDay) || startNodeDeparture >= departureMillisOfDay) {
-                                //momentalne jsem taky po pulnoci ale s drivejsim vyjezdem, nebo jsem dokonce pred pulnoci, to nechci :)
-                                return Iterables.empty();
-                            }
-                        }
-                    }
-
-                    //pokud to prislo sem, tak mam aktualne nejlepsi mozny cas vyjezdu k tomuto stopu
-                    visitedStops.put(currentNodeStopId, startNodeDeparture);
-
                     //kontrola unikatnosti ridy v ramci path
                     if (visitedRides.contains(currentRideId)) {
                         return Iterables.empty();

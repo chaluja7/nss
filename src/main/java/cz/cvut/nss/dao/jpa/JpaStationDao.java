@@ -202,4 +202,12 @@ public class JpaStationDao extends AbstractGenericJpaDao<Station> implements Sta
         return query.getResultList();
     }
 
+    @Override
+    @SuppressWarnings("JpaQlInspection")
+    public List<Station> findAll() {
+        TypedQuery<Station> query = em.createQuery("select s from Station s", Station.class);
+
+        return query.getResultList();
+    }
+
 }

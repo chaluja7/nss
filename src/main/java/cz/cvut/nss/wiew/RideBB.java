@@ -8,7 +8,7 @@ import cz.cvut.nss.services.LineService;
 import cz.cvut.nss.services.RideService;
 import cz.cvut.nss.services.StationService;
 import cz.cvut.nss.services.StopService;
-import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -43,9 +43,9 @@ public class RideBB {
 
     private Station newRideStop;
 
-    private LocalDateTime newStopDeparture;
+    private LocalTime newStopDeparture;
 
-    private LocalDateTime newStopArrival;
+    private LocalTime newStopArrival;
 
     private Long selectedLine;
 
@@ -79,11 +79,8 @@ public class RideBB {
         Stop stop = new Stop();
         stop.setStation(newRideStop);
         stop.setRide(ride);
-        //todo
-        stop.setDeparture(null);
-        stop.setArrival(null);
-//        stop.setDeparture(newStopDeparture);
-//        stop.setArrival(newStopArrival);
+        stop.setDeparture(newStopDeparture);
+        stop.setArrival(newStopArrival);
 
         stopService.createStop(stop);
         return "ride?id=" + id + "&faces-redirect=true";
@@ -107,7 +104,7 @@ public class RideBB {
         Map<String, Object> map = new HashMap<>();
         for(Station station : stationService.getAll()) {
             if(!usedStations().contains(station)) {
-                map.put(station.getTitle(), station);
+                map.put(station.getName(), station);
             }
         }
 
@@ -156,19 +153,19 @@ public class RideBB {
         this.newRideStop = newRideStop;
     }
 
-    public LocalDateTime getNewStopDeparture() {
+    public LocalTime getNewStopDeparture() {
         return newStopDeparture;
     }
 
-    public void setNewStopDeparture(LocalDateTime newStopDeparture) {
+    public void setNewStopDeparture(LocalTime newStopDeparture) {
         this.newStopDeparture = newStopDeparture;
     }
 
-    public LocalDateTime getNewStopArrival() {
+    public LocalTime getNewStopArrival() {
         return newStopArrival;
     }
 
-    public void setNewStopArrival(LocalDateTime newStopArrival) {
+    public void setNewStopArrival(LocalTime newStopArrival) {
         this.newStopArrival = newStopArrival;
     }
 

@@ -154,6 +154,7 @@ public class StationNeo4jServiceTest {
     public void importRidesToNeo4j() {
         for(Ride ride : rideService.getAll()) {
             rideService.importRideToNeo4j(ride);
+            ride = null;
         }
     }
 
@@ -161,6 +162,7 @@ public class StationNeo4jServiceTest {
     public void connectStopsOnStationInNeo4j() {
         for(Station station : stationService.getAll()) {
             stopNeo4jService.connectStopNodesOnStationWithWaitingStopRelationship(station.getId());
+            station = null;
         }
     }
 
@@ -673,6 +675,14 @@ public class StationNeo4jServiceTest {
             rideService.createRide(ride);
         }
     }
+
+    @Test
+    public void test() {
+
+        int j = 0;
+    }
+
+
 
 }
 

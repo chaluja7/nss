@@ -31,6 +31,8 @@ public final class DepartureTypeEvaluator implements Evaluator {
 
     Map<Long, Set<Long>> foundedPathsDetails = new HashMap<>();
 
+    Long prevFoundedDeparture = null;
+
     public DepartureTypeEvaluator(Long endStationId, LocalDateTime departureDateTime, int maxNumberOfResults) {
         this.endStationId = endStationId;
         this.departureMillisOfDay = departureDateTime.getMillisOfDay();
@@ -41,6 +43,7 @@ public final class DepartureTypeEvaluator implements Evaluator {
     public Evaluation evaluate(Path path) {
         Node startNode = path.startNode();
         long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
+        long startNodeDeparture = (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
 
         Node currentNode = path.endNode();
         long currentNodeStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
@@ -85,31 +88,37 @@ public final class DepartureTypeEvaluator implements Evaluator {
             }
         }
 
+        if(prevFoundedDeparture != null && startNodeDeparture < prevFoundedDeparture) {
+            return Evaluation.EXCLUDE_AND_PRUNE;
+        }
+
         int i = 0;
         if(foundedPathsDetails.size() >= maxNumberOfResults) {
             //Zde nechci pracovat z penalizovanym casem protoze bych musel pokazde iterovat skrz vsechny relace ke zjisteni poctu prestupu az sem
             //to by bylo pomalejsi, nez kdyz uvolim iteraci pres vice vysledku nez maxNumberOfResults, ktera bude v idealce max 15 min do budoucnosti nez by musela
-            for(Long key : foundedPathsDetails.keySet()) {
-                Long actualArrival = foundedPaths.get(key);
-                if(actualArrival >= departureMillisOfDay) {
-                    //tento prijezd byl pred pulnoci
-                    if((currentNodeTimeProperty >= departureMillisOfDay && actualArrival < currentNodeTimeProperty) || currentNodeTimeProperty < departureMillisOfDay) {
-                        //aktualne jsem taky pred pulnoci ale pozdeji nebo jsem az po pulnoci
-                        i++;
-                    }
-                } else {
-                    //tento prijezd byl po pulnoci
-                    if(currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty > actualArrival) {
-                        //momentalne jsem taky po pulnoci a s horsim casem
-                        i++;
-                    }
-                }
+//            for(Long key : foundedPathsDetails.keySet()) {
+//                Long actualArrival = foundedPaths.get(key);
+//                if(actualArrival >= departureMillisOfDay) {
+//                    //tento prijezd byl pred pulnoci
+//                    if((currentNodeTimeProperty >= departureMillisOfDay && actualArrival <= currentNodeTimeProperty) || currentNodeTimeProperty < departureMillisOfDay) {
+//                        //aktualne jsem taky pred pulnoci ale pozdeji nebo jsem az po pulnoci
+//                        i++;
+//                    }
+//                } else {
+//                    //tento prijezd byl po pulnoci
+//                    if(currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty >= actualArrival) {
+//                        //momentalne jsem taky po pulnoci a s horsim casem
+//                        i++;
+//                    }
+//                }
+//
+//                if(i >= maxNumberOfResults) {
+//                    //Jiz jsem nasel maxNumberOfResults vice lepsich vysledku
+//                    return Evaluation.EXCLUDE_AND_PRUNE;
+//                }
+//            }
 
-                if(i >= maxNumberOfResults) {
-                    //Jiz jsem nasel maxNumberOfResults vice lepsich vysledku
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
-            }
+            return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
         //nasel jsem
@@ -163,6 +172,7 @@ public final class DepartureTypeEvaluator implements Evaluator {
                 foundedPathsDetails.put(startNodeStopId, tmpRides);
             }
 
+            prevFoundedDeparture = startNodeDeparture;
             foundedPaths.put(startNodeStopId, currentNodeMillisTimeWithPenalty);
             foundedPathsNumOfTransfers.put(startNodeStopId, tmpRides.size() - 1);
             return Evaluation.INCLUDE_AND_PRUNE;

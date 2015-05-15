@@ -22,6 +22,8 @@ public class SearchResultWrapper {
 
     private List<Long> stops;
 
+    private List<VisitedStopsWrapper> stopDetails;
+
     public long getTravelTime() {
         return travelTime;
     }
@@ -68,5 +70,13 @@ public class SearchResultWrapper {
 
     public void setStops(List<Long> stops) {
         this.stops = stops;
+    }
+
+    public List<VisitedStopsWrapper> getStopDetails() {
+        return stopDetails;
+    }
+
+    public void setStopDetails(List<VisitedStopsWrapper> stopDetails) {
+        this.stopDetails = stopDetails;
     }
 }

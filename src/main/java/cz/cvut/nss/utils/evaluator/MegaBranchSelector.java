@@ -14,15 +14,15 @@ import org.neo4j.graphdb.traversal.TraversalContext;
  * @author jakubchalupa
  * @since 23.04.15
  */
-public class CustomBranchSelector implements BranchSelector {
+public class MegaBranchSelector implements BranchSelector {
 
-    private final SuperPriorityQueue queue = new SuperPriorityQueue();
+    private final MegaPriorityQueue queue = new MegaPriorityQueue();
 
     private TraversalBranch current;
 
     private final PathExpander expander;
 
-    public CustomBranchSelector(TraversalBranch startSource, PathExpander expander) {
+    public MegaBranchSelector(TraversalBranch startSource, PathExpander expander) {
         this.current = startSource;
         this.expander = expander;
     }

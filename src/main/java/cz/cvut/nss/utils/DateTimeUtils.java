@@ -14,6 +14,8 @@ public class DateTimeUtils {
 
     public static final String timePattern = "HH:mm";
 
+    public static final String timeWithMillisPattern = "HH:mm:ss.SSS";
+
     public static final String noDelimiterEnDatePattern = "yyyyMMdd";
 
     public static final String timeWithSecondsPattern = "HH:mm:ss";

@@ -46,7 +46,7 @@ public class Neo4jSearchDao implements SearchDao {
     public List<SearchResultWrapper> findRidesByDepartureDate(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers) {
 
         TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
+                .order(CustomBranchOrderingPolicies.MEGA_ORDERING)
                 .uniqueness(Uniqueness.NODE_PATH)
                 .expand(new DepartureTypeExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), getEmptyInitialBranchState())
                 .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(departure), 3));

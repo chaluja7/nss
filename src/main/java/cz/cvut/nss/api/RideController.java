@@ -6,8 +6,6 @@ import cz.cvut.nss.entities.Ride;
 import cz.cvut.nss.entities.Stop;
 import cz.cvut.nss.services.RideService;
 import cz.cvut.nss.utils.DateTimeUtils;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,17 +72,25 @@ public class RideController {
                     resource.setDeparture(from.getDeparture().toString(DateTimeUtils.timePattern));
                     resource.setArrival(to.getArrival().toString(DateTimeUtils.timePattern));
 
-                    //todo?
-                    Hours hours = Hours.hoursBetween(from.getDeparture(), to.getArrival());
+                    //pres pulnoc
+                    int millisOfDepartureDay = from.getDeparture().getMillisOfDay();
+                    int millisOfArrivalDay = to.getArrival().getMillisOfDay();
 
-                    //todo?
-                    Minutes minutes = Minutes.minutesBetween(from.getDeparture(), to.getArrival());
-                    String minutesString = String.valueOf(minutes.getMinutes() % 60);
-                    if ((minutes.getMinutes() % 60) < 10) {
-                        minutesString = "0" + minutesString;
+                    int travelTimeMillis;
+                    if(millisOfDepartureDay < millisOfArrivalDay) {
+                        //nejsem pres pulnoc
+                        travelTimeMillis = millisOfArrivalDay - millisOfDepartureDay;
+                    } else {
+                        travelTimeMillis = (DateTimeUtils.MILLIS_IN_DAY - millisOfDepartureDay) + millisOfArrivalDay;
                     }
 
-                    resource.setDuration(hours.getHours() + ":" + minutesString);
+                    int travelTimeSeconds = travelTimeMillis / 1000;
+                    int travelTimeMinutes = travelTimeSeconds / 60;
+                    int travelTimeHours = travelTimeMinutes / 60;
+                    travelTimeMinutes = travelTimeMinutes % 60;
+                    String travelTimeMinutesFormatted = travelTimeMinutes < 10 ? "0" + travelTimeMinutes : travelTimeMinutes + "";
+
+                    resource.setDuration(travelTimeHours + ":" + travelTimeMinutesFormatted);
                 }
 
             }
