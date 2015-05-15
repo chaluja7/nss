@@ -14,15 +14,17 @@ import org.neo4j.graphdb.traversal.TraversalContext;
  * @author jakubchalupa
  * @since 23.04.15
  */
-public class CustomBranchSelector implements BranchSelector {
+public class DepartureBranchSelector implements BranchSelector {
 
-    private final SuperPriorityQueue queue = new SuperPriorityQueue();
+    private final CustomPriorityQueue queue = new CustomPriorityQueue(FindingType.DEPARTURE);
 
     private TraversalBranch current;
 
     private final PathExpander expander;
 
-    public CustomBranchSelector(TraversalBranch startSource, PathExpander expander) {
+    private Long globalFirstNodeDeparture;
+
+    public DepartureBranchSelector(TraversalBranch startSource, PathExpander expander) {
         this.current = startSource;
         this.expander = expander;
     }
@@ -45,13 +47,24 @@ public class CustomBranchSelector implements BranchSelector {
                     currentTime = (long) endNode.getProperty(StopNode.DEPARTURE_PROPERTY);
                 }
 
+                //zjisti cas uplne prvniho zpracovavaneho uzlu
+                if(globalFirstNodeDeparture == null) {
+                    globalFirstNodeDeparture = departureTime;
+                }
+
+                boolean overMidnight;
+                if(globalFirstNodeDeparture <= currentTime) {
+                    overMidnight = false;
+                } else {
+                    overMidnight = true;
+                }
+
                 long travelTime;
                 if(departureTime <= currentTime) {
                     travelTime = currentTime - departureTime;
                 } else {
                     travelTime = DateTimeUtils.MILLIS_IN_DAY - departureTime + currentTime;
                 }
-
 
                 int numOfTransfers = 0;
                 RelTypes prevRelationShipType = null;
@@ -71,8 +84,7 @@ public class CustomBranchSelector implements BranchSelector {
 
                 travelTime = travelTime + (numOfTransfers * DateTimeUtils.TRANSFER_PENALTY_MILLIS);
 
-
-                queue.addPath(next, currentTime / 1000, travelTime / 1000);
+                queue.addPath(next, currentTime / 1000, travelTime / 1000, overMidnight);
                 result = next;
             } else {
                 current = queue.poll();

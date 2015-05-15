@@ -41,7 +41,13 @@
                     <rich:dataTable value="#{rideWrapper.stops}" var="stop" rowKeyVar="index">
                         <rich:column>
                             <f:facet name="header">Datum</f:facet>
-                            <h:outputText value="#{stop.arrival != null ? stop.arrival.millisOfDay >= searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay : stop.departure.millisOfDay >= searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay}" />
+                            <h:panelGroup rendered="#{searchResultBB.timeType == 'departure'}">
+                                <h:outputText value="#{stop.arrival != null ? stop.arrival.millisOfDay >= searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay : stop.departure.millisOfDay >= searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay}" />
+                            </h:panelGroup>
+
+                            <h:panelGroup rendered="#{searchResultBB.timeType == 'arrival'}">
+                                <h:outputText value="#{stop.arrival != null ? stop.arrival.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.arrivalDay : searchResultBB.departureDay : stop.departure.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.arrivalDay : searchResultBB.departureDay}" />
+                            </h:panelGroup>
                         </rich:column>
                         <rich:column>
                             <f:facet name="header">Stanice</f:facet>

@@ -11,14 +11,14 @@ import org.neo4j.graphdb.traversal.TraversalBranch;
  */
 public enum CustomBranchOrderingPolicies implements BranchOrderingPolicy {
 
-    CUSTOM_ORDERING {
+    DEPARTURE_ORDERING {
         public BranchSelector create(TraversalBranch startBranch, PathExpander expander) {
-            return new CustomBranchSelector(startBranch, expander);
+            return new DepartureBranchSelector(startBranch, expander);
         }
     },
-    MEGA_ORDERING {
+    ARRIVAL_ORDERING {
         public BranchSelector create(TraversalBranch startBranch, PathExpander expander) {
-            return new MegaBranchSelector(startBranch, expander);
+            return new ArrivalBranchSelector(startBranch, expander);
         }
     };
 

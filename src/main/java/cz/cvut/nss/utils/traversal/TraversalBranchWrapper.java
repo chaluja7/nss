@@ -14,10 +14,13 @@ public class TraversalBranchWrapper {
 
     private long travelTime;
 
-    public TraversalBranchWrapper(TraversalBranch traversalBranch, long nodeTime, long travelTime) {
+    private boolean overMidnight;
+
+    public TraversalBranchWrapper(TraversalBranch traversalBranch, long nodeTime, long travelTime, boolean overMidnight) {
         this.traversalBranch = traversalBranch;
         this.nodeTime = nodeTime;
         this.travelTime = travelTime;
+        this.overMidnight = overMidnight;
     }
 
     public TraversalBranch getTraversalBranch() {
@@ -42,5 +45,13 @@ public class TraversalBranchWrapper {
 
     public void setTravelTime(long travelTime) {
         this.travelTime = travelTime;
+    }
+
+    public boolean isOverMidnight() {
+        return overMidnight;
+    }
+
+    public void setOverMidnight(boolean overMidnight) {
+        this.overMidnight = overMidnight;
     }
 }

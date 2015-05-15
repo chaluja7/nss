@@ -46,7 +46,7 @@ public class Neo4jSearchDao implements SearchDao {
     public List<SearchResultWrapper> findRidesByDepartureDate(long stationFromId, long stationToId, Date departure, Date maxDeparture, int maxTransfers) {
 
         TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-                .order(CustomBranchOrderingPolicies.MEGA_ORDERING)
+                .order(CustomBranchOrderingPolicies.DEPARTURE_ORDERING)
                 .uniqueness(Uniqueness.NODE_PATH)
                 .expand(new DepartureTypeExpander(new LocalDateTime(departure), new LocalDateTime(maxDeparture), maxTransfers), getEmptyInitialBranchState())
                 .evaluator(new DepartureTypeEvaluator(stationToId, new LocalDateTime(departure), 3));
@@ -63,7 +63,7 @@ public class Neo4jSearchDao implements SearchDao {
             long millisOfArrival = ((long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY));
             long millisOfDeparture = ((long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY));
             long travelTime;
-            if(millisOfArrival > millisOfDeparture) {
+            if(millisOfArrival >= millisOfDeparture) {
                 travelTime = millisOfArrival - millisOfDeparture;
             } else {
                 travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;
@@ -134,7 +134,7 @@ public class Neo4jSearchDao implements SearchDao {
     public List<SearchResultWrapper> findRidesByArrivalDate(long stationFromId, long stationToId, Date arrival, Date minArrival, int maxTransfers) {
 
         TraversalDescription traversalDescription = graphDatabaseService.traversalDescription()
-                .order(CustomBranchOrderingPolicies.CUSTOM_ORDERING)
+                .order(CustomBranchOrderingPolicies.ARRIVAL_ORDERING)
                 .uniqueness(Uniqueness.NODE_PATH)
                 .expand(new ArrivalTypeExpander(new LocalDateTime(arrival), new LocalDateTime(minArrival), maxTransfers), getEmptyInitialBranchState())
                 .evaluator(new ArrivalTypeEvaluator(stationFromId, new LocalDateTime(arrival), 3));
@@ -151,7 +151,7 @@ public class Neo4jSearchDao implements SearchDao {
             long millisOfArrival = ((long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY));
             long millisOfDeparture = ((long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY));
             long travelTime;
-            if(millisOfArrival > millisOfDeparture) {
+            if(millisOfArrival >= millisOfDeparture) {
                 travelTime = millisOfArrival - millisOfDeparture;
             } else {
                 travelTime = (DateTimeUtils.MILLIS_IN_DAY - millisOfDeparture) + millisOfArrival;

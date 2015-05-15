@@ -88,36 +88,14 @@ public final class DepartureTypeEvaluator implements Evaluator {
             }
         }
 
+        //vyhledavam na ceste, kde departureTime (vychoziho uzlu) je mensi, nez departure time nektere jiz nalezene cesty
+        //to muzu hned ukoncit, protoze takovy vysledek stejne uzivateli nezobrazim
         if(prevFoundedDeparture != null && startNodeDeparture < prevFoundedDeparture) {
             return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
-        int i = 0;
+        //uz jsem nasel pozadovany pocet vysledku
         if(foundedPathsDetails.size() >= maxNumberOfResults) {
-            //Zde nechci pracovat z penalizovanym casem protoze bych musel pokazde iterovat skrz vsechny relace ke zjisteni poctu prestupu az sem
-            //to by bylo pomalejsi, nez kdyz uvolim iteraci pres vice vysledku nez maxNumberOfResults, ktera bude v idealce max 15 min do budoucnosti nez by musela
-//            for(Long key : foundedPathsDetails.keySet()) {
-//                Long actualArrival = foundedPaths.get(key);
-//                if(actualArrival >= departureMillisOfDay) {
-//                    //tento prijezd byl pred pulnoci
-//                    if((currentNodeTimeProperty >= departureMillisOfDay && actualArrival <= currentNodeTimeProperty) || currentNodeTimeProperty < departureMillisOfDay) {
-//                        //aktualne jsem taky pred pulnoci ale pozdeji nebo jsem az po pulnoci
-//                        i++;
-//                    }
-//                } else {
-//                    //tento prijezd byl po pulnoci
-//                    if(currentNodeTimeProperty < departureMillisOfDay && currentNodeTimeProperty >= actualArrival) {
-//                        //momentalne jsem taky po pulnoci a s horsim casem
-//                        i++;
-//                    }
-//                }
-//
-//                if(i >= maxNumberOfResults) {
-//                    //Jiz jsem nasel maxNumberOfResults vice lepsich vysledku
-//                    return Evaluation.EXCLUDE_AND_PRUNE;
-//                }
-//            }
-
             return Evaluation.EXCLUDE_AND_PRUNE;
         }
 

@@ -272,8 +272,6 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
 
                 //sel jsem (N)-[NEXT_AWAITING_STOP]-(m)-[NEXT_STOP]-(o)
                 if(prevRelationShipType != null && relationshipIsTypeNextAwaitingStop && prevRelationShipType.equals(RelTypes.NEXT_STOP)) {
-                    //+1 jde k visitedRides protoze ted jsem zcela urcite prestoupil na novou ridu
-                    //na tomto stopu jsem jiz drive byl
                     //kontrola unikatnosti ridy v ramci path
                     if (visitedRides.contains(currentRideId)) {
                         return Iterables.empty();

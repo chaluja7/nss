@@ -31,6 +31,8 @@ public final class ArrivalTypeEvaluator implements Evaluator {
 
     Map<Long, Set<Long>> foundedPathsDetails = new HashMap<>();
 
+    Long prevFoundedArrival = null;
+
     public ArrivalTypeEvaluator(Long startStationId, LocalDateTime arrivalDateTime, int maxNumberOfResults) {
         this.startStationId = startStationId;
         this.arrivalMillisOfDay = arrivalDateTime.getMillisOfDay();
@@ -41,6 +43,7 @@ public final class ArrivalTypeEvaluator implements Evaluator {
     public Evaluation evaluate(Path path) {
         Node startNode = path.startNode();
         long startNodeStopId = (long) startNode.getProperty(StopNode.STOP_PROPERTY);
+        long startNodeArrival = (long) startNode.getProperty(StopNode.ARRIVAL_PROPERTY);
 
         Node currentNode = path.endNode();
         long currentNodeStationId = (long) currentNode.getProperty(StopNode.STATION_PROPERTY);
@@ -85,31 +88,15 @@ public final class ArrivalTypeEvaluator implements Evaluator {
             }
         }
 
-        int i = 0;
-        if(foundedPathsDetails.size() >= maxNumberOfResults) {
-            //Zde nechci pracovat z penalizovanym casem protoze bych musel pokazde iterovat skrz vsechny relace ke zjisteni poctu prestupu az sem
-            //to by bylo pomalejsi, nez kdyz uvolim iteraci pres vice vysledku nez maxNumberOfResults, ktera bude v idealce max 15 min do budoucnosti nez by musela
-            for(Long key : foundedPathsDetails.keySet()) {
-                Long actualDeparture = foundedPaths.get(key);
-                if(actualDeparture <= arrivalMillisOfDay) {
-                    //tento vyjezd byl ve stejny den jako arrival
-                    if((currentNodeTimeProperty <= arrivalMillisOfDay && actualDeparture > currentNodeTimeProperty) || currentNodeTimeProperty > arrivalMillisOfDay) {
-                        //aktualne jsem taky ve stejny den jako arrival drive nebo jsem az pred pulnoci
-                        i++;
-                    }
-                } else {
-                    //tento vyjezd byl pred pulnoci
-                    if(currentNodeTimeProperty > arrivalMillisOfDay && currentNodeTimeProperty < actualDeparture) {
-                        //momentalne jsem taky pred pulnoci a s horsim casem
-                        i++;
-                    }
-                }
+        //vyhledavam na ceste, kde arrivalTime (ciloveho uzlu) je vetsi, nez arrival time nektere jiz nalezene cesty
+        //to muzu hned ukoncit, protoze takovy vysledek stejne uzivateli nezobrazim
+        if(prevFoundedArrival != null && startNodeArrival > prevFoundedArrival) {
+            return Evaluation.EXCLUDE_AND_PRUNE;
+        }
 
-                if(i >= maxNumberOfResults) {
-                    //Jiz jsem nasel maxNumberOfResults vice lepsich vysledku
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
-            }
+        //uz jsem nasel pozadovany pocet vysledku
+        if(foundedPathsDetails.size() >= maxNumberOfResults) {
+            return Evaluation.EXCLUDE_AND_PRUNE;
         }
 
         //nasel jsem
@@ -163,6 +150,7 @@ public final class ArrivalTypeEvaluator implements Evaluator {
                 foundedPathsDetails.put(startNodeStopId, tmpRides);
             }
 
+            prevFoundedArrival = startNodeArrival;
             foundedPaths.put(startNodeStopId, currentNodeMillisTimeWithPenalty);
             foundedPathsNumOfTransfers.put(startNodeStopId, tmpRides.size() - 1);
             return Evaluation.INCLUDE_AND_PRUNE;

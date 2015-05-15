@@ -85,6 +85,7 @@ public class SearchResultBB {
             List<SearchResultWrapper> path;
             int maxNumberOfTransfers = withoutTransfers ? 0 : maxTransfers;
 
+            long l = System.currentTimeMillis();
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
                     path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
@@ -103,6 +104,7 @@ public class SearchResultBB {
                 }
             }
 
+            l = System.currentTimeMillis() - l;
             foundResults = new ArrayList<>();
             for(SearchResultWrapper resultWrapper : path) {
                 FoundedPathsWrapper wrapper = new FoundedPathsWrapper();

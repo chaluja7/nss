@@ -14,15 +14,17 @@ import org.neo4j.graphdb.traversal.TraversalContext;
  * @author jakubchalupa
  * @since 23.04.15
  */
-public class MegaBranchSelector implements BranchSelector {
+public class ArrivalBranchSelector implements BranchSelector {
 
-    private final MegaPriorityQueue queue = new MegaPriorityQueue();
+    private final CustomPriorityQueue queue = new CustomPriorityQueue(FindingType.ARRIVAL);
 
     private TraversalBranch current;
 
     private final PathExpander expander;
 
-    public MegaBranchSelector(TraversalBranch startSource, PathExpander expander) {
+    private Long globalFirstNodeArrival;
+
+    public ArrivalBranchSelector(TraversalBranch startSource, PathExpander expander) {
         this.current = startSource;
         this.expander = expander;
     }
@@ -37,21 +39,32 @@ public class MegaBranchSelector implements BranchSelector {
                 Node startNode = next.startNode();
                 Node endNode = next.endNode();
 
-                long departureTime = (long) startNode.getProperty(StopNode.DEPARTURE_PROPERTY);
+                long arrivalTime = (long) startNode.getProperty(StopNode.ARRIVAL_PROPERTY);
                 long currentTime;
-                if(endNode.hasProperty(StopNode.ARRIVAL_PROPERTY)) {
-                    currentTime = (long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY);
-                } else {
+                if(endNode.hasProperty(StopNode.DEPARTURE_PROPERTY)) {
                     currentTime = (long) endNode.getProperty(StopNode.DEPARTURE_PROPERTY);
+                } else {
+                    currentTime = (long) endNode.getProperty(StopNode.ARRIVAL_PROPERTY);
+                }
+
+                //zjisti cas uplne prvniho zpracovavaneho uzlu
+                if(globalFirstNodeArrival == null) {
+                    globalFirstNodeArrival = arrivalTime;
+                }
+
+                boolean overMidnight;
+                if(globalFirstNodeArrival >= currentTime) {
+                    overMidnight = false;
+                } else {
+                    overMidnight = true;
                 }
 
                 long travelTime;
-                if(departureTime <= currentTime) {
-                    travelTime = currentTime - departureTime;
+                if(currentTime <= arrivalTime) {
+                    travelTime = arrivalTime - currentTime;
                 } else {
-                    travelTime = DateTimeUtils.MILLIS_IN_DAY - departureTime + currentTime;
+                    travelTime = DateTimeUtils.MILLIS_IN_DAY - currentTime + arrivalTime;
                 }
-
 
                 int numOfTransfers = 0;
                 RelTypes prevRelationShipType = null;
@@ -71,8 +84,7 @@ public class MegaBranchSelector implements BranchSelector {
 
                 travelTime = travelTime + (numOfTransfers * DateTimeUtils.TRANSFER_PENALTY_MILLIS);
 
-
-                queue.addPath(next, currentTime / 1000, travelTime / 1000);
+                queue.addPath(next, currentTime / 1000, travelTime / 1000, overMidnight);
                 result = next;
             } else {
                 current = queue.poll();
