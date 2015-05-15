@@ -22,6 +22,8 @@
             <nss:selectOne value="#{rideBB.ride.line}" items="#{rideBB.allLines}" title="line"
                     label="#{msg['rides.line']}" converter="#{lineConverter}"/>
 
+            <nss:selectOne value="#{rideBB.ride.operationInterval}" items="#{rideBB.allOperationIntervals}" title="operationInterval"
+                           label="#{msg['rides.operationInterval']}" converter="#{operationIntervalConverter}"/>
 
             <h:commandButton value="Vytvořit" action="#{rideBB.saveRide}" rendered="#{rideBB.id == null}" styleClass="submitButton"/>
             <h:commandButton value="Uložit" action="#{rideBB.updateRide}"  rendered="#{rideBB.id != null}" styleClass="submitButton"/>
@@ -46,6 +48,10 @@
                             <f:validator binding="#{localTimeValidator}" />
                             <f:converter binding="#{localTimeConverter}" />
                         </h:inputText>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">Pořadí</f:facet>
+                        <h:inputText value="#{stop.stopOrder}" />
                     </h:column>
                     <h:column>
                         <f:facet name="header">Akce</f:facet>
@@ -75,12 +81,14 @@
                 </h:inputText>
             </h:panelGroup>
 
+            <nss:inputText value="#{rideBB.newStopOrder}" title="Pořadí" label="#{msg['routes.order']}" />
+
             <h:commandButton value="Přidat zastavení" action="#{rideBB.addStop}" styleClass="submitButton"/>
 
             <h:panelGroup rendered="#{rideBB.id != null}" layout="block">
                 <h:panelGroup layout="block" styleClass="dangerZone" />
                 <h:panelGroup layout="block" styleClass="centerBox">
-                    <h:commandButton value="Smazat spoj" action="#{rideBB.deleteRide}" styleClass="deleteButton"
+                    <h:commandButton value="Smazat jízdu" action="#{rideBB.deleteRide}" styleClass="deleteButton"
                                      onclick="return confirm('Opravdu chcete tuto akci provést?')"/>
                 </h:panelGroup>
             </h:panelGroup>

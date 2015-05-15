@@ -1,5 +1,6 @@
 package cz.cvut.nss.entities;
 
+import cz.cvut.nss.utils.DateTimeUtils;
 import org.hibernate.annotations.Type;
 import org.joda.time.LocalDate;
 
@@ -139,5 +140,35 @@ public class OperationInterval extends AbstractEntity {
         }
 
         ride.setOperationInterval(this);
+    }
+
+    @Override
+    public String toString() {
+        String oiName = getId() + " (";
+        oiName += getStartDate().toString(DateTimeUtils.DATE_PATTERN) + " - " + getEndDate().toString(DateTimeUtils.DATE_PATTERN);
+        oiName += ") ";
+        if(getMonday()) {
+            oiName += "PO|";
+        }
+        if(getTuesday()) {
+            oiName += "ÚT|";
+        }
+        if(getWednesday()) {
+            oiName += "ST|";
+        }
+        if(getThursday()) {
+            oiName += "ČT|";
+        }
+        if(getFriday()) {
+            oiName += "PÁ|";
+        }
+        if(getSaturday()) {
+            oiName += "SO|";
+        }
+        if(getSunday()) {
+            oiName += "NE|";
+        }
+
+        return oiName;
     }
 }

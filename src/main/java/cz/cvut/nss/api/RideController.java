@@ -59,6 +59,9 @@ public class RideController {
             RideResource resource = new RideResource();
             resource.setId(ride.getId());
             resource.setLine(ride.getLine().getLineType().name() + " - " + ride.getLine().getName());
+            if(ride.getOperationInterval() != null) {
+                resource.setOperationInterval(ride.getOperationInterval().toString());
+            }
 
             List<Stop> stopList = ride.getStops();
             if(stopList.size() > 0) {

@@ -22,6 +22,8 @@ public class RideResource {
 
     private String duration;
 
+    private String operationInterval;
+
     public long getId() {
         return id;
     }
@@ -76,5 +78,13 @@ public class RideResource {
 
     public void setDuration(String duration) {
         this.duration = duration;
+    }
+
+    public String getOperationInterval() {
+        return operationInterval;
+    }
+
+    public void setOperationInterval(String operationInterval) {
+        this.operationInterval = operationInterval;
     }
 }

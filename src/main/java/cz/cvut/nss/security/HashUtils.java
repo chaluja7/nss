@@ -15,7 +15,7 @@ public class HashUtils {
 
         for (int i = 0; i < data.length; i++) {
             int halfbyte = (data[i] >>> 4) & 0x0F;
-            int two_halfs = 0;
+            int twoHalfs = 0;
 
             do {
                 if ((0 <= halfbyte) && (halfbyte <= 9)) {
@@ -25,20 +25,18 @@ public class HashUtils {
                 }
                 halfbyte = data[i] & 0x0F;
 
-            } while (two_halfs++ < 1);
+            } while (twoHalfs++ < 1);
         }
 
         return builder.toString();
     }
 
     public static String computeHash(String s) {
-
         if(s == null) {
-            return s;
+            return null;
         }
 
-        MessageDigest md = null;
-
+        MessageDigest md;
         try {
             md = MessageDigest.getInstance("SHA-256");
             md.update(s.getBytes("utf8"), 0, s.length());
@@ -47,7 +45,6 @@ public class HashUtils {
         }
 
         byte[] sha256hash = md.digest();
-
         return convertToHex(sha256hash);
     }
 

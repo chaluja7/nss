@@ -1,13 +1,7 @@
 package cz.cvut.nss.wiew;
 
-import cz.cvut.nss.entities.Line;
-import cz.cvut.nss.entities.Ride;
-import cz.cvut.nss.entities.Station;
-import cz.cvut.nss.entities.Stop;
-import cz.cvut.nss.services.LineService;
-import cz.cvut.nss.services.RideService;
-import cz.cvut.nss.services.StationService;
-import cz.cvut.nss.services.StopService;
+import cz.cvut.nss.entities.*;
+import cz.cvut.nss.services.*;
 import org.joda.time.LocalTime;
 
 import javax.faces.bean.ManagedBean;
@@ -37,6 +31,9 @@ public class RideBB {
     @ManagedProperty(value = "#{stopServiceImpl}")
     private StopService stopService;
 
+    @ManagedProperty(value = "#{operationIntervalServiceImpl}")
+    private OperationIntervalService operationIntervalService;
+
     private Long id;
 
     private Ride ride = new Ride();
@@ -46,6 +43,8 @@ public class RideBB {
     private LocalTime newStopDeparture;
 
     private LocalTime newStopArrival;
+
+    private Integer newStopOrder;
 
     private Long selectedLine;
 
@@ -81,6 +80,7 @@ public class RideBB {
         stop.setRide(ride);
         stop.setDeparture(newStopDeparture);
         stop.setArrival(newStopArrival);
+        stop.setStopOrder(newStopOrder);
 
         stopService.createStop(stop);
         return "ride?id=" + id + "&faces-redirect=true";
@@ -95,6 +95,15 @@ public class RideBB {
         Map<String, Object> map = new TreeMap<>();
         for(Line line : lineService.getAll()) {
             map.put(line.getLineType().name() + " - " + line.getName(), line);
+        }
+
+        return map;
+    }
+
+    public Map<String, Object> getAllOperationIntervals() {
+        Map<String, Object> map = new TreeMap<>();
+        for(OperationInterval operationInterval : operationIntervalService.getAll()) {
+            map.put(operationInterval.toString(), operationInterval);
         }
 
         return map;
@@ -169,6 +178,14 @@ public class RideBB {
         this.newStopArrival = newStopArrival;
     }
 
+    public Integer getNewStopOrder() {
+        return newStopOrder;
+    }
+
+    public void setNewStopOrder(Integer newStopOrder) {
+        this.newStopOrder = newStopOrder;
+    }
+
     public Long getSelectedLine() {
         return selectedLine;
     }
@@ -191,5 +208,9 @@ public class RideBB {
 
     public void setStopService(StopService stopService) {
         this.stopService = stopService;
+    }
+
+    public void setOperationIntervalService(OperationIntervalService operationIntervalService) {
+        this.operationIntervalService = operationIntervalService;
     }
 }

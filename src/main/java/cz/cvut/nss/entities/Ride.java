@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * One ride of a Line.
+ * One ride of a Line. (according to GTFS this is TRIP)
  *
  * @author jakubchalupa
  * @since 24.11.14.
