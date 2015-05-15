@@ -26,6 +26,11 @@ public class RideNeo4jServiceImpl implements RideNeo4jService {
     }
 
     @Override
+    public RideNode findById(long id) {
+        return rideNeo4jRepository.findOne(id);
+    }
+
+    @Override
     public Iterable<RideNode> findAll() {
         return rideNeo4jRepository.findAll();
     }

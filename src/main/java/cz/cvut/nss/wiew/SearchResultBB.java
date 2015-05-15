@@ -86,13 +86,14 @@ public class SearchResultBB {
             int maxNumberOfTransfers = withoutTransfers ? 0 : maxTransfers;
 
             long l = System.currentTimeMillis();
+            //vyhledavani nad relacni DB je pouze na 1 hodinu dopredu, aby to vubec neco naslo v rozumnem case :)
             if(timeType.equals("departure")) {
                 if(isWithNeo4j()) {
                     path = neo4jSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
                             SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 } else {
                     path = jdbcSearchService.findPathByDepartureDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
-                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
+                            1, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 }
             } else {
                 if(isWithNeo4j()) {
@@ -100,9 +101,10 @@ public class SearchResultBB {
                             SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 } else {
                     path = jdbcSearchService.findPathByArrivalDate(stationFrom.getId(), stationTo.getId(), departureOrArrival,
-                            SEARCH_INTERVAL_HOURS, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
+                            1, maxNumberOfTransfers, MAX_NUMBER_OF_RESULTS);
                 }
             }
+
 
             l = System.currentTimeMillis() - l;
             foundResults = new ArrayList<>();

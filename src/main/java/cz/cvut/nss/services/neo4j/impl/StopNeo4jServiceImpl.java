@@ -39,6 +39,11 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
     }
 
     @Override
+    public StopNode findByStopId(long stopId) {
+        return stopNeo4jRepository.findByStopId(stopId);
+    }
+
+    @Override
     public void deleteAll() {
         stopNeo4jRepository.deleteAll();
     }

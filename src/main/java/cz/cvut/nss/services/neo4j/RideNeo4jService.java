@@ -12,6 +12,8 @@ public interface RideNeo4jService {
 
     RideNode save(RideNode rideNode);
 
+    RideNode findById(long id);
+
     Iterable<RideNode> findAll();
 
     void deleteAll();

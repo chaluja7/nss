@@ -19,6 +19,8 @@ public interface StopNeo4jService {
 
     StopNode findById(long id);
 
+    StopNode findByStopId(long stopId);
+
     void deleteAll();
 
     /**

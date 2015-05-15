@@ -1,4 +1,4 @@
-package cz.cvut.nss.services;
+package cz.cvut.nss.services.neo4j;
 
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -7,15 +7,13 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Created by jakubchalupa on 19.11.14.
- *
- * Abstract supper class for services tests.
+ * @author jakubchalupa
+ * @since 15.05.15
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring-context.xml"})
-@TransactionConfiguration(defaultRollback = true, transactionManager = "jpaTransactionManager")
+@TransactionConfiguration(defaultRollback = true, transactionManager = "neo4jTransactionManager")
 @Transactional
-public abstract class AbstractServiceTest {
+public abstract class AbstractServiceNeo4jTest {
 
 }
-
