@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Common transport.
+ * OperationInterval entity.
  *
  * @author jakubchalupa
  * @since 24.11.14.

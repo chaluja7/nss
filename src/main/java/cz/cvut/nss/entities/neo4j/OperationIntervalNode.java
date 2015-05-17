@@ -6,6 +6,8 @@ import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 /**
+ * OperationIntervalNode in Neo4j entity.
+ *
  * @author jakubchalupa
  * @since 18.04.15
  */

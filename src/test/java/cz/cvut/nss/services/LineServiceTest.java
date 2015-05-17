@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Line service test.
+ * Line service tests.
  *
  * @author jakubchalupa
  * @since 05.01.15

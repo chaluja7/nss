@@ -13,12 +13,9 @@
 
         <spring.version>4.1.2.RELEASE</spring.version>
         <spring.security.version>3.2.5.RELEASE</spring.security.version>
-        <spring.batch.version>3.0.3.RELEASE</spring.batch.version>
         <hibernate.version>4.2.1.Final</hibernate.version>
         <richfaces.version>4.3.7.Final</richfaces.version>
-
         <com.sun.faces.version>2.2.8</com.sun.faces.version>
-
     </properties>
 
     <repositories>

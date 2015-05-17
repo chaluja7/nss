@@ -6,9 +6,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Station service test.
+ * Station service tests.
  *
- * Created by jakubchalupa on 20.11.14.
+ * @author jakubchalupa
+ * @since 05.01.15
  */
 public class StationServiceTest extends AbstractServiceTest {
 

@@ -4,6 +4,7 @@ import cz.cvut.nss.dao.neo4j.StopNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.StopNode;
 import cz.cvut.nss.services.neo4j.StopNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
     protected StopNeo4jRepository stopNeo4jRepository;
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public StopNode save(StopNode stop) {
         return stopNeo4jRepository.save(stop);
     }
@@ -44,6 +46,7 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteAll() {
         stopNeo4jRepository.deleteAll();
     }
@@ -88,6 +91,7 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteByStopId(long stopId) {
         StopNode stopNode = stopNeo4jRepository.findByStopId(stopId);
         if(stopNode != null) {
@@ -96,6 +100,7 @@ public class StopNeo4jServiceImpl implements StopNeo4jService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteAllByRideId(long rideId) {
         for(StopNode stopNode : stopNeo4jRepository.findByRideId(rideId)) {
             stopNeo4jRepository.delete(stopNode);

@@ -14,6 +14,8 @@ import javax.faces.validator.ValidatorException;
 import java.util.ResourceBundle;
 
 /**
+ * Local time validator.
+ *
  * @author jakubchalupa
  * @since 06.05.15
  */

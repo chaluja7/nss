@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Node stop v grafu.
+ * StopNode in Neo4j entity.
  *
  * @author jakubchalupa
  * @since 17.03.15

@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Stop Neo4j service tests.
+ *
  * @author jakubchalupa
  * @since 15.03.15
  */
@@ -48,7 +50,7 @@ public class StopNeo4jServiceTest extends AbstractServiceNeo4jTest {
     }
 
 
-    public StopNode prepareStop() {
+    private StopNode prepareStop() {
         RideNode rideNode = new RideNode();
         rideNode.setRideId(-1l);
         RideNode savedRideNode = rideNeo4jService.save(rideNode);

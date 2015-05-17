@@ -4,11 +4,12 @@ import cz.cvut.nss.dao.neo4j.RideNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.RideNode;
 import cz.cvut.nss.services.neo4j.RideNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Stop Neo4j service implementation.
+ * Ride Neo4j service implementation.
  *
  * @author jakubchalupa
  * @since 17.03.15
@@ -21,6 +22,7 @@ public class RideNeo4jServiceImpl implements RideNeo4jService {
     protected RideNeo4jRepository rideNeo4jRepository;
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public RideNode save(RideNode rideNode) {
         return rideNeo4jRepository.save(rideNode);
     }
@@ -36,6 +38,7 @@ public class RideNeo4jServiceImpl implements RideNeo4jService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteAll() {
         rideNeo4jRepository.deleteAll();
     }

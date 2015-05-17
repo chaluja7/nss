@@ -3,6 +3,8 @@ package cz.cvut.nss.utils.traversal;
 import java.util.*;
 
 /**
+ * Wrapper to wrap stations for traversal purposes.
+ *
  * @author jakubchalupa
  * @since 20.04.15
  */

@@ -12,7 +12,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * Converter
+ * Converter for local time.
  *
  * @author jakubchalupa
  * @since 27.11.14

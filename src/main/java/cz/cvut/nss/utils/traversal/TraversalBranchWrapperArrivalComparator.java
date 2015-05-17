@@ -3,6 +3,8 @@ package cz.cvut.nss.utils.traversal;
 import java.util.Comparator;
 
 /**
+ * Comparator to compare traversal branch wrappers in priority queue. For arrival finding type.
+ *
  * @author jakubchalupa
  * @since 13.05.15
  */

@@ -7,6 +7,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Ride Neo4j service tests.
+ *
  * @author jakubchalupa
  * @since 15.05.15
  */
@@ -45,7 +47,7 @@ public class RideNeo4jServiceTest extends AbstractServiceNeo4jTest {
         Assert.assertTrue(-99l == retrieved.getRideId());
     }
 
-    public RideNode prepareRideNode() {
+    private RideNode prepareRideNode() {
         OperationIntervalNode operationIntervalNode = new OperationIntervalNode();
         operationIntervalNode.setOperationIntervalId(-1l);
         operationIntervalNode.setFromDateInMillis(-1l);

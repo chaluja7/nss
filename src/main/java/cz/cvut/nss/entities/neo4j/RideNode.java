@@ -4,6 +4,8 @@ import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
 
 /**
+ * RideNode in Neo4j entity.
+ *
  * @author jakubchalupa
  * @since 18.04.15
  */

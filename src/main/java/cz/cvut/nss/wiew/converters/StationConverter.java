@@ -10,7 +10,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * Converter for region (prior pro jsf select one)
+ * Converter for station (prior pro jsf select one)
  *
  * @author jakubchalupa
  * @since 27.11.14

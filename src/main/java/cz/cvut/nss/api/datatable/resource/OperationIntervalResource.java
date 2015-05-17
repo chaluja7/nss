@@ -1,6 +1,8 @@
 package cz.cvut.nss.api.datatable.resource;
 
 /**
+ * Operation interval resource.
+ *
  * @author jakubchalupa
  * @since 17.04.15
  */

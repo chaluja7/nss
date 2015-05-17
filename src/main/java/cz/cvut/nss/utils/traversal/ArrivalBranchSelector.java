@@ -11,6 +11,8 @@ import org.neo4j.graphdb.traversal.TraversalBranch;
 import org.neo4j.graphdb.traversal.TraversalContext;
 
 /**
+ * Arrival branch selector implementation.
+ *
  * @author jakubchalupa
  * @since 23.04.15
  */

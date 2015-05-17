@@ -3,6 +3,8 @@ package cz.cvut.nss.utils;
 import java.util.*;
 
 /**
+ * Util for deep collections cloning.
+ *
  * @author jakubchalupa
  * @since 02.05.15
  */

@@ -57,6 +57,11 @@ public interface RideService {
      */
     void importRideToNeo4j(Ride id);
 
+    /**
+     * find rides by line id
+     * @param lineId id of a line
+     * @return all rides by line id
+     */
     List<Ride> getByLineId(long lineId);
 
 }

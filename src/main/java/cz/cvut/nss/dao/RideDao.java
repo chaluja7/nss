@@ -13,6 +13,11 @@ import java.util.List;
  */
 public interface RideDao extends GenericDao<Ride> {
 
+    /**
+     * vraci ridy dle lineId
+     * @param lineId lineId
+     * @return ridy dle lineId
+     */
     List<Ride> getByLineId(long lineId);
 
 }

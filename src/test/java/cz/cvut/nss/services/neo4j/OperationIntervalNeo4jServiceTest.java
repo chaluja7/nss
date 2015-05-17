@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * OperationInterval Neo4j service tests.
+ *
  * @author jakubchalupa
  * @since 15.05.15
  */
@@ -42,7 +44,7 @@ public class OperationIntervalNeo4jServiceTest extends AbstractServiceNeo4jTest 
         Assert.assertTrue(99l == retrieved.getToDateInMillis());
     }
 
-    public OperationIntervalNode prepareOperationInterval() {
+    private OperationIntervalNode prepareOperationInterval() {
         OperationIntervalNode operationIntervalNode = new OperationIntervalNode();
         operationIntervalNode.setOperationIntervalId(-1l);
         operationIntervalNode.setFromDateInMillis(-1l);

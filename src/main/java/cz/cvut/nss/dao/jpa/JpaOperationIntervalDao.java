@@ -6,6 +6,8 @@ import cz.cvut.nss.entities.OperationInterval;
 import org.springframework.stereotype.Repository;
 
 /**
+ * JPA implementation of OperationIntervalDao.
+ *
  * @author jakubchalupa
  * @since 17.04.15
  */

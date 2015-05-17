@@ -13,7 +13,7 @@ public class HashUtils {
     private static String convertToHex(byte[] data) {
         StringBuilder builder = new StringBuilder();
 
-        for (int i = 0; i < data.length; i++) {
+        for(int i = 0; i < data.length; i++) {
             int halfbyte = (data[i] >>> 4) & 0x0F;
             int twoHalfs = 0;
 

@@ -7,9 +7,10 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Created by jakubchalupa on 19.11.14.
+ * Abstract service test.
  *
- * Abstract supper class for services tests.
+ * @author jakubchalupa
+ * @since 15.05.15
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:spring-context.xml"})

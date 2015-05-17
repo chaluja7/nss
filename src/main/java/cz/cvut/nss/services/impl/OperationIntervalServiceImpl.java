@@ -6,6 +6,7 @@ import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.services.OperationIntervalService;
 import cz.cvut.nss.services.neo4j.OperationIntervalNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
+ * Implementation of OperationIntervalService.
+ *
  * @author jakubchalupa
  * @since 17.04.15
  */
@@ -33,18 +36,21 @@ public class OperationIntervalServiceImpl implements OperationIntervalService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public OperationInterval updateOperationInterval(OperationInterval operationInterval) {
         return operationIntervalDao.update(operationInterval);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void createOperationInterval(OperationInterval operationInterval) {
         operationIntervalDao.create(operationInterval);
     }
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteOperationInterval(long id) {
         operationIntervalDao.delete(id);
     }
@@ -73,7 +79,6 @@ public class OperationIntervalServiceImpl implements OperationIntervalService {
         node.setToDateInMillis(operationInterval.getEndDate().toDate().getTime());
 
         operationIntervalNeo4jService.save(node);
-
     }
 
 }

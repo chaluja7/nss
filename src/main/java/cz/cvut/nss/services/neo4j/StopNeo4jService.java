@@ -13,14 +13,35 @@ import java.util.Set;
  */
 public interface StopNeo4jService {
 
+    /**
+     * ulozi StopNode
+     * @param stop StopNode k ulozeni
+     * @return ulozeny StopNode
+     */
     StopNode save(StopNode stop);
 
+    /**
+     * @return vsechny StopNode
+     */
     Iterable<StopNode> findAll();
 
+    /**
+     * najde StopNode dle id uzlu
+     * @param id id uzlu
+     * @return StopNode dle id uzlu
+     */
     StopNode findById(long id);
 
+    /**
+     * najde StopNode dle stopId
+     * @param stopId stopId
+     * @return StopNode dle stopid
+     */
     StopNode findByStopId(long stopId);
 
+    /**
+     * smaze vsechny StopNode
+     */
     void deleteAll();
 
     /**
@@ -45,10 +66,23 @@ public interface StopNeo4jService {
      */
     void connectStopNodesOnStationWithWaitingStopRelationship(long stationId);
 
+    /**
+     * smaze StopNode dle stopId
+     * @param stopId stopId
+     */
     void deleteByStopId(long stopId);
 
+    /**
+     * smaze vsechny StopNode na ride (tripu)
+     * @param rideId rideId (tripId)
+     */
     void deleteAllByRideId(long rideId);
 
+    /**
+     * najde vsechny StopNode na stanici serazene dle absolutniho casu
+     * @param stationId id stanice
+     * @return vsechny StopNode na dane stanici dle absolutniho casu
+     */
     List<StopNode> findStopNodesByStationIdOrderByActionTime(Long stationId);
 
 }

@@ -85,6 +85,4 @@ public class JdbcSearchService implements SearchService {
         return retList;
     }
 
-
-
 }

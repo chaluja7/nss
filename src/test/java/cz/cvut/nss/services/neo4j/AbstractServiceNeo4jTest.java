@@ -7,6 +7,8 @@ import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
+ * Abstract Neo4j service test.
+ *
  * @author jakubchalupa
  * @since 15.05.15
  */

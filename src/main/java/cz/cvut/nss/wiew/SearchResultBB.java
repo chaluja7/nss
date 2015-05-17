@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Backing bean for search results
+ * Backing bean for search results.
  *
  * @author jakubchalupa
  * @since 06.12.14
@@ -156,9 +156,12 @@ public class SearchResultBB {
             return;
         }
 
-        if(timeType.equals("departure") || timeType.equals("arrival")) {
+        if(timeType.equals("departure")) {
             departureDay = dt.toString(DateTimeUtils.DATE_PATTERN);
             arrivalDay = dt.plusDays(1).toString(DateTimeUtils.DATE_PATTERN);
+        } else {
+            arrivalDay = dt.toString(DateTimeUtils.DATE_PATTERN);
+            departureDay = dt.minusDays(1).toString(DateTimeUtils.DATE_PATTERN);
         }
     }
 

@@ -13,6 +13,8 @@ import org.neo4j.helpers.collection.Iterables;
 import java.util.*;
 
 /**
+ * Arrival type expander implementation.
+ *
  * @author jakubchalupa
  * @since 19.04.15
  */

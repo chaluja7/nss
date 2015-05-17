@@ -33,12 +33,27 @@ public interface StopNeo4jRepository extends GraphRepository<StopNode> {
     @Query("match (n:StopNode {stationId: {0}}) where n.departureInMillis >= {1} and n.departureInMillis <= {2} return n")
     Set<StopNode> findByStationAndDepartureRange(Long stationId, Long departureInMillisMin, Long departureInMillisMax);
 
+    /**
+     * najde stop dle stopId
+     * @param stopId stopId
+     * @return stopNode dle stopId
+     */
     @Query("match (n:StopNode {stopId: {0}}) return n")
     StopNode findByStopId(Long stopId);
 
+    /**
+     * najde stopy dle rideId
+     * @param rideId rideId
+     * @return stopy dle rideId
+     */
     @Query("match (n:StopNode {rideId: {0}}) return n")
     Set<StopNode> findByRideId(Long rideId);
 
+    /**
+     * vrati serazene stopy nalezici jedne stanici. Vyuziva se pro propojovani stopu na stanici hranamy prestupnimi
+     * @param stationId id stanice
+     * @return serazene stopy na stanici dle casu
+     */
     @Query("match (n:StopNode {stationId: {0}}) return n order by case when n.departureInMillis is not null then n.departureInMillis else n.arrivalInMillis end")
     List<StopNode> findStopNodesByStationIdOrderByActionTime(Long stationId);
 

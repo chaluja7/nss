@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Region service test.
+ * Region service tests.
  *
  * @author jakubchalupa
  * @since 05.01.15

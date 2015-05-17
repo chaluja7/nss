@@ -60,6 +60,11 @@ public interface StationService {
      */
     Station getStationByTitle(String title);
 
+    /**
+     * find station by its name
+     * @param name name of station
+     * @return station with given name or null
+     */
     Station getStationByName(String name);
 
     /**
@@ -75,6 +80,11 @@ public interface StationService {
      */
     int getCountAll();
 
+    /**
+     * find all station ordered by orderColumn
+     * @param orderColumn column to order results
+     * @return ordered list of stations
+     */
     List<Station> getAllWithOrder(String orderColumn);
 
 }

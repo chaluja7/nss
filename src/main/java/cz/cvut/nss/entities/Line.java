@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Common transport.
+ * Line entity.
  *
  * @author jakubchalupa
  * @since 24.11.14.

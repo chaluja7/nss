@@ -88,5 +88,4 @@ public class Neo4jSearchService implements SearchService {
         return retList;
     }
 
-
 }

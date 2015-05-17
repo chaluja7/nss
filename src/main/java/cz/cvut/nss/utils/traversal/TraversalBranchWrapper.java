@@ -3,6 +3,8 @@ package cz.cvut.nss.utils.traversal;
 import org.neo4j.graphdb.traversal.TraversalBranch;
 
 /**
+ * Traversal branch wrapper. Wraps traversal branch for priority queue.
+ *
  * @author jakubchalupa
  * @since 13.05.15
  */

@@ -1,6 +1,8 @@
 package cz.cvut.nss.SearchWrappers;
 
 /**
+ * Wrapper to wrap visited stops.
+ *
  * @author jakubchalupa
  * @since 07.05.15
  */

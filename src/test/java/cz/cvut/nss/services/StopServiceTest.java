@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Stop service test.
+ * Stop service tests.
  *
  * @author jakubchalupa
  * @since 05.01.15

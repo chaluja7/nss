@@ -46,7 +46,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup rendered="#{searchResultBB.timeType == 'arrival'}">
-                                <h:outputText value="#{stop.arrival != null ? stop.arrival.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.arrivalDay : searchResultBB.departureDay : stop.departure.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.arrivalDay : searchResultBB.departureDay}" />
+                                <h:outputText value="#{stop.arrival != null ? stop.arrival.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay : stop.departure.millisOfDay > searchResultBB.millisOfDepartureDay ? searchResultBB.departureDay : searchResultBB.arrivalDay}" />
                             </h:panelGroup>
                         </rich:column>
                         <rich:column>

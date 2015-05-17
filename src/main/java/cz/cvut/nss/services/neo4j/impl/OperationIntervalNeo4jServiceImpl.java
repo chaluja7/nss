@@ -4,11 +4,12 @@ import cz.cvut.nss.dao.neo4j.OperationIntervalNeo4jRepository;
 import cz.cvut.nss.entities.neo4j.OperationIntervalNode;
 import cz.cvut.nss.services.neo4j.OperationIntervalNeo4jService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Stop Neo4j service implementation.
+ * OperationInterval Neo4j service implementation.
  *
  * @author jakubchalupa
  * @since 17.03.15
@@ -21,6 +22,7 @@ public class OperationIntervalNeo4jServiceImpl implements OperationIntervalNeo4j
     protected OperationIntervalNeo4jRepository operationIntervalNeo4jRepository;
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public OperationIntervalNode save(OperationIntervalNode operationIntervalNode) {
         return operationIntervalNeo4jRepository.save(operationIntervalNode);
     }
@@ -41,6 +43,7 @@ public class OperationIntervalNeo4jServiceImpl implements OperationIntervalNeo4j
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public OperationIntervalNode update(OperationIntervalNode operationIntervalNode) {
         OperationIntervalNode byOperationIntervalId = operationIntervalNeo4jRepository.findByOperationIntervalId(operationIntervalNode.getOperationIntervalId());
         operationIntervalNode.setId(byOperationIntervalId.getId());
@@ -49,11 +52,13 @@ public class OperationIntervalNeo4jServiceImpl implements OperationIntervalNeo4j
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteAll() {
         operationIntervalNeo4jRepository.deleteAll();
     }
 
     @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
     public void deleteByOperationIntervalId(long operationIntervalId) {
         OperationIntervalNode node = findByOperationIntervalId(operationIntervalId);
         if(node != null) {

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Route service test.
+ * Route service tests.
  *
  * @author jakubchalupa
  * @since 05.01.15

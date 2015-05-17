@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * RouteStop service test.
+ * RouteStop service tests.
  *
  * @author jakubchalupa
  * @since 05.01.15

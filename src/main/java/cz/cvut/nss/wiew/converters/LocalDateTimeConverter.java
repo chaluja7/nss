@@ -11,7 +11,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * Converter for line (prior pro jsf select one)
+ * Converter for local date time.
  *
  * @author jakubchalupa
  * @since 27.11.14

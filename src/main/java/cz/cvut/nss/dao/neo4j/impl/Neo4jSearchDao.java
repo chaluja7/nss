@@ -25,7 +25,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 /**
- * Neo4j implementace vyhledavani spoju
+ * Neo4j implementace vyhledavani spoju.
  *
  * @author jakubchalupa
  * @since 31.03.15
@@ -232,6 +232,13 @@ public class Neo4jSearchDao implements SearchDao {
         return resultList;
     }
 
+    /**
+     * najde vychozi stopy pro traverzovani (hledani dle departure)
+     * @param stationId id vychozi stanice
+     * @param departure datum odjezdu
+     * @param maxDateDeparture max datum odjezdu
+     * @return vychozi zastaveni (serazena)
+     */
     protected Iterable<Node> findStartNodesForDepartureTypePathFinding(long stationId, Date departure, Date maxDateDeparture) {
         LocalDateTime tempDateDeparture = new LocalDateTime(departure);
         LocalDateTime tempMaxDateDeparture = new LocalDateTime(maxDateDeparture);
@@ -272,6 +279,13 @@ public class Neo4jSearchDao implements SearchDao {
         return query.to(Node.class);
     }
 
+    /**
+     * najde vychozi stopy pro traverzovani (hledani dle arrival)
+     * @param stationId id cilove stanice
+     * @param arrival datum prijezdu
+     * @param minDateArrival min datum prijezdu
+     * @return cilova zastaveni (serazena)
+     */
     protected Iterable<Node> findStartNodesForArrivalTypePathFinding(long stationId, Date arrival, Date minDateArrival) {
         LocalDateTime tempDateArrival = new LocalDateTime(arrival);
         LocalDateTime tempMinDateArrival = new LocalDateTime(minDateArrival);
@@ -312,6 +326,9 @@ public class Neo4jSearchDao implements SearchDao {
         return query.to(Node.class);
     }
 
+    /**
+     * @return initial branch state for neo4j traversing.
+     */
     protected InitialBranchState<StationRideWrapper> getEmptyInitialBranchState() {
 
         return new InitialBranchState<StationRideWrapper>() {

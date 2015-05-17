@@ -42,6 +42,7 @@
             <map>
                 <entry key="hibernate.dialect" value="org.hibernate.dialect.PostgresPlusDialect" />
                 <entry key="hibernate.show_sql" value="false" />
+                <!-- Odkomentujte pro tvoru relacniho schematu hibernatem pri instalaci aplikace -->
                 <!--<entry key="hibernate.hbm2ddl.auto" value="update" />-->
             </map>
         </property>

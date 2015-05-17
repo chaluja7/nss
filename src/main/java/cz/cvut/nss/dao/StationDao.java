@@ -57,6 +57,11 @@ public interface StationDao extends GenericDao<Station> {
      */
     int getCountAll();
 
+    /**
+     * vrati vsechny stanice serazene dle daneho sloupce
+     * @param orderColumn radici sloupec
+     * @return serazene stanice
+     */
     List<Station> getAllWithOrder(String orderColumn);
 
 }

@@ -13,6 +13,8 @@ import org.neo4j.helpers.collection.Iterables;
 import java.util.*;
 
 /**
+ * Departure type expander implementation.
+ *
  * @author jakubchalupa
  * @since 19.04.15
  */
