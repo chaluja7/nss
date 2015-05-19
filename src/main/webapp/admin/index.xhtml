@@ -6,8 +6,26 @@
 
     <ui:define name="innerContent">
         <h1>Vítejte v administraci!</h1>
-        <p>NSS je demonstrační aplikace, která vznikla v rámci Bakalářské práce na téma Využití grafových databází pro vyhledávání spojů veřejné dopravy.</p>
+        <p>NSS je demonstrační vyhledávací aplikace, která vznikla v rámci bakalářské práce na téma Využití grafových databází pro vyhledávání spojů veřejné dopravy.</p>
+        <p>Jedná se pouze o doplněk BP!</p>
         <p>Veškeré změny v administraci provedené se týkají pouze dat v relační databázi!</p>
+        <p>Jednotlivé spravovatelné entity přímo odpovídají popsaným entitám v textu BP. Zde tedy nebudou znovu podrobně popisovány.</p>
+
+        <h2>Sekce</h2>
+        <h3>Stanice</h3>
+        <p>V seznamu stanic jsou všechny stanice. Stanici můžeme editovat nebo vytvořit novou (symbolem + na stránce seznam stanic)</p>
+
+        <h3>Trasy</h3>
+        <p>V seznamu tras jsou všechny trasy. Trasy můžeme editovat nebo vytvářet nové. V rámci trasy můžeme přidávat a odebírat jednotlivé zastavení na trase. Celá trasa může být smazána. Tím dojde ke smazání všech spojů a jízd, které jezdí na této trase.</p>
+
+        <h3>Spoje</h3>
+        <p>V seznamu spojů jsou všechny spoje. Spoj můžeme editovat, vytvořit nový, nebo můžeme spoj smazat. Smazáním spoje se smažou i všechny jízdy, které jsou na tento spoj navázány.</p>
+
+        <h3>Platnosti jízd</h3>
+        <p>V seznamu platnosti jízd jsou všechny platnosti jízd. Platnost jízdy můžeme editovat nebo vytvořit novou.</p>
+
+        <h3>Jízdy</h3>
+        <p>V seznamu jízd jsou všechny jízdy. Pro zobrazení jízd musíme nejprve vybrat spoj. Jízdy můžeme editovat, mazat, nebo vytvářet nové. K jízdě můžeme přidávat nová zastavení.</p>
     </ui:define>
 
 </ui:composition>
