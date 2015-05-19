@@ -20,7 +20,7 @@
 
     d) Do databáze "nss" naimportujte schéma a data databáze z rozbaleného archivu "/src/db/postgreDatabase.zip" na tomto CD.
     Lze provést např. volbou restore (obnovit). Více viz: http://www.pgadmin.org/docs/1.16/restore.html
-    **Import může trvat až několik desítek minut.**
+    **Import může trvat až několik desítek minut. Importovat se bude cca 1 000 000 záznamů.**
 
 --------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@
     Instalační manuál: http://neo4j.com/docs/stable/server-installation.html
 
     b) Do složky "/data/" v rootu nainstalované (rozbalené) Neo4j databáze zkopírujte celý obsah rozbaleného archivu "/src/db/neo4jdatabase.zip" z tohoto CD
-    **Velikost databázového schématu graph.db je přes 1.7 GB**
+    **Velikost databázového schématu graph.db je přes 1.7 GB.**
 
 --------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@
     Vyhledávání proběhne po vybrání výchozí a cílové stanice, data a času odjezdu a dalších parametrů vyhledávacího formuláře.
 
     Pokud nevyberete databázi "Neo4j" může vyhledávání trvat velmi dlouho (nemusí doběhnout nikdy).
-    Nad databází Neo4j se vyhledává pro interval 6 hodin. Nad databází PostgreSQL jen pro interval 1 hodiny.
+    Nad databází Neo4j se vyhledává pro interval šesti hodin. Nad databází PostgreSQL jen pro interval 1 jedné hodiny.
 
     b) Administrace
     Pokud jste správně importovali data do databáze PostgreSql, do administrace se přihlásíte těmito údaji:
