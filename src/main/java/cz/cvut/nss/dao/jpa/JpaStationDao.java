@@ -65,6 +65,7 @@ public class JpaStationDao extends AbstractGenericJpaDao<Station> implements Sta
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public IdsAndCountResult getStationIdsByFilter(CommonRequest filter) {
         StringBuilder where = new StringBuilder();
         where.append(" where 1 = 1");

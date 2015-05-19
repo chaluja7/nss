@@ -30,6 +30,7 @@ public class JpaLineDao extends AbstractGenericJpaDao<Line> implements LineDao {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public IdsAndCountResult getLineIdsByFilter(CommonRequest filter) {
         String where = " where 1 = 1";
         for(CommonRequestColumn column : filter.getColumns()) {
