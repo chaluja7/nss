@@ -18,7 +18,7 @@
 
     V případě využití jiného usera samozřejmě změníme hodnotu OWNER.
 
-    d) Do databáze "nss" naimportujte schéma a data databáze z rozbaleného archivu "/src/db/postgreDatabase.zip" na tomto CD.
+    d) Do databáze "nss" naimportujte schéma a data databáze z rozbaleného archivu "/src/db/postgreDatabase.zip" na tomto CD (nebo archivu se shodným jménem nahraným v KOSu).
     Lze provést např. volbou restore (obnovit) z aplikace pgAdmin. Více viz: http://www.pgadmin.org/docs/1.16/restore.html
     **Import může trvat až několik desítek minut. Importovat se bude cca 1 000 000 záznamů.**
 
@@ -30,7 +30,7 @@
     Odkaz na stažení: http://neo4j.com/download/other-releases/
     Instalační manuál: http://neo4j.com/docs/stable/server-installation.html
 
-    b) Do složky "/data/" v rootu nainstalované (rozbalené) Neo4j databáze zkopírujte celý obsah rozbaleného archivu "/src/db/neo4jdatabase.zip" z tohoto CD.
+    b) Do složky "/data/" v rootu nainstalované (rozbalené) Neo4j databáze zkopírujte celý obsah rozbaleného archivu "/src/db/neo4jdatabase.zip" z tohoto CD (nebo archivu neo4jDatabase.rar (part01 - part05) nahraného v KOSu).
     **Velikost databázového schématu graph.db je přes 1.7 GB. Kopírování tedy může trvat delší dobu.**
 
 --------------------------------------------------------------------------------
