@@ -18,6 +18,7 @@ public class SearchResultByDepartureDateComparatorTest {
 
     @Test
     public void testCompareByOverMidnightArrival() {
+
         SearchResultWrapper w1 = getWrapperForTest();
         SearchResultWrapper w2 = getWrapperForTest();
 
