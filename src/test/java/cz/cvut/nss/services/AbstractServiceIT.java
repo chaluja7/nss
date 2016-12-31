@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:spring-context.xml"})
 @TransactionConfiguration(defaultRollback = true, transactionManager = "jpaTransactionManager")
 @Transactional
-public abstract class AbstractServiceTest {
+public abstract class AbstractServiceIT {
 
 }
 

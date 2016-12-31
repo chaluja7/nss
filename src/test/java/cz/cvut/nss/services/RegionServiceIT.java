@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 05.01.15
  */
-public class RegionServiceTest extends AbstractServiceTest {
+public class RegionServiceIT extends AbstractServiceIT {
 
     @Autowired
     private RegionService regionService;

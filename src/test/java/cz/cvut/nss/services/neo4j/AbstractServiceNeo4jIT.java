@@ -16,6 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:spring-context.xml"})
 @TransactionConfiguration(defaultRollback = true, transactionManager = "neo4jTransactionManager")
 @Transactional
-public abstract class AbstractServiceNeo4jTest {
+public abstract class AbstractServiceNeo4jIT {
 
 }

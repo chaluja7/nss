@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 05.01.15
  */
-public class RouteServiceTest extends AbstractServiceTest {
+public class RouteServiceIT extends AbstractServiceIT {
 
     @Autowired
     private RouteService routeService;

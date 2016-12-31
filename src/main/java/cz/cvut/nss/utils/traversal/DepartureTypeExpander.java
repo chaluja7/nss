@@ -307,4 +307,11 @@ public class DepartureTypeExpander implements PathExpander<StationRideWrapper> {
         return this;
     }
 
+    //TODO -je pouze pro ucely ZKS
+//    private boolean isRelationshipNextStop(Relationship relationship) {
+//        return relationship != null &&
+//            (relationship.isType(RelTypes.NEXT_AWAITING_STOP) || relationship.isType(RelTypes.NEXT_STOP));
+//    }
+
+
 }

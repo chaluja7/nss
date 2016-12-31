@@ -1,8 +1,7 @@
-package cz.cvut.nss.filter;
+package cz.cvut.nss.utils.filter;
 
 import cz.cvut.nss.SearchWrappers.SearchResultWrapper;
 import cz.cvut.nss.utils.comparator.SearchResultByDepartureDateComparator;
-import cz.cvut.nss.utils.filter.SearchResultFilter;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -11,10 +10,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Search results filter tests.
- *
  * @author jakubchalupa
- * @since 16.05.15
+ * @since 30.12.16
  */
 public class SearchResultFilterTest {
 

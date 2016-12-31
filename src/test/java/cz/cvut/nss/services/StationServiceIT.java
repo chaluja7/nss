@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 05.01.15
  */
-public class StationServiceTest extends AbstractServiceTest {
+public class StationServiceIT extends AbstractServiceIT {
 
     @Autowired
     private StationService stationService;

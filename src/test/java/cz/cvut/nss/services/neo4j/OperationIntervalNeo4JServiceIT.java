@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 15.05.15
  */
-public class OperationIntervalNeo4jServiceTest extends AbstractServiceNeo4jTest {
+public class OperationIntervalNeo4JServiceIT extends AbstractServiceNeo4jIT {
 
     @Autowired
     private OperationIntervalNeo4jService operationIntervalNeo4jService;

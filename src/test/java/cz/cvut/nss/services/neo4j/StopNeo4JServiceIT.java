@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 15.03.15
  */
-public class StopNeo4jServiceTest extends AbstractServiceNeo4jTest {
+public class StopNeo4JServiceIT extends AbstractServiceNeo4jIT {
 
     @Autowired
     private StopNeo4jService stopNeo4jService;

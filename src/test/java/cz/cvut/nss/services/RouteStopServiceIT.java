@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 05.01.15
  */
-public class RouteStopServiceTest extends AbstractServiceTest {
+public class RouteStopServiceIT extends AbstractServiceIT {
 
     @Autowired
     private RouteStopService routeStopService;

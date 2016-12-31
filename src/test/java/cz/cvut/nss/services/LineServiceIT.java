@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author jakubchalupa
  * @since 05.01.15
  */
-public class LineServiceTest extends AbstractServiceTest {
+public class LineServiceIT extends AbstractServiceIT {
 
     @Autowired
     private LineService lineService;
