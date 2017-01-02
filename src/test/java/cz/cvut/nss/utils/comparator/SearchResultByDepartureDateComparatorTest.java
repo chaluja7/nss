@@ -10,9 +10,10 @@ import java.util.List;
 
 /**
  * Search results comparator tests.
+ * Test vyuziva techniky pairwise testing (testuje se jednotlive kombinace parametru objektu)
  *
  * @author jakubchalupa
- * @since 16.05.15
+ * @since 02.01.17
  */
 public class SearchResultByDepartureDateComparatorTest {
 
@@ -105,6 +106,5 @@ public class SearchResultByDepartureDateComparatorTest {
 
         return w1;
     }
-
 
 }

@@ -1,8 +1,9 @@
 package cz.cvut.nss.utils.traversal;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.*;
 
 /**
  * @author jakubchalupa
@@ -10,34 +11,36 @@ import org.junit.Test;
  */
 public class StationRideWrapperTest {
 
-    @Before
-    public void setUp() throws Exception {
+    @Test
+    public void testGetVisitedRides() throws Exception {
+        StationRideWrapper wrapper = new StationRideWrapper();
+        Assert.assertNotNull(wrapper.getVisitedRides());
+        Assert.assertTrue(wrapper.getVisitedRides().isEmpty());
 
-    }
+        Set<Long> set = new HashSet<>();
+        set.add(5L);
+        wrapper.setVisitedRides(set);
 
-    @After
-    public void tearDown() throws Exception {
-
+        Assert.assertNotNull(wrapper.getVisitedRides());
+        Assert.assertEquals(1, wrapper.getVisitedRides().size());
     }
 
     @Test
-    public void getVisitedRides() throws Exception {
+    public void testGetVisitedStations() throws Exception {
+        StationRideWrapper wrapper = new StationRideWrapper();
+        Assert.assertNotNull(wrapper.getVisitedStations());
+        Assert.assertTrue(wrapper.getVisitedStations().isEmpty());
 
-    }
 
-    @Test
-    public void setVisitedRides() throws Exception {
+        List<Long> list = new ArrayList<>();
+        list.add(5L);
 
-    }
+        Map<Long, List<Long>> map = new HashMap<>();
+        map.put(1L, list);
+        wrapper.setVisitedStations(map);
 
-    @Test
-    public void getVisitedStations() throws Exception {
-
-    }
-
-    @Test
-    public void setVisitedStations() throws Exception {
-
+        Assert.assertNotNull(wrapper.getVisitedStations());
+        Assert.assertEquals(1, wrapper.getVisitedStations().size());
     }
 
 }

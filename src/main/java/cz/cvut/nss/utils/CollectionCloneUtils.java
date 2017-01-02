@@ -13,8 +13,9 @@ public class CollectionCloneUtils {
     public static Set<Long> cloneSet(Set<Long> set) {
         Set<Long> clone = new HashSet<>(set.size());
         for(Long item : set) {
-            clone.add(new Long(item));
+            clone.add(item);
         }
+
         return clone;
     }
 
@@ -23,10 +24,10 @@ public class CollectionCloneUtils {
         for (Map.Entry<Long, List<Long>> entry : map.entrySet()) {
             List<Long> cloneList = new ArrayList<>();
             for(Long item : entry.getValue()) {
-                cloneList.add(new Long(item));
+                cloneList.add(item);
             }
 
-            clone.put(new Long(entry.getKey()), cloneList);
+            clone.put(entry.getKey(), cloneList);
         }
 
         return clone;

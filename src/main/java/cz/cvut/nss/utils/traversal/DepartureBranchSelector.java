@@ -100,17 +100,16 @@ public class DepartureBranchSelector implements BranchSelector {
         return result;
     }
 
-    //TODO - je pouze pro ucely ZKS
-//    private boolean timeIsOverMidnight(long startTimeInMillis, long currentTimeInMillis) {
-//        if(!isOneDayMillis(startTimeInMillis) || !isOneDayMillis(currentTimeInMillis)) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        return startTimeInMillis > currentTimeInMillis;
-//    }
-//
-//    private boolean isOneDayMillis(long timeInMillis) {
-//        return timeInMillis >= 0 && timeInMillis < 86400000;
-//    }
+    public static boolean timeIsOverMidnight(long startTimeInMillis, long currentTimeInMillis) {
+        if(!isOneDayMillis(startTimeInMillis) || !isOneDayMillis(currentTimeInMillis)) {
+            throw new IllegalArgumentException();
+        }
+
+        return startTimeInMillis > currentTimeInMillis;
+    }
+
+    public static boolean isOneDayMillis(long timeInMillis) {
+        return timeInMillis >= 0 && timeInMillis < 86400000;
+    }
 
 }

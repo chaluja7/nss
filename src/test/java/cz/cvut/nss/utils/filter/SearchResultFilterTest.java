@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Test vyuziva techniky pairwise testing (testuje se jednotlive kombinace parametru objektu)
+ *
  * @author jakubchalupa
  * @since 30.12.16
  */

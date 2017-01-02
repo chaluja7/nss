@@ -1,0 +1,6 @@
+-1;false;
+0;true;
+1;true;
+86399999;true;
+86400000;false;
+86400001;false;
